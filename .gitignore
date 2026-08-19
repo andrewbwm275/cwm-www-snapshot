@@ -1,2 +1,4 @@
 .DS_Store
 Thumbs.db
+# Mis-saved YouTube watch HTML (not an image); GitHub secret-scanning flags it
+assets/img/2FBKYZ_iDOo.bin
