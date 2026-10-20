@@ -17,6 +17,7 @@ Do not edit [legal.carwashmgmt.com](https://legal.carwashmgmt.com/).
 
 ## Known gaps (same on live)
 - The 4 forms (index, contact, equipment, preventive-maintenance) have no action/backend.
-- Broken links: /blog/* (4 posts), /Testimonials, /Contact?type=chemistry.
+- Broken links: fixed on branch `fix/404-and-dead-links` (Contact?type=chemistry -> contact.html; dead product/blog/testimonial links removed, cards kept).
+- `404.html` (branch `fix/404-and-dead-links`): Pages returns it with HTTP 404 for unknown paths instead of the SPA-style index.html fallback.
 - Touch Free booklet PDF still on Duda (irp.cdn-website.com, 47 MB, over Pages' 25 MiB/file limit).
 - preventive-maintenance.html is live but not linked from any page.
