@@ -28,7 +28,7 @@ Do not edit [legal.carwashmgmt.com](https://legal.carwashmgmt.com/).
   from the repo root; it writes `index.html`, `<page>/index.html`, `404.html`, `sitemap.xml`, `robots.txt`, `_redirects`, `_headers`.
   `_build/` holds no secrets; IT may exclude it from the deploy root like `workers/`.
 - Pages: `/`, `/car-wash-equipment-repair/`, `/car-wash-equipment-installation/`, `/car-wash-maintenance-plans/`,
-  `/urgent-car-wash-repair/` (old `/emergency-car-wash-repair/` 301s here), `/car-wash-equipment-brands/`, `/equipment/`, `/service-area/`, `/chemistry/`, `/about/`, `/contact/`, `/thank-you/` (noindex), `404.html`.
+  `/urgent-car-wash-repair/` (old `/emergency-car-wash-repair/` 301s here), `/car-wash-equipment-brands/`, `/equipment/` (hub) + 7 category pages `/equipment/<slug>/`, `/service-area/`, `/chemistry/`, `/about/`, `/contact/`, `/thank-you/` (noindex), `404.html`.
   Old .html pages were removed and 301/302 to their new equivalents via `_redirects`. `privacy-policy.html` / `terms-and-conditions.html`
   are kept untouched (noindex via `_headers`); the footer links the legal.carwashmgmt.com copies.
 - Fonts: Archivo + Inter (SIL OFL 1.1, licences in `assets/cwm/fonts/`), self-hosted, Latin subset, variable ranges trimmed.
@@ -39,6 +39,10 @@ Do not edit [legal.carwashmgmt.com](https://legal.carwashmgmt.com/).
 - Brands: `_build/brands.py` holds the verified brand list (grouped by category, one anchor id per brand, source URL per brand).
   It feeds the brands page, the homepage chips, the footer and the repair/equipment lists. Text only, no logos, no dealer/partner claims;
   the trademark disclaimer shows wherever brands are listed.
+- Equipment categories: `_build/categories.py` (copy, components, faults, brands, fallback images). FAQ answers come only from the approved
+  facts in `build.py` (phone, hours, same-business-day reply, after-hours line, install/plan wording, service area). If Design's
+  `/workspace/brand/cwm-redesign/images/categories/<slug>/manifest.csv` exists, the build copies that set in (skipping PENDING/ALTERNATE
+  rows and `_pending-clearance`), captions `kind=own` photos "Our job", leaves stock uncaptioned and credits it on `/credits/`.
 - Photos: `assets/cwm/img/photos/` (WebP, 1600w/800w heroes, 1200w/600w others), picked from Design's manifest
   (`/workspace/brand/cwm-redesign/images/manifest.csv`, PICK rows + Andrew's six real-job shots). Registry, alt text and stock
   credits live in `IMG` in `_build/build.py`; stock credits render on `/credits/` (noindex, linked from the footer).

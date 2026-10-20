@@ -242,3 +242,15 @@ section.s{padding:96px 0}
  .hero.home::after,.phero.photo::after{background:linear-gradient(180deg,rgba(11,27,43,.66) 0%,rgba(11,27,43,.90) 45%,rgba(11,27,43,.97) 100%)}
 }
 @media (max-width:700px){.jobs{grid-template-columns:1fr 1fr;gap:10px}.jobs figcaption{font-size:12.5px;left:8px;right:8px;bottom:7px}}
+
+/* Equipment hub + category pages */
+.ecards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:22px 0 10px}
+.ecard .bd{padding:18px}.ecard h3{font-size:22px;margin:0}.ecard h3 a{color:var(--ink);text-decoration:none}.ecard p{font-size:16px;margin:8px 0 12px}
+.ecard .media .ph{height:100%;border-radius:0;border-width:0}
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:6px 0 22px}
+.gal figure{position:relative;aspect-ratio:280/180;border-radius:12px;overflow:hidden;margin:0}
+.gal img{width:100%;height:100%;object-fit:cover;display:block}
+.gal .ph{height:100%;border-radius:12px;font-size:11px}
+.gal figcaption{position:absolute;left:8px;bottom:8px;background:rgba(11,27,43,.85);color:#fff;font:700 11.5px/1 var(--text);letter-spacing:.04em;padding:6px 8px;border-radius:6px}
+.faq h3{font-size:19px;margin:18px 0 6px}
+@media (max-width:700px){.ecards{grid-template-columns:1fr}.gal{grid-template-columns:1fr 1fr}}

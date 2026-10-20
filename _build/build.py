@@ -8,12 +8,16 @@ import html, json, pathlib, re, datetime, sys
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from brands import CATS as BRAND_CATS
+from categories import CATEGORIES
+import csv, shutil, struct
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BASE = "https://www.carwashmgmt.com"
 LASTMOD = "2026-10-20"
 PHONE_D, PHONE_T = "(808) 465-2291", "+18084652291"
 EMAIL = "info@carwashmgmt.com"
 HOURS = "Mon–Fri 8 AM–5 PM PT"
+AREA = "the Southwest United States and Hawaii"
+AREA_LINE = f"We service car washes across {AREA}. Call or text and we’ll tell you straight whether we can reach your site."
 BRANDS_URL = "/car-wash-equipment-brands/"
 TM = ("Brand names are trademarks of their respective owners. Car Wash Management is an independent service company "
       "and is not affiliated with or endorsed by these manufacturers.")
@@ -65,8 +69,10 @@ IMG = {
  "job-05": ("Close-up of a new green and black brush hub", 1200, 771, 600, 385, None),
  "job-06": ("Self-serve bay meter with an out-of-order notice for spot-free rinse", 1200, 771, 600, 386, None),
 }
+USED_IMG = set()
 def img(key, sizes, cls="", lazy=True, prio=False):
     alt, w, h, sw, _sh, _c = IMG[key]
+    USED_IMG.add(key)
     srcset = f"{IMG_DIR}{key}-{w}w.webp {w}w, {IMG_DIR}{key}-{sw}w.webp {sw}w"
     attrs = (' fetchpriority="high"' if prio else "") + (' loading="lazy" decoding="async"' if lazy else "")
     c = f' class="{cls}"' if cls else ""
@@ -91,10 +97,10 @@ def header(path):
 def footer():
     return f'''<footer class="foot"><div class="wrap fgrid">
 <div><a class="logo" href="/"><img src="/assets/cwm/img/cwm-logo-stacked-white.png" alt="Car Wash Management" width="111" height="96"></a><p style="margin-top:14px;max-width:300px">Service and repair for any car wash equipment, plus installation and replacement of equipment and components.</p>
-<p style="margin-top:16px"><a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> · <a href="sms:{PHONE_T}" data-evt="sms_click">call or text</a></p><p><a href="mailto:{EMAIL}">{EMAIL}</a></p><p>Hours: {HOURS}</p></div>
+<p style="margin-top:16px"><a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> · <a href="sms:{PHONE_T}" data-evt="sms_click">call or text</a></p><p><a href="mailto:{EMAIL}">{EMAIL}</a></p><p>Hours: {HOURS}</p><p>Serving the Southwest United States and Hawaii.</p></div>
 <div><h2>Services</h2><p><a href="/car-wash-equipment-repair/">Car wash equipment repair</a></p><p><a href="/car-wash-equipment-installation/">Installation &amp; replacement</a></p><p><a href="/car-wash-maintenance-plans/">Maintenance plans</a></p><p><a href="/urgent-car-wash-repair/">Urgent repair</a></p><p><a href="/chemistry/">Chemistry</a></p></div>
-<div><h2>Company</h2><p><a href="/car-wash-equipment-brands/">Brands we service</a></p><p><a href="/equipment/">Equipment types</a></p><p><a href="/service-area/">Service area</a></p><p><a href="/about/">About</a></p><p><a href="/contact/">Request service</a></p></div>
-<div><h2>Brands we service</h2>{"".join(f'<p><a href="{BRANDS_URL}#{cid}">{short}</a></p>' for cid, _, short, _ in BRAND_CATS)}<p><a href="{BRANDS_URL}">All brands →</a></p></div>
+<div><h2>Company</h2><p><a href="/car-wash-equipment-brands/">Brands we service</a></p><p><a href="/equipment/">Equipment we service</a></p><p><a href="/service-area/">Service area</a></p><p><a href="/about/">About</a></p><p><a href="/contact/">Request service</a></p></div>
+<div><h2>Equipment we service</h2>{"".join(f'<p><a href="/equipment/{c["slug"]}/">{c["short"]}</a></p>' for c in CATEGORIES)}<p><a href="{BRANDS_URL}">Brands we service →</a></p></div>
 </div><div class="wrap">{SMS_OPTIN}
 <div class="fbot">© 2026 Car Wash Management · carwashmgmt.com · <a href="https://legal.carwashmgmt.com/privacy-policy.html">Privacy Policy</a> · <a href="https://legal.carwashmgmt.com/terms-and-conditions.html">Terms &amp; Conditions</a> · <a href="/credits/">Photo credits</a><p class="tm-foot">{TM}</p></div></div></footer>
 <div class="mbar">{call_btn("btn btn-blue", "Call")}{text_btn("btn btn-ghost", "Text")}<a class="btn btn-white" href="/contact/">Request</a></div>'''
@@ -125,12 +131,12 @@ ORG = {"@context": "https://schema.org", "@graph": [
      "logo": BASE + "/assets/cwm/img/cwm-logo-horizontal.png", "telephone": "+1-808-465-2291", "email": EMAIL},
     {"@type": "HomeAndConstructionBusiness", "@id": BASE + "/#business", "name": "Car Wash Management", "url": BASE + "/",
      "image": BASE + "/assets/cwm/img/cwm-logo-horizontal.png", "telephone": "+1-808-465-2291", "email": EMAIL,
-     "parentOrganization": {"@id": BASE + "/#org"}, "areaServed": {"@type": "Place", "name": "Southwest United States"},
+     "parentOrganization": {"@id": BASE + "/#org"}, "areaServed": [{"@type": "Place", "name": "Southwest United States"}, {"@type": "Place", "name": "Hawaii"}],
      "openingHoursSpecification": {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "08:00", "closes": "17:00"}}]}
-def crumbs_ld(path, name):
+def crumbs_ld(path, name, parent=None):
+    trail = [("/", "Home")] + ([parent] if parent else []) + [(path, name)]
     return {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Home", "item": BASE + "/"},
-        {"@type": "ListItem", "position": 2, "name": name, "item": BASE + path}]}
+        {"@type": "ListItem", "position": i, "name": html.unescape(n), "item": BASE + u} for i, (u, n) in enumerate(trail, 1)]}
 
 def page(path, title, desc, body, extra_ld=(), noindex=False, canonical=True):
     assert len(title) <= 60, (path, len(title)); assert len(desc) <= 158, (path, len(desc))
@@ -157,10 +163,10 @@ def downtime():
 <div class="acts">{call_btn("btn btn-ink", PHONE_D)}{text_btn()}</div></div></section>'''
 
 def brand_chips(cls="bcats"):
-    groups = "".join(f'<div class="bcat"><h3><a href="{BRANDS_URL}#{cid}">{short}</a></h3><ul class="chips sm">'
+    groups = "".join(f'<div class="bcat"><h3><a href="{CAT_FOR_BRANDCAT.get(cid, BRANDS_URL + "#" + cid)}">{short}</a></h3><ul class="chips sm">'
                      + "".join(f'<li><a class="chip" href="{BRANDS_URL}#{a}">{n}</a></li>' for n, a, *_ in bs) + '</ul></div>'
                      for cid, _, short, bs in BRAND_CATS)
-    return f'<div class="{cls}">{groups}</div>'
+    return f'<!--brands--><div class="{cls}">{groups}</div><!--/brands-->'
 def brands_block(h="h2"):
     return f'''<section class="brands" aria-labelledby="br-h"><div class="wrap"><div class="eyebrow">Brands &amp; equipment</div><{h} id="br-h">We service and repair any make and model.</{h}>
 <p class="bintro">Tunnel, in-bay, self-serve, vacuum, pay station and water equipment from the brands below, and others too. Don’t see yours? Call or text {PHONE_D}.</p>
@@ -195,17 +201,17 @@ def home():
              ("We’re still there after", "Same number, same team, every time your wash needs us.")]
     stp = "".join(f'<li class="st"><div class="num">{i}</div><h3>{a}</h3><p>{b}</p></li>' for i, (a, b) in enumerate(steps, 1))
     body = f'''<section class="hero home">{hero_bg("home-hero")}<div class="wrap grid"><div>
-<h1>Car Wash Equipment Service, Installation &amp; Support for Any Brand Across the Southwest United States</h1>
+<h1>Car Wash Equipment Service, Installation &amp; Support for Any Brand Across the Southwest United States and Hawaii</h1>
 <p class="hd head">Any equipment.<br>Any problem.<br><em>We’re there for you.</em></p>
 <p class="lead">Car Wash Management services and repairs any car wash equipment, installs and replaces equipment and components, and supports your team, so your wash keeps running and your customers keep coming.</p>
 <div class="btns">{call_btn()}<a class="btn btn-ghost" href="#request">Request Service {I_ARR}</a></div>
-<p class="sms">Serving the Southwest United States. Or text a photo of the problem to <a href="sms:{PHONE_T}" data-evt="sms_click">{PHONE_D}</a> · {HOURS}</p>
+<p class="sms">Serving the Southwest United States and Hawaii. Or text a photo of the problem to <a href="sms:{PHONE_T}" data-evt="sms_click">{PHONE_D}</a> · {HOURS}</p>
 <div class="photos">{img("job-04", "330px")}{img("job-03", "230px")}</div>
 </div><div id="request">{form("home-request", "home-hero")}</div></div></section>
 {downtime()}
 <section class="s" aria-labelledby="wd-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">What we do</div><h2 id="wd-h">Service, installation and support. One team for your whole wash.</h2></div><p>Aging equipment, a part that needs replacing, or a bay that just went down: call one number and we take it from there.</p></div><div class="cards">{cardh}</div></div></section>
 {brands_block()}
-<section class="area" aria-labelledby="ar-h"><div class="wrap"><div class="ahead"><div><div class="eyebrow">Service area</div><h2 id="ar-h">Serving the Southwest United States.</h2></div><p>We service car washes across the Southwest United States. Call or text and we’ll tell you straight whether we can reach your site.</p></div><a class="lnk" href="/service-area/">See our service area →</a></div></section>
+<section class="area" aria-labelledby="ar-h"><div class="wrap"><div class="ahead"><div><div class="eyebrow">Service area</div><h2 id="ar-h">Serving the Southwest United States and Hawaii.</h2></div><p>{AREA_LINE}</p></div><a class="lnk" href="/service-area/">See our service area →</a></div></section>
 <section class="s dark" aria-labelledby="ba-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Our work</div><h2 id="ba-h">Real jobs. Up close. Before and after.</h2></div><p style="color:var(--on-dark)">Close-ups of real repairs, and before/after pairs shot from the same spot.</p></div>
 <h3 class="h3s">From real jobs</h3><div class="jobs">{jobs}</div><h3 class="h3s">Before &amp; after</h3><div class="pairs">{pair * 3}</div></div></section>
 <section class="s" aria-labelledby="rv-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Reviews</div><h2 id="rv-h">What owners say after we leave.</h2></div><p>Real reviews from real wash owners, shared with their permission. {tag("Reviews: placeholder until real reviews exist")}</p></div><div class="rgrid">{rev * 3}</div></div></section>
@@ -213,24 +219,24 @@ def home():
 <section class="s steps" aria-labelledby="hw-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">How it works</div><h2 id="hw-h">From “it’s broken” to running, in four steps.</h2></div></div><ol class="sgrid">{stp}</ol></div></section>
 {final_cta()}'''
     website = {"@context": "https://schema.org", "@type": "WebSite", "@id": BASE + "/#website", "name": "Car Wash Management", "url": BASE + "/", "publisher": {"@id": BASE + "/#org"}}
-    return page("/", "Southwest Car Wash Equipment Service | Car Wash Management",
-                "We service and repair any car wash equipment across the Southwest United States, and install from single parts to complete systems. Call or request a quote.",
+    return page("/", "Southwest & Hawaii Car Wash Service | Car Wash Management",
+                "We service and repair car wash equipment across the Southwest United States and Hawaii, and install single parts to complete systems. Call or request a quote.",
                 body, (website,))
 
 # ---------------- Inner pages ----------------
-def inner(path, crumb, title, desc, h1, lead, content, soon, form_heading="Request service or a quote", extra_ld=()):
+def inner(path, crumb, title, desc, h1, lead, content, soon, form_heading="Request service or a quote", extra_ld=(), parent=None):
     soon_html = f'<div class="soon"><b>Coming soon:</b> {soon}</div>' if soon else ""
     hk = PAGE_HERO.get(path)
-    body = f'''<section class="phero{" photo" if hk else ""}">{hero_bg(hk) if hk else ""}<div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <span aria-current="page">{crumb}</span></nav>
+    body = f'''<section class="phero{" photo" if hk else ""}">{hero_bg(hk) if hk else ""}<div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › {f'<a href="{parent[0]}">{parent[1]}</a> › ' if parent else ""}<span aria-current="page">{crumb}</span></nav>
 <h1>{h1}</h1><p class="lead">{lead}</p><div class="btns">{call_btn()}{text_btn()}<a class="btn btn-ghost" href="#request">Request Service {I_ARR}</a></div></div></section>
 {downtime() if path != "/urgent-car-wash-repair/" else ""}
 <section class="body"><div class="wrap cols"><div class="txt">{content}{soon_html}</div><div id="request">{form(path.strip("/").replace("/", "-") + "-request", path, form_heading, "h2", True)}</div></div></section>'''
-    return page(path, title, desc, body, (crumbs_ld(path, crumb), *extra_ld))
+    return page(path, title, desc, body, (crumbs_ld(path, crumb, parent), *extra_ld))
 
 def facts():
     return f'''<ul class="facts"><li><b>Call or text:</b> <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> (<a href="sms:{PHONE_T}" data-evt="sms_click">text</a>)</li><li><b>Email:</b> <a href="mailto:{EMAIL}">{EMAIL}</a></li><li><b>Hours:</b> {HOURS}</li></ul>'''
 def brand_list():
-    return "<ul class='ticks'>" + "".join(f'<li><a href="{BRANDS_URL}#{cid}">{short}</a>: ' + ", ".join(f'<a href="{BRANDS_URL}#{a}">{n}</a>' for n, a, *_ in bs) + "</li>" for cid, _, short, bs in BRAND_CATS) + f"</ul><p class='tm'>{TM}</p>"
+    return "<!--brands--><ul class='ticks'>" + "".join(f'<li><a href="{BRANDS_URL}#{cid}">{short}</a>: ' + ", ".join(f'<a href="{BRANDS_URL}#{a}">{n}</a>' for n, a, *_ in bs) + "</li>" for cid, _, short, bs in BRAND_CATS) + f"</ul><!--/brands--><p class='tm'>{TM}</p>"
 def service_ld(path, name, stype):
     return {"@context": "https://schema.org", "@type": "Service", "name": name, "serviceType": stype, "url": BASE + path, "provider": {"@id": BASE + "/#business"}}
 
@@ -271,33 +277,116 @@ PAGES["/urgent-car-wash-repair/"] = lambda: inner("/urgent-car-wash-repair/", "W
 <p>Call or text any time. Messages after hours are answered the next business morning.</p><h2>How to reach us</h2>{facts()}''',
     None, "Request urgent service",
     extra_ld=(service_ld("/urgent-car-wash-repair/", "Urgent car wash repair", "Car wash equipment repair"),))
-PAGES["/equipment/"] = lambda: inner("/equipment/", "Equipment Types",
-    "Car Wash Equipment Types We Service | Car Wash Management",
-    "Car Wash Management services and repairs tunnel, in-bay automatic and self-serve equipment, plus dryers, vacuums, pay stations, water and dosing systems.",
-    "Car Wash Equipment Types We Service",
-    "We service and repair any make and model, across every part of the wash.",
-    f'''<h2>Equipment types</h2><ul class="ticks"><li>Tunnel</li><li>In-bay automatic</li><li>Self-serve</li><li>Dryers &amp; blowers</li><li>Vacuums</li><li>Pay stations &amp; controllers</li><li>Water, RO &amp; reclaim</li><li>Chemistry &amp; dosing</li></ul><h2>Brands we service</h2><p>See the full list on our <a href="{BRANDS_URL}">brands we service</a> page.</p>{brand_list()}<h2>How to reach us</h2>{facts()}''',
-    None)
+# ---------------- Equipment hub + category pages ----------------
+CAT_DESIGN_DIR = pathlib.Path("/workspace/brand/cwm-redesign/images/categories")
+def webp_size(fp):
+    b = fp.read_bytes()[:40]
+    if b[12:16] == b"VP8X": return 1 + int.from_bytes(b[24:27], "little"), 1 + int.from_bytes(b[27:30], "little")
+    if b[12:16] == b"VP8L":
+        v = int.from_bytes(b[21:25], "little"); return (v & 0x3FFF) + 1, ((v >> 14) & 0x3FFF) + 1
+    return struct.unpack("<H", b[26:28])[0] & 0x3FFF, struct.unpack("<H", b[28:30])[0] & 0x3FFF
+def design_category(slug):
+    """Use Design's per-category set when it exists: categories/<slug>/manifest.csv with columns incl. filename, slot,
+    alt text, kind (own|stock), photographer, source, license. Rows marked PENDING/ALTERNATE and anything under
+    _pending-clearance are ignored. Files are copied to assets/cwm/img/photos/ as cat-<slug>-<base>-<w>w.webp."""
+    d = CAT_DESIGN_DIR / slug; m = d / "manifest.csv"
+    if not m.exists(): return None
+    rows = [r for r in csv.DictReader(m.open(encoding="utf-8"))
+            if "pending-clearance" not in (r.get("filename") or "") and not re.search(r"PENDING|ALTERNATE", r.get("slot") or "", re.I)
+            and (r.get("filename") or "").endswith(".webp") and (d / r["filename"]).is_file()]
+    groups = {}
+    for r in rows: groups.setdefault(re.sub(r"-\d+w\.webp$", "", pathlib.Path(r["filename"]).name), []).append(r)
+    hero, gallery = None, []
+    for base, rs in groups.items():
+        files = sorted(((webp_size(d / r["filename"]), r) for r in rs), key=lambda t: t[0][0])
+        (sw, sh), _ = files[0]; (w, h), r0 = files[-1]
+        key = f"cat-{slug}-{base}"
+        for (fw, _fh), r in files: shutil.copyfile(d / r["filename"], ROOT / IMG_DIR.strip("/") / f"{key}-{fw}w.webp")
+        lic = r0.get("license") or ""; lm = re.match(r"\s*(.*?)\s*[—-]+\s*(https?://\S+)", lic)
+        credit = None if (r0.get("kind") or "").strip().lower() == "own" else (
+            r0.get("photographer") or "", r0.get("source") or "", lm.group(1) if lm else lic, lm.group(2) if lm else (r0.get("source") or ""))
+        IMG[key] = (r0.get("alt text") or r0.get("alt") or "", w, h, sw, sh, credit)
+        if "hero" in (r0.get("slot") or "").lower() and not hero: hero = key
+        else: gallery.append(key)
+    return hero, gallery
+for c in CATEGORIES:
+    c["path"] = f"/equipment/{c['slug']}/"
+    c["hero"], c["gallery"] = design_category(c["slug"]) or c["images"]
+    if c["hero"]: PAGE_HERO[c["path"]] = c["hero"]
+CAT_FOR_BRANDCAT = {"tunnel": "/equipment/tunnel/", "in-bay": "/equipment/in-bay-automatic/", "self-serve": "/equipment/self-serve/",
+                    "vacuums": "/equipment/vacuums/", "controllers": "/equipment/controllers-pay-stations/", "chemistry-water": "/equipment/"}
+CAT_LINKS = {"tunnel": '<p><a href="/equipment/tunnel/">Tunnel equipment service and repair →</a></p>',
+             "in-bay": '<p><a href="/equipment/in-bay-automatic/">In-bay automatic service and repair →</a></p>',
+             "self-serve": '<p><a href="/equipment/self-serve/">Self-serve equipment service and repair →</a></p>',
+             "vacuums": '<p><a href="/equipment/vacuums/">Vacuum service and repair →</a></p>',
+             "controllers": '<p><a href="/equipment/controllers-pay-stations/">Controller and pay station service and repair →</a></p>',
+             "chemistry-water": '<p><a href="/equipment/chemical-dosing/">Chemical dosing service →</a> · <a href="/equipment/water-reclaim-ro/">Water, reclaim and RO service →</a></p>'}
+BRAND_BY_ANCHOR = {a: n for _, _, _, bs in BRAND_CATS for n, a, *_ in bs}
+def cat_faq(c):
+    n = c["name"]
+    qs = [(f"How do I get my {n} equipment looked at?", f"Call or text {PHONE_D}, or send the request form on this page. We reply the same business day. Hours: {HOURS}."),
+          (f"What if my {n} equipment goes down after hours?", "Call or text any time. Messages after hours are answered the next business morning.")]
+    qs.append((f"Do you install and replace {n} equipment?", "Yes. Installation and replacement of equipment and components, from single parts to complete systems.")
+              if c["extra_q"] == "install" else
+              (f"Do you offer maintenance plans for {n} equipment?", "Yes. Scheduled preventive maintenance visits, priority scheduling and a custom quote for each site."))
+    qs.append((f"Where do you service {n} equipment?", AREA_LINE))
+    return qs
+def gallery(c):
+    keys = c["gallery"]; slots = max(3, -(-len(keys) // 3) * 3)
+    figs = [f'<figure>{img(k, "(max-width:700px) calc(50vw - 27px), 260px")}' + ('<figcaption>Our job</figcaption>' if IMG[k][5] is None else "") + "</figure>" for k in keys]
+    figs += [f'<figure class="gph">{ph(c["short"] + " photo")}</figure>' for _ in range(slots - len(keys))]
+    return f'<div class="gal">{"".join(figs)}</div>'
+def category_page(c):
+    faq = cat_faq(c)
+    brands = "".join(f'<li><a class="chip" href="{BRANDS_URL}#{a}">{BRAND_BY_ANCHOR[a]}</a></li>' for a in c["brands"])
+    content = f'''<h2>What we service</h2><ul class="ticks">{"".join(f"<li>{x}</li>" for x in c["components"])}</ul>
+<h2>Common faults we fix</h2><ul class="ticks">{"".join(f"<li>{x}</li>" for x in c["faults"])}</ul>
+<h2>Photos</h2>{gallery(c)}
+<h2>Brands we service</h2><p>We work on {c["name"]} equipment from these brands, and other makes too. <a href="{BRANDS_URL}">See all brands</a>.</p><!--brands--><ul class="chips sm">{brands}</ul><!--/brands--><p class="tm">{TM}</p>
+<h2>Questions</h2><div class="faq">{"".join(f"<h3>{q}</h3><p>{a}</p>" for q, a in faq)}</div>
+<h2>How to reach us</h2>{facts()}'''
+    faq_ld = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+        {"@type": "Question", "name": html.unescape(q), "acceptedAnswer": {"@type": "Answer", "text": html.unescape(a)}} for q, a in faq]}
+    svc = service_ld(c["path"], html.unescape(c["short"]) + " car wash equipment service and repair", "Car wash equipment repair")
+    return inner(c["path"], c["short"], c["title"], c["desc"], c["h1"], c["lead"], content, None,
+                 "Request service or a quote",
+                 extra_ld=(svc, faq_ld), parent=("/equipment/", "Equipment"))
+for _c in CATEGORIES: PAGES[_c["path"]] = (lambda c=_c: category_page(c))
+def equipment_hub():
+    cards = ""
+    for c in CATEGORIES:
+        k = c["hero"] or (c["gallery"][0] if c["gallery"] else None)
+        media = img(k, "(max-width:700px) calc(100vw - 40px), 270px") if k else ph(c["short"] + " photo")
+        cards += f'''<article class="card ecard"><div class="media">{media}</div><div class="bd"><h3><a href="{c["path"]}">{c["short"]}</a></h3><p>{c["card"]}</p><a class="more" href="{c["path"]}">Service &amp; repair {I_ARR}</a></div></article>'''
+    content = f'''<p>We service and repair car wash equipment across every part of the wash. Pick a category to see what we work on, common faults we fix and the brands we see most.</p>
+<div class="ecards">{cards}</div><h2>Brands we service</h2><p>See the full list on our <a href="{BRANDS_URL}">brands we service</a> page.</p>{brand_list()}<h2>How to reach us</h2>{facts()}'''
+    return inner("/equipment/", "Equipment",
+        "Car Wash Equipment We Service | Car Wash Management",
+        "Car Wash Management services and repairs in-bay automatic, tunnel, self-serve, vacuum, pay station, chemical dosing and water reclaim equipment.",
+        "Car Wash Equipment We Service",
+        "In-bay automatics, tunnels, self-serve bays, vacuums, controllers and pay stations, chemical dosing, and water, reclaim and RO.",
+        content, None)
+PAGES["/equipment/"] = equipment_hub
 def brands_page():
     jump = '<ul class="chips sm">' + "".join(f'<li><a class="chip" href="#{cid}">{short}</a></li>' for cid, _, short, _ in BRAND_CATS) + "</ul>"
-    secs = "".join(f'<h2 id="{cid}">{name}</h2>' + "".join(f'<h3 id="{a}">{n}</h3><p>{txt}</p>' for n, a, _, txt, *_ in bs) for cid, name, _, bs in BRAND_CATS)
+    secs = "<!--brands-->" + "".join(f'<h2 id="{cid}">{name}</h2>' + CAT_LINKS.get(cid, "") + "".join(f'<h3 id="{a}">{n}</h3><p>{txt}</p>' for n, a, _, txt, *_ in bs) for cid, name, _, bs in BRAND_CATS) + "<!--/brands-->"
     content = f'''<p>We repair and service car wash equipment from the brands below, grouped by type. We work on other makes too, so if yours isn’t listed, call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a>.</p>
 {jump}<p class="tm">{TM}</p>{secs}<p class="tm">{TM}</p><h2>How to reach us</h2>{facts()}'''
     svc = service_ld(BRANDS_URL, "Car wash equipment repair and service for all major brands", "Car wash equipment repair")
     svc["description"] = "Repair, troubleshooting, parts replacement and preventive maintenance for tunnel, in-bay automatic, self-serve, vacuum, pay station and water equipment."
     return inner(BRANDS_URL, "Brands We Service",
         "Car Wash Equipment Brands We Service | Car Wash Management",
-        "We repair and service tunnel, in-bay, self-serve, vacuum, pay station and water equipment from Sonny’s, MacNeil, PDQ, Ryko, Washworld and more.",
+        "We repair and service tunnel, in-bay, self-serve, vacuum, pay station and water equipment from Sonny’s, MacNeil, PDQ, Ryko, Belanger and more.",
         "Car Wash Equipment Brands We Service",
         "Repair, troubleshooting, parts replacement and preventive maintenance for the major car wash equipment brands.",
         content, None, extra_ld=(svc,))
 PAGES[BRANDS_URL] = brands_page
 PAGES["/service-area/"] = lambda: inner("/service-area/", "Service Area",
-    "Southwest United States Service Area | Car Wash Management",
-    f"Car Wash Management services car washes across the Southwest United States. Call or text {PHONE_D} to check whether we can reach your site.",
-    "Car Wash Equipment Service Across the Southwest United States",
-    "We service car washes across the Southwest United States. Call or text and we’ll tell you straight whether we can reach your site.",
-    f'''<h2>Where we work</h2><p>We service car washes across the Southwest United States. Call or text and we’ll tell you straight whether we can reach your site.</p><h2>How to reach us</h2>{facts()}''',
+    "Service Area: Southwest US & Hawaii | Car Wash Management",
+    f"Car Wash Management services car washes across the Southwest United States and Hawaii. Call or text {PHONE_D} to check if we can reach your site.",
+    "Car Wash Equipment Service Across the Southwest United States and Hawaii",
+    AREA_LINE,
+    f'''<h2>Where we work</h2><p>{AREA_LINE}</p><h2>How to reach us</h2>{facts()}''',
     None)
 PAGES["/chemistry/"] = lambda: inner("/chemistry/", "Chemistry",
     "Car Wash Chemicals & Chemical Programs | Car Wash Management",
@@ -327,10 +416,10 @@ def contact():
                 body, (crumbs_ld("/contact/", "Request Service"), cp))
 def credits():
     stock = "".join(f'<li><b>{html.escape(IMG[k][0])}</b><br>Photo by {c[0]}, <a href="{c[1]}" rel="nofollow noopener">source</a>, used under the <a href="{c[3]}" rel="nofollow noopener">{c[2]}</a>.</li>'
-                    for k in IMG if (c := IMG[k][5]))
+                    for k in IMG if (c := IMG[k][5]) and k in USED_IMG)
     body = f'''<section class="phero"><div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <span aria-current="page">Photo Credits</span></nav>
 <h1>Photo Credits</h1><p class="lead">Where the photos on this site come from.</p></div></section>
-<section class="body"><div class="wrap"><div class="txt" style="max-width:820px"><h2>Our own photos</h2><p>Photos in the “From real jobs” strip, the service cards, the small photos in the homepage header and the headers of the repair, installation, maintenance plans and urgent repair pages were taken by Car Wash Management.</p>
+<section class="body"><div class="wrap"><div class="txt" style="max-width:820px"><h2>Our own photos</h2><p>Photos captioned “Our job”, the “From real jobs” strip, the service cards, the small photos in the homepage header and the headers of the repair, installation, maintenance plans, urgent repair and equipment category pages (other than the stock photos listed below) were taken by Car Wash Management.</p>
 <h2>Stock photos</h2><p>These are general car wash scenes from free stock libraries. They are not Car Wash Management jobs or sites.</p><ul class="ticks">{stock}</ul></div></div></section>'''
     return page("/credits/", "Photo Credits | Car Wash Management", "Credits and licenses for the stock photos used on carwashmgmt.com.", body, noindex=True)
 def thank_you():
@@ -350,13 +439,14 @@ def write(path, content):
     out.parent.mkdir(parents=True, exist_ok=True); out.write_text(content)
 
 def main():
-    built = {"/": home(), "/contact/": contact(), "/thank-you/": thank_you(), "/credits/": credits()}
+    built = {"/": home(), "/contact/": contact(), "/thank-you/": thank_you()}
     for p, fn in PAGES.items(): built[p] = fn()
+    built["/credits/"] = credits()
     for p, c in built.items(): write(p, c)
     (ROOT / "404.html").write_text(notfound())
     indexable = [p for p in built if p not in ("/thank-you/", "/credits/")]
     order = ["/", "/car-wash-equipment-repair/", "/car-wash-equipment-installation/", "/car-wash-maintenance-plans/", "/urgent-car-wash-repair/",
-             "/car-wash-equipment-brands/", "/equipment/", "/service-area/", "/chemistry/", "/about/", "/contact/"]
+             "/car-wash-equipment-brands/", "/equipment/", *[f"/equipment/{c['slug']}/" for c in CATEGORIES], "/service-area/", "/chemistry/", "/about/", "/contact/"]
     assert sorted(order) == sorted(indexable)
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
         f"  <url><loc>{BASE}{p}</loc><lastmod>{LASTMOD}</lastmod></url>\n" for p in order) + "</urlset>\n"
