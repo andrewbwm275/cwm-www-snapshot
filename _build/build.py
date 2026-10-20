@@ -4,16 +4,17 @@ Run from the repo root:  python3 _build/build.py
 Writes index.html, <page>/index.html, 404.html, sitemap.xml, robots.txt, _redirects, _headers.
 Plain Python 3, no dependencies. Shared header/footer live here; page copy lives in PAGES below.
 Rules: confirmed facts only; all proof is labeled PLACEHOLDER; no stats, testimonials or logos invented."""
-import html, json, pathlib, re, datetime
+import html, json, pathlib, re, datetime, sys
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from brands import CATS as BRAND_CATS
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BASE = "https://www.carwashmgmt.com"
 LASTMOD = "2026-10-20"
 PHONE_D, PHONE_T = "(808) 465-2291", "+18084652291"
 EMAIL = "info@carwashmgmt.com"
 HOURS = "Mon–Fri 8 AM–5 PM PT"
-BRANDS = [("WashWorld", "In-bay automatic systems"), ("MacNeil", "Tunnel equipment"), ("Unitec/DRB", "Pay stations & wash controllers"),
-          ("AXEON", "Reverse osmosis"), ("HECO", "Gear drives"), ("Ryko", "In-bay automatic systems"),
-          ("Cat Pumps", "High-pressure pumps"), ("Grundfos", "Water pumps")]
+BRANDS_URL = "/car-wash-equipment-brands/"
 TM = ("Brand names are trademarks of their respective owners. Car Wash Management is an independent service company "
       "and is not affiliated with or endorsed by these manufacturers.")
 # SMS opt-in small print: kept exactly as on the current site (fix/404-and-dead-links footer), option (a).
@@ -23,7 +24,7 @@ SMS_OPTIN = """<aside id="sms-opt-in" class="sms-optin">
   <p>We do not share, sell, or provide your mobile phone number or messaging consent data to third parties or affiliates for marketing or promotional purposes. <a href="https://legal.carwashmgmt.com/privacy-policy.html">Privacy Policy</a> · <a href="https://legal.carwashmgmt.com/terms-and-conditions.html">Terms &amp; Conditions</a>.</p>
 </aside>"""
 NAV = [("/car-wash-equipment-repair/", "Repair"), ("/car-wash-equipment-installation/", "Installation"),
-       ("/car-wash-maintenance-plans/", "Maintenance Plans"), ("/equipment/", "Equipment &amp; Brands"),
+       ("/car-wash-maintenance-plans/", "Maintenance Plans"), (BRANDS_URL, "Brands"),
        ("/service-area/", "Service Area"), ("/chemistry/", "Chemistry"), ("/about/", "About")]
 I_PHONE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>'
 I_SMS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
@@ -55,8 +56,8 @@ def footer():
 <div><a class="logo" href="/"><img src="/assets/cwm/img/cwm-logo-stacked-white.png" alt="Car Wash Management" width="111" height="96"></a><p style="margin-top:14px;max-width:300px">Service and repair for any car wash equipment, plus installation and replacement of equipment and components.</p>
 <p style="margin-top:16px"><a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> · <a href="sms:{PHONE_T}" data-evt="sms_click">call or text</a></p><p><a href="mailto:{EMAIL}">{EMAIL}</a></p><p>Hours: {HOURS}</p></div>
 <div><h2>Services</h2><p><a href="/car-wash-equipment-repair/">Car wash equipment repair</a></p><p><a href="/car-wash-equipment-installation/">Installation &amp; replacement</a></p><p><a href="/car-wash-maintenance-plans/">Maintenance plans</a></p><p><a href="/urgent-car-wash-repair/">Urgent repair</a></p><p><a href="/chemistry/">Chemistry</a></p></div>
-<div><h2>Company</h2><p><a href="/equipment/">Equipment &amp; brands</a></p><p><a href="/service-area/">Service area</a></p><p><a href="/about/">About</a></p><p><a href="/contact/">Request service</a></p></div>
-<div><h2>Brands we service</h2>{"".join(f"<p>{b}</p>" for b, _ in BRANDS)}</div>
+<div><h2>Company</h2><p><a href="/car-wash-equipment-brands/">Brands we service</a></p><p><a href="/equipment/">Equipment types</a></p><p><a href="/service-area/">Service area</a></p><p><a href="/about/">About</a></p><p><a href="/contact/">Request service</a></p></div>
+<div><h2>Brands we service</h2>{"".join(f'<p><a href="{BRANDS_URL}#{cid}">{short}</a></p>' for cid, _, short, _ in BRAND_CATS)}<p><a href="{BRANDS_URL}">All brands →</a></p></div>
 </div><div class="wrap">{SMS_OPTIN}
 <div class="fbot">© 2026 Car Wash Management · carwashmgmt.com · <a href="https://legal.carwashmgmt.com/privacy-policy.html">Privacy Policy</a> · <a href="https://legal.carwashmgmt.com/terms-and-conditions.html">Terms &amp; Conditions</a><p class="tm-foot">{TM}</p></div></div></footer>
 <div class="mbar">{call_btn("btn btn-blue", "Call")}{text_btn("btn btn-ghost", "Text")}<a class="btn btn-white" href="/contact/">Request</a></div>'''
@@ -118,11 +119,15 @@ def downtime():
     return f'''<section class="downtime" aria-labelledby="dt-h"><div class="wrap"><div class="pulse" aria-hidden="true"></div><div><h2 id="dt-h">Wash down? Call now.</h2><p>Every hour down costs you cars. Call or text and tell us what stopped. Call or text any time. Messages after hours are answered the next business morning. <a href="/urgent-car-wash-repair/">Urgent repair →</a></p></div>
 <div class="acts">{call_btn("btn btn-ink", PHONE_D)}{text_btn()}</div></div></section>'''
 
+def brand_chips(cls="bcats"):
+    groups = "".join(f'<div class="bcat"><h3><a href="{BRANDS_URL}#{cid}">{short}</a></h3><ul class="chips sm">'
+                     + "".join(f'<li><a class="chip" href="{BRANDS_URL}#{a}">{n}</a></li>' for n, a, *_ in bs) + '</ul></div>'
+                     for cid, _, short, bs in BRAND_CATS)
+    return f'<div class="{cls}">{groups}</div>'
 def brands_block(h="h2"):
-    tiles = "".join(f'<li class="btile">{b}</li>' for b, _ in BRANDS)
-    chips = "".join(f'<a href="/equipment/" class="chip">{c}</a>' for c in ["Tunnel", "In-bay automatic", "Self-serve", "Dryers &amp; blowers", "Vacuums", "Water &amp; reclaim", "Chemistry &amp; dosing"])
     return f'''<section class="brands" aria-labelledby="br-h"><div class="wrap"><div class="eyebrow">Brands &amp; equipment</div><{h} id="br-h">We service and repair any make and model.</{h}>
-<div class="chips">{chips}{tag("Equipment list: Andrew to confirm")}</div><ul class="bgrid">{tiles}</ul><p class="tm">{TM}</p><a class="lnk" href="/equipment/">See the equipment &amp; brands we service →</a></div></section>'''
+<p class="bintro">Tunnel, in-bay, self-serve, vacuum, pay station and water equipment from the brands below, and others too. Don’t see yours? Call or text {PHONE_D}.</p>
+{brand_chips()}<p class="tm">{TM}</p><a class="lnk" href="{BRANDS_URL}">See all the brands we service →</a></div></section>'''
 
 def final_cta():
     return f'''<section class="final" aria-labelledby="fin-h"><div class="wrap grid"><div><div class="eyebrow" style="color:var(--sky)">Get help today</div><h2 id="fin-h" style="margin-top:14px">Let’s get your wash running right.</h2><p>Call or text {PHONE_D}, or send the form. Tell us your equipment and what’s going on.</p>
@@ -186,7 +191,7 @@ def inner(path, crumb, title, desc, h1, lead, content, soon, form_heading="Reque
 def facts():
     return f'''<ul class="facts"><li><b>Call or text:</b> <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> (<a href="sms:{PHONE_T}" data-evt="sms_click">text</a>)</li><li><b>Email:</b> <a href="mailto:{EMAIL}">{EMAIL}</a></li><li><b>Hours:</b> {HOURS}</li></ul>'''
 def brand_list():
-    return "<ul class='ticks'>" + "".join(f"<li>{b} <span style='font-weight:400;color:var(--muted)'>· {c}</span></li>" for b, c in BRANDS) + f"</ul><p class='tm'>{TM}</p>"
+    return "<ul class='ticks'>" + "".join(f'<li><a href="{BRANDS_URL}#{cid}">{short}</a>: ' + ", ".join(f'<a href="{BRANDS_URL}#{a}">{n}</a>' for n, a, *_ in bs) + "</li>" for cid, _, short, bs in BRAND_CATS) + f"</ul><p class='tm'>{TM}</p>"
 def service_ld(path, name, stype):
     return {"@context": "https://schema.org", "@type": "Service", "name": name, "serviceType": stype, "url": BASE + path, "provider": {"@id": BASE + "/#business"}}
 
@@ -227,13 +232,27 @@ PAGES["/urgent-car-wash-repair/"] = lambda: inner("/urgent-car-wash-repair/", "W
 <p>Call or text any time. Messages after hours are answered the next business morning.</p><h2>How to reach us</h2>{facts()}''',
     None, "Request urgent service",
     extra_ld=(service_ld("/urgent-car-wash-repair/", "Urgent car wash repair", "Car wash equipment repair"),))
-PAGES["/equipment/"] = lambda: inner("/equipment/", "Equipment &amp; Brands",
-    "Car Wash Equipment & Brands We Service | Car Wash Management",
-    "Car Wash Management services and repairs any make of car wash equipment, including WashWorld, MacNeil, Unitec/DRB, AXEON, HECO, Ryko and more.",
-    "Car Wash Equipment &amp; Brands We Service",
-    "We service and repair any make and model. These are brands our techs work on.",
-    f'''<h2>Brands we service</h2>{brand_list()}<h2>Equipment types</h2><ul class="ticks"><li>Tunnel</li><li>In-bay automatic</li><li>Self-serve</li><li>Dryers &amp; blowers</li><li>Vacuums</li><li>Water &amp; reclaim</li><li>Chemistry &amp; dosing</li></ul><p>{tag("Equipment types list: Andrew to confirm")}</p><h2>How to reach us</h2>{facts()}''',
-    "brand-by-brand pages and the equipment we install and replace.")
+PAGES["/equipment/"] = lambda: inner("/equipment/", "Equipment Types",
+    "Car Wash Equipment Types We Service | Car Wash Management",
+    "Car Wash Management services and repairs tunnel, in-bay automatic and self-serve equipment, plus dryers, vacuums, pay stations, water and dosing systems.",
+    "Car Wash Equipment Types We Service",
+    "We service and repair any make and model, across every part of the wash.",
+    f'''<h2>Equipment types</h2><ul class="ticks"><li>Tunnel</li><li>In-bay automatic</li><li>Self-serve</li><li>Dryers &amp; blowers</li><li>Vacuums</li><li>Pay stations &amp; controllers</li><li>Water, RO &amp; reclaim</li><li>Chemistry &amp; dosing</li></ul><h2>Brands we service</h2><p>See the full list on our <a href="{BRANDS_URL}">brands we service</a> page.</p>{brand_list()}<h2>How to reach us</h2>{facts()}''',
+    None)
+def brands_page():
+    jump = '<ul class="chips sm">' + "".join(f'<li><a class="chip" href="#{cid}">{short}</a></li>' for cid, _, short, _ in BRAND_CATS) + "</ul>"
+    secs = "".join(f'<h2 id="{cid}">{name}</h2>' + "".join(f'<h3 id="{a}">{n}</h3><p>{txt}</p>' for n, a, _, txt, *_ in bs) for cid, name, _, bs in BRAND_CATS)
+    content = f'''<p>We repair and service car wash equipment from the brands below, grouped by type. We work on other makes too, so if yours isn’t listed, call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a>.</p>
+{jump}<p class="tm">{TM}</p>{secs}<p class="tm">{TM}</p><h2>How to reach us</h2>{facts()}'''
+    svc = service_ld(BRANDS_URL, "Car wash equipment repair and service for all major brands", "Car wash equipment repair")
+    svc["description"] = "Repair, troubleshooting, parts replacement and preventive maintenance for tunnel, in-bay automatic, self-serve, vacuum, pay station and water equipment."
+    return inner(BRANDS_URL, "Brands We Service",
+        "Car Wash Equipment Brands We Service | Car Wash Management",
+        "We repair and service tunnel, in-bay, self-serve, vacuum, pay station and water equipment from Sonny’s, MacNeil, PDQ, Ryko, Washworld and more.",
+        "Car Wash Equipment Brands We Service",
+        "Repair, troubleshooting, parts replacement and preventive maintenance for the major car wash equipment brands.",
+        content, None, extra_ld=(svc,))
+PAGES[BRANDS_URL] = brands_page
 PAGES["/service-area/"] = lambda: inner("/service-area/", "Service Area",
     "Southwest United States Service Area | Car Wash Management",
     f"Car Wash Management services car washes across the Southwest United States. Call or text {PHONE_D} to check whether we can reach your site.",
@@ -290,7 +309,7 @@ def main():
     (ROOT / "404.html").write_text(notfound())
     indexable = [p for p in built if p != "/thank-you/"]
     order = ["/", "/car-wash-equipment-repair/", "/car-wash-equipment-installation/", "/car-wash-maintenance-plans/", "/urgent-car-wash-repair/",
-             "/equipment/", "/service-area/", "/chemistry/", "/about/", "/contact/"]
+             "/car-wash-equipment-brands/", "/equipment/", "/service-area/", "/chemistry/", "/about/", "/contact/"]
     assert sorted(order) == sorted(indexable)
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
         f"  <url><loc>{BASE}{p}</loc><lastmod>{LASTMOD}</lastmod></url>\n" for p in order) + "</urlset>\n"
