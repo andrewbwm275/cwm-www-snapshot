@@ -21,12 +21,8 @@ AREA_LINE = f"We service car washes across {AREA}. Call or text and we’ll tell
 BRANDS_URL = "/car-wash-equipment-brands/"
 TM = ("Brand names are trademarks of their respective owners. Car Wash Management is an independent service company "
       "and is not affiliated with or endorsed by these manufacturers.")
-# SMS opt-in small print: kept exactly as on the current site (fix/404-and-dead-links footer), option (a).
-SMS_OPTIN = """<aside id="sms-opt-in" class="sms-optin">
-  <p>The only way to opt in to Car Wash Management customer-care texts is to text the keyword <strong>START</strong> to <strong>+1 619-914-6819</strong>. Keyword-only. No website form, checkbox, paper form, or in-person consent. Consent is not a condition of purchase.</p>
-  <p>Reply <strong>STOP</strong> to opt out. Reply <strong>HELP</strong> for help, email <a href="mailto:info@carwashmgmt.com">info@carwashmgmt.com</a>, or call <a href="tel:+18084652291" data-evt="tel_click">808-465-2291</a>. Message frequency varies. You may receive up to 8 customer-care messages per month, plus replies. Message and data rates may apply.</p>
-  <p>We do not share, sell, or provide your mobile phone number or messaging consent data to third parties or affiliates for marketing or promotional purposes. <a href="https://legal.carwashmgmt.com/privacy-policy.html">Privacy Policy</a> · <a href="https://legal.carwashmgmt.com/terms-and-conditions.html">Terms &amp; Conditions</a>.</p>
-</aside>"""
+# SMS opt-in block removed per Andrew 10/20/2026 (no "Text START to +1 619-914-6819" on carwashmgmt.com).
+SMS_OPTIN = ""
 NAV = [("/car-wash-equipment-repair/", "Repair"), ("/car-wash-equipment-installation/", "Installation"),
        ("/car-wash-maintenance-plans/", "Maintenance Plans"), (BRANDS_URL, "Brands"),
        ("/service-area/", "Service Area"), ("/chemistry/", "Chemistry"), ("/about/", "About")]
