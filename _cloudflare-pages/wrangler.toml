@@ -1,0 +1,19 @@
+name = "cwm-www"
+pages_build_output_dir = "../site"
+compatibility_date = "2026-01-20"
+
+[vars]
+LEAD_TO = "andrew@carwashmgmt.com"
+LEAD_FROM = "leads@forms.carwashmgmt.com"
+ALLOWED_ORIGINS = "https://ambrsystems-www.pages.dev,https://*.ambrsystems-www.pages.dev,https://cwm-www.pages.dev,https://*.cwm-www.pages.dev"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "site-forms"
+database_id = "764f62e9-cb8b-4c4f-8531-49734bd31d54"
+
+# Email: add once Email Sending is onboarded for forms.carwashmgmt.com (needs Andrew's yes for DNS):
+# [[send_email]]
+# name = "EMAIL"
+# allowed_destination_addresses = ["andrew@carwashmgmt.com"]
+# Secrets (wrangler pages secret put, never committed): TURNSTILE_SECRET, IP_HASH_SALT
