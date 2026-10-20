@@ -39,6 +39,43 @@ def ph(label, dark=False, cls=""):
     return f'<div class="ph{" dark" if dark else ""} {cls}" role="img" aria-label="Placeholder: {html.escape(label)}"><span>PLACEHOLDER: {label}</span></div>'
 def tag(t): return f'<span class="tag-ph">{t}</span>'
 
+# Photos (Design manifest /workspace/brand/cwm-redesign/images/manifest.csv: PICK rows + Andrew's real-job strip).
+# key: (alt text from manifest, large w, large h, small w, small h, stock credit or None). Stock is never captioned as our work.
+IMG_DIR = "/assets/cwm/img/photos/"
+PEXELS = ("Pexels License", "https://www.pexels.com/license/")
+UNSPLASH = ("Unsplash License", "https://unsplash.com/license")
+IMG = {
+ "home-hero": ("Red car in an automatic tunnel wash between red and blue cloth brushes, covered in soap", 1600, 900, 800, 450,
+               ("Pixabay (via Pexels)", "https://www.pexels.com/photo/red-and-black-banner-210627/", *PEXELS)),
+ "chemistry-page-hero": ("Close-up of blue soap foam bubbles", 1600, 900, 800, 450,
+               ("Julia Ly", "https://unsplash.com/photos/blue-bubbles-on-a-white-surface-lkp-b-kfdwc", *UNSPLASH)),
+ "hero-repair": ("Wrap brush and swing arm inside a car wash tunnel", 1600, 900, 800, 450, None),
+ "hero-installation": ("New shrink-wrapped cloth brushes staged for installation", 1600, 900, 800, 450, None),
+ "hero-maintenance": ("Inside a car wash tunnel: brushes, conveyor and overhead plumbing", 1600, 900, 800, 450, None),
+ "hero-urgent": ("Wash stopped with the conveyor pit open, tech standing by (no face visible)", 1600, 900, 800, 450, None),
+ "card-repair": ("Blue foam wrap brush on its swing arm inside a car wash tunnel", 1200, 649, 600, 324, None),
+ "card-installation": ("New green and black cloth brushes still in shrink wrap, ready for installation", 1200, 649, 600, 324, None),
+ "card-support": ("Inside a car wash tunnel: red top brush, wrap brushes, conveyor and overhead plumbing", 1200, 649, 600, 324, None),
+ "chemistry": ("Car covered in thick white foam with red paint showing through, wheel in the foreground", 1200, 739, 600, 370,
+               ("Erik Mclean", "https://www.pexels.com/photo/red-acura-integra-car-covered-in-foam-20856507/", *PEXELS)),
+ "job-01": ("Red cloth brush during a tunnel repair", 1200, 771, 600, 386, None),
+ "job-02": ("New blue cloth strips laid out before install", 1200, 771, 600, 386, None),
+ "job-03": ("Close-up of a blue foam wrap brush hub", 1200, 771, 600, 386, None),
+ "job-04": ("Open conveyor pit during a repair, tech standing by (no face visible)", 1200, 771, 600, 386, None),
+ "job-05": ("Close-up of a new green and black brush hub", 1200, 771, 600, 385, None),
+ "job-06": ("Self-serve bay meter with an out-of-order notice for spot-free rinse", 1200, 771, 600, 386, None),
+}
+def img(key, sizes, cls="", lazy=True, prio=False):
+    alt, w, h, sw, _sh, _c = IMG[key]
+    srcset = f"{IMG_DIR}{key}-{w}w.webp {w}w, {IMG_DIR}{key}-{sw}w.webp {sw}w"
+    attrs = (' fetchpriority="high"' if prio else "") + (' loading="lazy" decoding="async"' if lazy else "")
+    c = f' class="{cls}"' if cls else ""
+    return f'<img{c} src="{IMG_DIR}{key}-{sw}w.webp" srcset="{srcset}" sizes="{sizes}" width="{w}" height="{h}" alt="{html.escape(alt)}"{attrs}>'
+def hero_bg(key):
+    return f'<picture class="hbg">{img(key, "100vw", lazy=False, prio=True)}</picture>'
+PAGE_HERO = {"/car-wash-equipment-repair/": "hero-repair", "/car-wash-equipment-installation/": "hero-installation",
+             "/car-wash-maintenance-plans/": "hero-maintenance", "/urgent-car-wash-repair/": "hero-urgent", "/chemistry/": "chemistry-page-hero"}
+
 CSS = (ROOT / "_build/site.css").read_text()
 CSS = re.sub(r"/\*.*?\*/", "", CSS, flags=re.S); CSS = re.sub(r"\s*\n\s*", "", CSS)
 
@@ -59,7 +96,7 @@ def footer():
 <div><h2>Company</h2><p><a href="/car-wash-equipment-brands/">Brands we service</a></p><p><a href="/equipment/">Equipment types</a></p><p><a href="/service-area/">Service area</a></p><p><a href="/about/">About</a></p><p><a href="/contact/">Request service</a></p></div>
 <div><h2>Brands we service</h2>{"".join(f'<p><a href="{BRANDS_URL}#{cid}">{short}</a></p>' for cid, _, short, _ in BRAND_CATS)}<p><a href="{BRANDS_URL}">All brands →</a></p></div>
 </div><div class="wrap">{SMS_OPTIN}
-<div class="fbot">© 2026 Car Wash Management · carwashmgmt.com · <a href="https://legal.carwashmgmt.com/privacy-policy.html">Privacy Policy</a> · <a href="https://legal.carwashmgmt.com/terms-and-conditions.html">Terms &amp; Conditions</a><p class="tm-foot">{TM}</p></div></div></footer>
+<div class="fbot">© 2026 Car Wash Management · carwashmgmt.com · <a href="https://legal.carwashmgmt.com/privacy-policy.html">Privacy Policy</a> · <a href="https://legal.carwashmgmt.com/terms-and-conditions.html">Terms &amp; Conditions</a> · <a href="/credits/">Photo credits</a><p class="tm-foot">{TM}</p></div></div></footer>
 <div class="mbar">{call_btn("btn btn-blue", "Call")}{text_btn("btn btn-ghost", "Text")}<a class="btn btn-white" href="/contact/">Request</a></div>'''
 
 REQ_TYPES = ["Repair", "Installation or replacement", "Maintenance plan", "Urgent / wash is down", "Chemistry", "Other"]
@@ -147,8 +184,9 @@ def home():
          "Ongoing support for your equipment, with one number to call or text when something isn’t right.",
          ["Scheduled preventive maintenance visits", "Priority scheduling", "A custom quote for each site"]),
     ]
-    cardh = "".join(f'''<article class="card">{ph("real job photo")}<div class="bd"><h3><span class="n">{n}</span>{t}</h3><p>{d}</p><ul class="ticks">{"".join(f"<li>{x}</li>" for x in li)}</ul><a class="more" href="{u}">{a} {I_ARR}</a></div></article>''' for n, t, u, a, d, li in cards)
-    closeups = "".join(ph("repair close-up (real job photo)", True) for _ in range(8))
+    card_img = {"01": "card-repair", "02": "card-installation", "03": "card-support"}
+    cardh = "".join(f'''<article class="card"><div class="media">{img(card_img[n], "(max-width:700px) calc(100vw - 40px), 369px")}</div><div class="bd"><h3><span class="n">{n}</span>{t}</h3><p>{d}</p><ul class="ticks">{"".join(f"<li>{x}</li>" for x in li)}</ul><a class="more" href="{u}">{a} {I_ARR}</a></div></article>''' for n, t, u, a, d, li in cards)
+    jobs = "".join(f'<figure>{img(k, "(max-width:700px) calc(50vw - 27px), 360px")}<figcaption>{IMG[k][0].replace(" (no face visible)", "")}</figcaption></figure>' for k in ["job-01", "job-02", "job-03", "job-04", "job-05", "job-06"])
     pair = f'''<div class="pair"><div class="two">{ph("before (real job photo)", True)}{ph("after, same angle", True)}<span class="lbl lb">BEFORE</span><span class="lbl la">AFTER</span></div><p class="cap">{tag("PLACEHOLDER caption: equipment · what was wrong · what we did")}</p></div>'''
     rev = f'''<div class="rev">{tag("PLACEHOLDER REVIEW: real customer review, used with permission (Andrew to supply)")}<div class="q" aria-hidden="true">“</div><div class="ln"></div><div class="ln"></div><div class="ln" style="width:70%"></div><div class="who"><div class="av"></div><div><b>Customer name</b>Wash name · city</div></div></div>'''
     steps = [("Call, text or send the form", "Tell us your equipment and what’s happening. A photo of the problem helps."),
@@ -156,22 +194,22 @@ def home():
              ("We repair, replace or set up a plan", "The work gets done, and your team knows what changed."),
              ("We’re still there after", "Same number, same team, every time your wash needs us.")]
     stp = "".join(f'<li class="st"><div class="num">{i}</div><h3>{a}</h3><p>{b}</p></li>' for i, (a, b) in enumerate(steps, 1))
-    body = f'''<section class="hero"><div class="wrap grid"><div>
+    body = f'''<section class="hero home">{hero_bg("home-hero")}<div class="wrap grid"><div>
 <h1>Car Wash Equipment Service, Installation &amp; Support for Any Brand Across the Southwest United States</h1>
 <p class="hd head">Any equipment.<br>Any problem.<br><em>We’re there for you.</em></p>
 <p class="lead">Car Wash Management services and repairs any car wash equipment, installs and replaces equipment and components, and supports your team, so your wash keeps running and your customers keep coming.</p>
 <div class="btns">{call_btn()}<a class="btn btn-ghost" href="#request">Request Service {I_ARR}</a></div>
 <p class="sms">Serving the Southwest United States. Or text a photo of the problem to <a href="sms:{PHONE_T}" data-evt="sms_click">{PHONE_D}</a> · {HOURS}</p>
-<div class="photos">{ph("real job photo (tech at work)", True)}{ph("real job photo", True)}</div>
+<div class="photos">{img("job-04", "330px")}{img("job-03", "230px")}</div>
 </div><div id="request">{form("home-request", "home-hero")}</div></div></section>
 {downtime()}
 <section class="s" aria-labelledby="wd-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">What we do</div><h2 id="wd-h">Service, installation and support. One team for your whole wash.</h2></div><p>Aging equipment, a part that needs replacing, or a bay that just went down: call one number and we take it from there.</p></div><div class="cards">{cardh}</div></div></section>
 {brands_block()}
 <section class="area" aria-labelledby="ar-h"><div class="wrap"><div class="ahead"><div><div class="eyebrow">Service area</div><h2 id="ar-h">Serving the Southwest United States.</h2></div><p>We service car washes across the Southwest United States. Call or text and we’ll tell you straight whether we can reach your site.</p></div><a class="lnk" href="/service-area/">See our service area →</a></div></section>
-<section class="s dark" aria-labelledby="ba-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Our work</div><h2 id="ba-h">Real jobs. Up close. Before and after.</h2></div><p style="color:var(--on-dark)">Close-ups of real repairs, and before/after pairs shot from the same spot. {tag("Photos: Andrew to approve")}</p></div>
-<h3 class="h3s">Repair close-ups</h3><div class="closeups">{closeups}</div><h3 class="h3s">Before &amp; after</h3><div class="pairs">{pair * 3}</div></div></section>
+<section class="s dark" aria-labelledby="ba-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Our work</div><h2 id="ba-h">Real jobs. Up close. Before and after.</h2></div><p style="color:var(--on-dark)">Close-ups of real repairs, and before/after pairs shot from the same spot.</p></div>
+<h3 class="h3s">From real jobs</h3><div class="jobs">{jobs}</div><h3 class="h3s">Before &amp; after</h3><div class="pairs">{pair * 3}</div></div></section>
 <section class="s" aria-labelledby="rv-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Reviews</div><h2 id="rv-h">What owners say after we leave.</h2></div><p>Real reviews from real wash owners, shared with their permission. {tag("Reviews: placeholder until real reviews exist")}</p></div><div class="rgrid">{rev * 3}</div></div></section>
-<section class="chem" aria-labelledby="ch-h" style="background:var(--mist)"><div class="wrap cg"><div>{ph("real job photo (chemistry setup or dosing station)")}</div><div><div class="eyebrow">Chemistry</div><h2 id="ch-h">Chemistry tailored to your wash by a real chemist.</h2><p>CWM Ceramic Wax, made by Car Wash Management.</p><p style="margin-top:10px">We also service chemical injectors and dosing equipment.</p><a class="lnk" href="/chemistry/">Car wash chemicals &amp; programs →</a></div></div></section>
+<section class="chem" aria-labelledby="ch-h" style="background:var(--mist)"><div class="wrap cg"><div class="cimg">{img("chemistry", "(max-width:700px) calc(100vw - 40px), 552px")}</div><div><div class="eyebrow">Chemistry</div><h2 id="ch-h">Chemistry tailored to your wash by a real chemist.</h2><p>CWM Ceramic Wax, made by Car Wash Management.</p><p style="margin-top:10px">We also service chemical injectors and dosing equipment.</p><a class="lnk" href="/chemistry/">Car wash chemicals &amp; programs →</a></div></div></section>
 <section class="s steps" aria-labelledby="hw-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">How it works</div><h2 id="hw-h">From “it’s broken” to running, in four steps.</h2></div></div><ol class="sgrid">{stp}</ol></div></section>
 {final_cta()}'''
     website = {"@context": "https://schema.org", "@type": "WebSite", "@id": BASE + "/#website", "name": "Car Wash Management", "url": BASE + "/", "publisher": {"@id": BASE + "/#org"}}
@@ -182,7 +220,8 @@ def home():
 # ---------------- Inner pages ----------------
 def inner(path, crumb, title, desc, h1, lead, content, soon, form_heading="Request service or a quote", extra_ld=()):
     soon_html = f'<div class="soon"><b>Coming soon:</b> {soon}</div>' if soon else ""
-    body = f'''<section class="phero"><div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <span aria-current="page">{crumb}</span></nav>
+    hk = PAGE_HERO.get(path)
+    body = f'''<section class="phero{" photo" if hk else ""}">{hero_bg(hk) if hk else ""}<div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <span aria-current="page">{crumb}</span></nav>
 <h1>{h1}</h1><p class="lead">{lead}</p><div class="btns">{call_btn()}{text_btn()}<a class="btn btn-ghost" href="#request">Request Service {I_ARR}</a></div></div></section>
 {downtime() if path != "/urgent-car-wash-repair/" else ""}
 <section class="body"><div class="wrap cols"><div class="txt">{content}{soon_html}</div><div id="request">{form(path.strip("/").replace("/", "-") + "-request", path, form_heading, "h2", True)}</div></div></section>'''
@@ -265,7 +304,7 @@ PAGES["/chemistry/"] = lambda: inner("/chemistry/", "Chemistry",
     "Chemistry tailored to your wash by a real chemist. CWM Ceramic Wax, made by Car Wash Management. Call, text or request pricing.",
     "Car Wash Chemicals &amp; Chemical Programs",
     "Chemistry tailored to your wash by a real chemist.",
-    f'''<h2>Our own product</h2><p>CWM Ceramic Wax, made by Car Wash Management.</p><h2>Dosing equipment</h2><p>We service chemical injectors and dosing equipment as part of our repair work.</p><p>Ask us about the chemistry for your wash.</p><h2>How to reach us</h2>{facts()}''',
+    f'''<div class="cimg inl">{img("chemistry", "(max-width:700px) calc(100vw - 40px), 560px")}</div><h2>Our own product</h2><p>CWM Ceramic Wax, made by Car Wash Management.</p><h2>Dosing equipment</h2><p>We service chemical injectors and dosing equipment as part of our repair work.</p><p>Ask us about the chemistry for your wash.</p><h2>How to reach us</h2>{facts()}''',
     None, "Ask about chemistry")
 PAGES["/about/"] = lambda: inner("/about/", "About",
     "About Car Wash Management | Car Wash Equipment Service",
@@ -286,6 +325,14 @@ def contact():
     return page("/contact/", "Request Car Wash Service or a Quote | Car Wash Management",
                 f"Call or send a service or quote request to Car Wash Management. Tell us your wash type, equipment and issue. Hours {HOURS}.",
                 body, (crumbs_ld("/contact/", "Request Service"), cp))
+def credits():
+    stock = "".join(f'<li><b>{html.escape(IMG[k][0])}</b><br>Photo by {c[0]}, <a href="{c[1]}" rel="nofollow noopener">source</a>, used under the <a href="{c[3]}" rel="nofollow noopener">{c[2]}</a>.</li>'
+                    for k in IMG if (c := IMG[k][5]))
+    body = f'''<section class="phero"><div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <span aria-current="page">Photo Credits</span></nav>
+<h1>Photo Credits</h1><p class="lead">Where the photos on this site come from.</p></div></section>
+<section class="body"><div class="wrap"><div class="txt" style="max-width:820px"><h2>Our own photos</h2><p>Photos in the “From real jobs” strip, the service cards, the small photos in the homepage header and the headers of the repair, installation, maintenance plans and urgent repair pages were taken by Car Wash Management.</p>
+<h2>Stock photos</h2><p>These are general car wash scenes from free stock libraries. They are not Car Wash Management jobs or sites.</p><ul class="ticks">{stock}</ul></div></div></section>'''
+    return page("/credits/", "Photo Credits | Car Wash Management", "Credits and licenses for the stock photos used on carwashmgmt.com.", body, noindex=True)
 def thank_you():
     body = f'''<section class="ty"><div class="wrap"><div class="eyebrow">Request sent</div><h1 style="margin-top:12px">Thanks. We got your request.</h1>
 <p>Your details went to the Car Wash Management team. We reply the same business day.</p><p>If your wash is down right now, call or text {PHONE_D}. Hours: {HOURS}.</p>
@@ -303,11 +350,11 @@ def write(path, content):
     out.parent.mkdir(parents=True, exist_ok=True); out.write_text(content)
 
 def main():
-    built = {"/": home(), "/contact/": contact(), "/thank-you/": thank_you()}
+    built = {"/": home(), "/contact/": contact(), "/thank-you/": thank_you(), "/credits/": credits()}
     for p, fn in PAGES.items(): built[p] = fn()
     for p, c in built.items(): write(p, c)
     (ROOT / "404.html").write_text(notfound())
-    indexable = [p for p in built if p != "/thank-you/"]
+    indexable = [p for p in built if p not in ("/thank-you/", "/credits/")]
     order = ["/", "/car-wash-equipment-repair/", "/car-wash-equipment-installation/", "/car-wash-maintenance-plans/", "/urgent-car-wash-repair/",
              "/car-wash-equipment-brands/", "/equipment/", "/service-area/", "/chemistry/", "/about/", "/contact/"]
     assert sorted(order) == sorted(indexable)

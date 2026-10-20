@@ -39,4 +39,7 @@ Do not edit [legal.carwashmgmt.com](https://legal.carwashmgmt.com/).
 - Brands: `_build/brands.py` holds the verified brand list (grouped by category, one anchor id per brand, source URL per brand).
   It feeds the brands page, the homepage chips, the footer and the repair/equipment lists. Text only, no logos, no dealer/partner claims;
   the trademark disclaimer shows wherever brands are listed.
-- Photos, before/after and reviews are still labeled PLACEHOLDER.
+- Photos: `assets/cwm/img/photos/` (WebP, 1600w/800w heroes, 1200w/600w others), picked from Design's manifest
+  (`/workspace/brand/cwm-redesign/images/manifest.csv`, PICK rows + Andrew's six real-job shots). Registry, alt text and stock
+  credits live in `IMG` in `_build/build.py`; stock credits render on `/credits/` (noindex, linked from the footer).
+  Stock is never captioned as our work. Before/after pairs and reviews are still labeled PLACEHOLDER.

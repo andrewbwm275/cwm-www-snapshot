@@ -218,3 +218,27 @@ section.s{padding:96px 0}
  .mbar{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:10px;position:fixed;left:0;right:0;bottom:0;padding:12px 16px;background:var(--ink);border-top:1px solid #1f3650;z-index:60}
  .mbar .btn{padding:14px 8px}.mbar .btn-ghost{color:#fff;border-color:#3b5673}
 }
+
+/* Photos: Design treatment (treatment.css, Look A navy) adapted to <img>/<picture> so srcset + fetchpriority work */
+.hero,.phero.photo{position:relative;isolation:isolate}
+.hero.home,.phero.photo{background:var(--ink)}
+.hbg{position:absolute;inset:0;z-index:-2;overflow:hidden}
+.hbg img{width:100%;height:100%;object-fit:cover;object-position:50% 40%;filter:saturate(.85) contrast(1.05)}
+.hero.home::after,.phero.photo::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(11,27,43,.96) 0%,rgba(11,27,43,.90) 34%,rgba(11,27,43,.66) 62%,rgba(11,27,43,.44) 100%),linear-gradient(0deg,rgba(11,27,43,.85) 0%,rgba(11,27,43,0) 42%),radial-gradient(1200px 600px at 85% 10%,rgba(18,58,99,.55) 0,transparent 60%)}
+.hero .photos img{width:100%;height:100%;object-fit:cover;border-radius:14px;border:1px solid rgba(201,214,229,.25)}
+.card .media{aspect-ratio:369/200;overflow:hidden;border-bottom:3px solid var(--ink)}
+.card .media img{width:100%;height:100%;object-fit:cover;display:block}
+.jobs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:56px}
+.jobs figure{position:relative;aspect-ratio:280/180;border-radius:12px;overflow:hidden;margin:0}
+.jobs img{width:100%;height:100%;object-fit:cover;display:block}
+.jobs figure::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(11,27,43,.75),rgba(11,27,43,0) 55%)}
+.jobs figcaption{position:absolute;left:12px;right:12px;bottom:10px;z-index:1;color:#fff;font:600 14px/1.35 var(--text)}
+.cimg{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:552/340}
+.cimg img{width:100%;height:100%;object-fit:cover;display:block}
+.cimg::after{content:"";position:absolute;inset:0;background:rgba(11,27,43,.18);mix-blend-mode:multiply}
+.cimg.inl{margin-bottom:28px}
+@media (max-width:760px){
+ .hbg img{object-position:50% 30%}
+ .hero.home::after,.phero.photo::after{background:linear-gradient(180deg,rgba(11,27,43,.66) 0%,rgba(11,27,43,.90) 45%,rgba(11,27,43,.97) 100%)}
+}
+@media (max-width:700px){.jobs{grid-template-columns:1fr 1fr;gap:10px}.jobs figcaption{font-size:12.5px;left:8px;right:8px;bottom:7px}}
