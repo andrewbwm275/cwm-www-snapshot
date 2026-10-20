@@ -43,43 +43,87 @@ def ph(label, dark=False, cls=""):
     return f'<div class="ph{" dark" if dark else ""} {cls}" role="img" aria-label="Placeholder: {html.escape(label)}"><span>PLACEHOLDER: {label}</span></div>'
 def tag(t): return f'<span class="tag-ph">{t}</span>'
 
-# Photos (Design manifest /workspace/brand/cwm-redesign/images/manifest.csv: PICK rows + Andrew's real-job strip).
-# key: (alt text from manifest, large w, large h, small w, small h, stock credit or None). Stock is never captioned as our work.
+# Photos. Design delivery /workspace/brand/cwm-redesign/images/: manifest.csv PICK rows only (never _retired/, _pending-clearance/,
+# manifest-v1.csv, DROPPED/RETIRED/ALT rows), categories/manifest.csv for the 7 category pages, plus Andrew's approved new-build picks
+# (/workspace/website-photos/newbuild/web/, cleaned + EXIF-free). IMG key: (alt, large w, large h, small w, small h, credit, {w: source file}).
+# credit None = our own photo (visible caption "Our job"); otherwise (name, source page, license name, license url, kind) where kind is
+# "stock" (visible "Stock photo") or "manufacturer" (visible "Photo: AVW"; listed on /credits/ as a manufacturer image; never our work).
 IMG_DIR = "/assets/cwm/img/photos/"
-PEXELS = ("Pexels License", "https://www.pexels.com/license/")
-UNSPLASH = ("Unsplash License", "https://unsplash.com/license")
-IMG = {
- "home-hero": ("Red car in an automatic tunnel wash between red and blue cloth brushes, covered in soap", 1600, 900, 800, 450,
-               ("Pixabay (via Pexels)", "https://www.pexels.com/photo/red-and-black-banner-210627/", *PEXELS)),
- "chemistry-page-hero": ("Close-up of blue soap foam bubbles", 1600, 900, 800, 450,
-               ("Julia Ly", "https://unsplash.com/photos/blue-bubbles-on-a-white-surface-lkp-b-kfdwc", *UNSPLASH)),
- "hero-repair": ("Wrap brush and swing arm inside a car wash tunnel", 1600, 900, 800, 450, None),
- "hero-installation": ("New shrink-wrapped cloth brushes staged for installation", 1600, 900, 800, 450, None),
- "hero-maintenance": ("Inside a car wash tunnel: brushes, conveyor and overhead plumbing", 1600, 900, 800, 450, None),
- "hero-urgent": ("Wash stopped with the conveyor pit open, tech standing by (no face visible)", 1600, 900, 800, 450, None),
- "card-repair": ("Blue foam wrap brush on its swing arm inside a car wash tunnel", 1200, 649, 600, 324, None),
- "card-installation": ("New green and black cloth brushes still in shrink wrap, ready for installation", 1200, 649, 600, 324, None),
- "card-support": ("Inside a car wash tunnel: red top brush, wrap brushes, conveyor and overhead plumbing", 1200, 649, 600, 324, None),
- "chemistry": ("Car covered in thick white foam with red paint showing through, wheel in the foreground", 1200, 739, 600, 370,
-               ("Erik Mclean", "https://www.pexels.com/photo/red-acura-integra-car-covered-in-foam-20856507/", *PEXELS)),
- "job-01": ("Red cloth brush during a tunnel repair", 1200, 771, 600, 386, None),
- "job-02": ("New blue cloth strips laid out before install", 1200, 771, 600, 386, None),
- "job-03": ("Close-up of a blue foam wrap brush hub", 1200, 771, 600, 386, None),
- "job-04": ("Open conveyor pit during a repair, tech standing by (no face visible)", 1200, 771, 600, 386, None),
- "job-05": ("Close-up of a new green and black brush hub", 1200, 771, 600, 385, None),
- "job-06": ("Self-serve bay meter with an out-of-order notice for spot-free rinse", 1200, 771, 600, 386, None),
+DESIGN = pathlib.Path("/workspace/brand/cwm-redesign/images")
+NEWBUILD = pathlib.Path("/workspace/website-photos/newbuild/web")
+IMG = {}
+def _bad(fn, pick=""):
+    return any(x in fn for x in ("_retired", "pending-clearance", "manifest-v1")) or re.search(r"DROP|RETIRE|ALT", pick or "", re.I)
+def _credit(r):
+    kind = (r.get("kind") or "").strip().lower()
+    if kind == "own": return None
+    src = (r.get("source") or "").strip(); page_url = src.split(" (")[0]
+    if kind == "manufacturer": return ((r.get("photographer") or "AVW").strip(), page_url, "Manufacturer image", page_url, "manufacturer", src)
+    lic = r.get("license") or ""; lm = re.match(r"\s*(.*?)\s*[—-]+\s*(https?://\S+)", lic)
+    return ((r.get("photographer") or "").strip(), page_url, lm.group(1) if lm else lic, lm.group(2) if lm else page_url, "stock", src)
+def webp_size(fp):
+    b = fp.read_bytes()[:40]
+    if b[12:16] == b"VP8X": return 1 + int.from_bytes(b[24:27], "little"), 1 + int.from_bytes(b[27:30], "little")
+    if b[12:16] == b"VP8L":
+        v = int.from_bytes(b[21:25], "little"); return (v & 0x3FFF) + 1, ((v >> 14) & 0x3FFF) + 1
+    return struct.unpack("<H", b[26:28])[0] & 0x3FFF, struct.unpack("<H", b[28:30])[0] & 0x3FFF
+def _register(rows, base_dir, key_for, alt_fix=None):
+    groups = {}
+    for r in rows: groups.setdefault(re.sub(r"-\d+w\.webp$", "", r["filename"]), []).append(r)
+    keys = []
+    for base, rs in groups.items():
+        files = sorted(((webp_size(base_dir / r["filename"]), r) for r in rs), key=lambda t: t[0][0])
+        (sw, sh), _ = files[0]; (w, h), r0 = files[-1]
+        key = key_for(base, r0); alt = (r0.get("alt text") or "").strip()
+        if alt_fix: alt = alt_fix(alt)
+        IMG[key] = (alt, w, h, sw, sh, _credit(r0), {fw: base_dir / r["filename"] for (fw, _), r in files}, r0)
+        keys.append(key)
+    return keys
+_ALT_FIX = lambda a: a.replace("red emergency-stop button", "red stop button")
+_main_rows = [r for r in csv.DictReader((DESIGN / "manifest.csv").open(encoding="utf-8"))
+              if (r.get("pick") or "").strip().upper() == "PICK" and not _bad(r["filename"]) and (DESIGN / r["filename"]).is_file()
+              and not r["filename"].startswith("hero-tile")]          # the 2 hero tiles are dropped
+_register(_main_rows, DESIGN, lambda base, r0: ("avw-" if r0["kind"].strip() == "manufacturer" else "") + pathlib.Path(base).name, _ALT_FIX)
+# Andrew's approved new-build picks (Our job). Alt text is descriptive; no customer or site names.
+NB_ALT = {
+ "04": "New touch-free tunnel arch with lit signage over a clean conveyor, daylight at the exit",
+ "01": "Finished tunnel with yellow wrap arches and brushes over a clean conveyor",
+ "06": "Tunnel with new green brushes on stainless frames and a clean conveyor",
+ "12": "Row of tunnel arches over the conveyor in a long white tunnel",
+ "32": "Blue and red cloth curtain hanging over a tunnel conveyor",
+ "15": "Touch-free in-bay automatic gantry in a clean wash bay",
+ "16": "In-bay automatic with blowers and a wash-step sign, car inside (plate blurred)",
+ "18": "Soft-touch in-bay wash with brushes and yellow tire guides",
+ "28": "New chemical dosing panel with filters, valves and tubing on a tidy wall",
+ "29": "Tidy equipment room with a controller, tubing and a tank",
+ "30": "Two new reclaim holding tanks in a clean equipment room",
+ "26": "Water treatment install: softener and RO panel with a new tank and pump",
+ "25": "New stainless water treatment skid with tank and pump",
 }
-USED_IMG = set()
+for n, alt in NB_ALT.items():
+    ws = sorted(int(m.group(1)) for f in NEWBUILD.glob(f"nb-{n}-*w.webp") if (m := re.search(r"-(\d+)w\.webp$", f.name)))
+    big, small = (1600, 800) if n == "04" else (1200, 600)
+    (w, h), (sw, sh) = webp_size(NEWBUILD / f"nb-{n}-{big}w.webp"), webp_size(NEWBUILD / f"nb-{n}-{small}w.webp")
+    IMG[f"nb-{n}"] = (alt, w, h, sw, sh, None, {big: NEWBUILD / f"nb-{n}-{big}w.webp", small: NEWBUILD / f"nb-{n}-{small}w.webp"}, {"filename": f"nb-{n}", "kind": "own"})
+USED_IMG = {}            # key -> set of page paths
+CUR_PAGE = ["/"]
+def kind(key):
+    c = IMG[key][5]; return "own" if c is None else c[4]
+def caption(key):
+    return {"own": "Our job", "manufacturer": "Photo: AVW", "stock": "Stock photo"}[kind(key)]
 def img(key, sizes, cls="", lazy=True, prio=False):
-    alt, w, h, sw, _sh, _c = IMG[key]
-    USED_IMG.add(key)
+    alt, w, h, sw, _sh, _c, _f, _r = IMG[key]
+    USED_IMG.setdefault(key, set()).add(CUR_PAGE[0])
     srcset = f"{IMG_DIR}{key}-{w}w.webp {w}w, {IMG_DIR}{key}-{sw}w.webp {sw}w"
     attrs = (' fetchpriority="high"' if prio else "") + (' loading="lazy" decoding="async"' if lazy else "")
     c = f' class="{cls}"' if cls else ""
     return f'<img{c} src="{IMG_DIR}{key}-{sw}w.webp" srcset="{srcset}" sizes="{sizes}" width="{w}" height="{h}" alt="{html.escape(alt)}"{attrs}>'
+def badge(key, cls="pcap"):
+    return f'<span class="{cls} k-{kind(key)}">{caption(key)}</span>'
 def hero_bg(key):
-    return f'<picture class="hbg">{img(key, "100vw", lazy=False, prio=True)}</picture>'
-PAGE_HERO = {"/car-wash-equipment-repair/": "hero-repair", "/car-wash-equipment-installation/": "hero-installation",
+    return f'<picture class="hbg">{img(key, "100vw", lazy=False, prio=True)}</picture>{badge(key, "hcap")}'
+HOME_HERO = "avw-home-hero"  # Design AVW arch (v2b). Andrew's #4 "nb-04" passed AA but read weak at 1440/390 (arch hidden behind headline/form); it leads the jobs strip instead
+PAGE_HERO = {"/car-wash-equipment-repair/": "avw-hero-repair", "/car-wash-equipment-installation/": "hero-installation",
              "/car-wash-maintenance-plans/": "hero-maintenance", "/urgent-car-wash-repair/": "hero-urgent", "/chemistry/": "chemistry-page-hero"}
 
 CSS = (ROOT / "_build/site.css").read_text()
@@ -178,6 +222,7 @@ def final_cta():
 <div><div class="form"><h3>Prefer the form?</h3><p class="sub">It takes about two minutes. Your details go straight to our team.</p><a class="btn btn-blue" href="#request">Go to the request form {I_ARR}</a><p class="alt">Or use the <a href="/contact/">Request Service page</a></p></div></div></div></section>'''
 
 # ---------------- Home ----------------
+JOBS_STRIP = ["nb-04", "job-01", "job-02", "job-03", "nb-28", "nb-26"]   # 3 new-build picks + Design's 3, all "Our job"
 def home():
     cards = [
         ("01", "Repair", "/car-wash-equipment-repair/", "Car wash equipment repair",
@@ -190,9 +235,9 @@ def home():
          "Ongoing support for your equipment, with one number to call or text when something isn’t right.",
          ["Scheduled preventive maintenance visits", "Priority scheduling", "A custom quote for each site"]),
     ]
-    card_img = {"01": "card-repair", "02": "card-installation", "03": "card-support"}
-    cardh = "".join(f'''<article class="card"><div class="media">{img(card_img[n], "(max-width:700px) calc(100vw - 40px), 369px")}</div><div class="bd"><h3><span class="n">{n}</span>{t}</h3><p>{d}</p><ul class="ticks">{"".join(f"<li>{x}</li>" for x in li)}</ul><a class="more" href="{u}">{a} {I_ARR}</a></div></article>''' for n, t, u, a, d, li in cards)
-    jobs = "".join(f'<figure>{img(k, "(max-width:700px) calc(50vw - 27px), 360px")}<figcaption>{IMG[k][0].replace(" (no face visible)", "")}</figcaption></figure>' for k in ["job-01", "job-02", "job-03", "job-04", "job-05", "job-06"])
+    card_img = {"01": "avw-card-repair", "02": "avw-card-installation", "03": "avw-card-support"}
+    cardh = "".join(f'''<article class="card"><div class="media">{img(card_img[n], "(max-width:700px) calc(100vw - 40px), 369px")}{badge(card_img[n])}</div><div class="bd"><h3><span class="n">{n}</span>{t}</h3><p>{d}</p><ul class="ticks">{"".join(f"<li>{x}</li>" for x in li)}</ul><a class="more" href="{u}">{a} {I_ARR}</a></div></article>''' for n, t, u, a, d, li in cards)
+    jobs = "".join(f'<figure>{img(k, "(max-width:700px) calc(50vw - 27px), 360px")}<figcaption>Our job</figcaption></figure>' for k in JOBS_STRIP)
     pair = f'''<div class="pair"><div class="two">{ph("before (real job photo)", True)}{ph("after, same angle", True)}<span class="lbl lb">BEFORE</span><span class="lbl la">AFTER</span></div><p class="cap">{tag("PLACEHOLDER caption: equipment · what was wrong · what we did")}</p></div>'''
     rev = f'''<div class="rev">{tag("PLACEHOLDER REVIEW: real customer review, used with permission (Andrew to supply)")}<div class="q" aria-hidden="true">“</div><div class="ln"></div><div class="ln"></div><div class="ln" style="width:70%"></div><div class="who"><div class="av"></div><div><b>Customer name</b>Wash name · city</div></div></div>'''
     steps = [("Call, text or send the form", "Tell us your equipment and what’s happening. A photo of the problem helps."),
@@ -200,13 +245,12 @@ def home():
              ("We repair, replace or set up a plan", "The work gets done, and your team knows what changed."),
              ("We’re still there after", "Same number, same team, every time your wash needs us.")]
     stp = "".join(f'<li class="st"><div class="num">{i}</div><h3>{a}</h3><p>{b}</p></li>' for i, (a, b) in enumerate(steps, 1))
-    body = f'''<section class="hero home">{hero_bg("home-hero")}<div class="wrap grid"><div>
+    body = f'''<section class="hero home">{hero_bg(HOME_HERO)}<div class="wrap grid"><div>
 <h1>Car Wash Equipment Service, Installation &amp; Support for Any Brand Across the Southwest United States and Hawaii</h1>
 <p class="hd head">Any equipment.<br>Any problem.<br><em>We’re there for you.</em></p>
 <p class="lead">Car Wash Management services and repairs any car wash equipment, installs and replaces equipment and components, and supports your team, so your wash keeps running and your customers keep coming.</p>
 <div class="btns">{call_btn()}<a class="btn btn-ghost" href="#request">Request Service {I_ARR}</a></div>
 <p class="sms">Serving the Southwest United States and Hawaii. Or text a photo of the problem to <a href="sms:{PHONE_T}" data-evt="sms_click">{PHONE_D}</a> · {HOURS}</p>
-<div class="photos">{img("job-04", "330px")}{img("job-03", "230px")}</div>
 </div><div id="request">{form("home-request", "home-hero")}</div></div></section>
 {downtime()}
 <section class="s" aria-labelledby="wd-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">What we do</div><h2 id="wd-h">Service, installation and support. One team for your whole wash.</h2></div><p>Aging equipment, a part that needs replacing, or a bay that just went down: call one number and we take it from there.</p></div><div class="cards">{cardh}</div></div></section>
@@ -215,7 +259,7 @@ def home():
 <section class="s dark" aria-labelledby="ba-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Our work</div><h2 id="ba-h">Real jobs. Up close. Before and after.</h2></div><p style="color:var(--on-dark)">Close-ups of real repairs, and before/after pairs shot from the same spot.</p></div>
 <h3 class="h3s">From real jobs</h3><div class="jobs">{jobs}</div><h3 class="h3s">Before &amp; after</h3><div class="pairs">{pair * 3}</div></div></section>
 <section class="s" aria-labelledby="rv-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Reviews</div><h2 id="rv-h">What owners say after we leave.</h2></div><p>Real reviews from real wash owners, shared with their permission. {tag("Reviews: placeholder until real reviews exist")}</p></div><div class="rgrid">{rev * 3}</div></div></section>
-<section class="chem" aria-labelledby="ch-h" style="background:var(--mist)"><div class="wrap cg"><div class="cimg">{img("chemistry", "(max-width:700px) calc(100vw - 40px), 552px")}</div><div><div class="eyebrow">Chemistry</div><h2 id="ch-h">Chemistry tailored to your wash by a real chemist.</h2><p>CWM Ceramic Wax, made by Car Wash Management.</p><p style="margin-top:10px">We also service chemical injectors and dosing equipment.</p><a class="lnk" href="/chemistry/">Car wash chemicals &amp; programs →</a></div></div></section>
+<section class="chem" aria-labelledby="ch-h" style="background:var(--mist)"><div class="wrap cg"><div class="cimg">{img("chemistry", "(max-width:700px) calc(100vw - 40px), 552px")}{badge("chemistry")}</div><div><div class="eyebrow">Chemistry</div><h2 id="ch-h">Chemistry tailored to your wash by a real chemist.</h2><p>CWM Ceramic Wax, made by Car Wash Management.</p><p style="margin-top:10px">We also service chemical injectors and dosing equipment.</p><a class="lnk" href="/chemistry/">Car wash chemicals &amp; programs →</a></div></div></section>
 <section class="s steps" aria-labelledby="hw-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">How it works</div><h2 id="hw-h">From “it’s broken” to running, in four steps.</h2></div></div><ol class="sgrid">{stp}</ol></div></section>
 {final_cta()}'''
     website = {"@context": "https://schema.org", "@type": "WebSite", "@id": BASE + "/#website", "name": "Car Wash Management", "url": BASE + "/", "publisher": {"@id": BASE + "/#org"}}
@@ -278,37 +322,19 @@ PAGES["/urgent-car-wash-repair/"] = lambda: inner("/urgent-car-wash-repair/", "W
     None, "Request urgent service",
     extra_ld=(service_ld("/urgent-car-wash-repair/", "Urgent car wash repair", "Car wash equipment repair"),))
 # ---------------- Equipment hub + category pages ----------------
-CAT_DESIGN_DIR = pathlib.Path("/workspace/brand/cwm-redesign/images/categories")
-def webp_size(fp):
-    b = fp.read_bytes()[:40]
-    if b[12:16] == b"VP8X": return 1 + int.from_bytes(b[24:27], "little"), 1 + int.from_bytes(b[27:30], "little")
-    if b[12:16] == b"VP8L":
-        v = int.from_bytes(b[21:25], "little"); return (v & 0x3FFF) + 1, ((v >> 14) & 0x3FFF) + 1
-    return struct.unpack("<H", b[26:28])[0] & 0x3FFF, struct.unpack("<H", b[28:30])[0] & 0x3FFF
+CAT_MANIFEST = DESIGN / "categories/manifest.csv"
+CAT_OWN = {"tunnel": ["nb-12", "nb-06", "nb-01", "nb-32"], "in-bay-automatic": ["nb-15", "nb-16", "nb-18"],
+           "chemical-dosing": ["nb-28", "nb-29"], "water-reclaim-ro": ["nb-30", "nb-26", "nb-25"]}   # Andrew's picks, shown first
+_cat_rows = [r for r in csv.DictReader(CAT_MANIFEST.open(encoding="utf-8")) if not r["filename"].startswith("avw/")
+             and not _bad(r["filename"], r.get("pick")) and (DESIGN / r["filename"]).is_file()]
 def design_category(slug):
-    """Use Design's per-category set when it exists: categories/<slug>/manifest.csv with columns incl. filename, slot,
-    alt text, kind (own|stock), photographer, source, license. Rows marked PENDING/ALTERNATE and anything under
-    _pending-clearance are ignored. Files are copied to assets/cwm/img/photos/ as cat-<slug>-<base>-<w>w.webp."""
-    d = CAT_DESIGN_DIR / slug; m = d / "manifest.csv"
-    if not m.exists(): return None
-    rows = [r for r in csv.DictReader(m.open(encoding="utf-8"))
-            if "pending-clearance" not in (r.get("filename") or "") and not re.search(r"PENDING|ALTERNATE", r.get("slot") or "", re.I)
-            and (r.get("filename") or "").endswith(".webp") and (d / r["filename"]).is_file()]
-    groups = {}
-    for r in rows: groups.setdefault(re.sub(r"-\d+w\.webp$", "", pathlib.Path(r["filename"]).name), []).append(r)
-    hero, gallery = None, []
-    for base, rs in groups.items():
-        files = sorted(((webp_size(d / r["filename"]), r) for r in rs), key=lambda t: t[0][0])
-        (sw, sh), _ = files[0]; (w, h), r0 = files[-1]
-        key = f"cat-{slug}-{base}"
-        for (fw, _fh), r in files: shutil.copyfile(d / r["filename"], ROOT / IMG_DIR.strip("/") / f"{key}-{fw}w.webp")
-        lic = r0.get("license") or ""; lm = re.match(r"\s*(.*?)\s*[—-]+\s*(https?://\S+)", lic)
-        credit = None if (r0.get("kind") or "").strip().lower() == "own" else (
-            r0.get("photographer") or "", r0.get("source") or "", lm.group(1) if lm else lic, lm.group(2) if lm else (r0.get("source") or ""))
-        IMG[key] = (r0.get("alt text") or r0.get("alt") or "", w, h, sw, sh, credit)
-        if "hero" in (r0.get("slot") or "").lower() and not hero: hero = key
-        else: gallery.append(key)
-    return hero, gallery
+    """Design's set for one category from categories/manifest.csv (files under categories/<slug>/; AVW ones are copies of avw/categories/).
+    Files go to assets/cwm/img/photos/ as cat-<slug>-<base>-<w>w.webp (avw-cat-... for manufacturer images)."""
+    rows = [r for r in _cat_rows if r["category"] == slug]
+    if not rows: return None
+    keys = _register(rows, DESIGN, lambda base, r0: ("avw-" if r0["kind"].strip() == "manufacturer" else "") + "cat-" + slug + "-" + pathlib.Path(base).name.replace(slug + "-", ""), _ALT_FIX)
+    hero = next((k for k in keys if IMG[k][7]["slot"].lower().endswith("hero")), None)
+    return hero, CAT_OWN.get(slug, []) + [k for k in keys if k != hero]
 for c in CATEGORIES:
     c["path"] = f"/equipment/{c['slug']}/"
     c["hero"], c["gallery"] = design_category(c["slug"]) or c["images"]
@@ -332,8 +358,8 @@ def cat_faq(c):
     qs.append((f"Where do you service {n} equipment?", AREA_LINE))
     return qs
 def gallery(c):
-    keys = c["gallery"]; slots = max(3, -(-len(keys) // 3) * 3)
-    figs = [f'<figure>{img(k, "(max-width:700px) calc(50vw - 27px), 260px")}' + ('<figcaption>Our job</figcaption>' if IMG[k][5] is None else "") + "</figure>" for k in keys]
+    keys = c["gallery"]; slots = len(keys) if keys else 3
+    figs = [f'<figure>{img(k, "(max-width:700px) calc(50vw - 27px), 260px")}<figcaption class="k-{kind(k)}">{caption(k)}</figcaption></figure>' for k in keys]
     figs += [f'<figure class="gph">{ph(c["short"] + " photo")}</figure>' for _ in range(slots - len(keys))]
     return f'<div class="gal">{"".join(figs)}</div>'
 def category_page(c):
@@ -356,7 +382,7 @@ def equipment_hub():
     cards = ""
     for c in CATEGORIES:
         k = c["hero"] or (c["gallery"][0] if c["gallery"] else None)
-        media = img(k, "(max-width:700px) calc(100vw - 40px), 270px") if k else ph(c["short"] + " photo")
+        media = (img(k, "(max-width:700px) calc(100vw - 40px), 270px") + badge(k)) if k else ph(c["short"] + " photo")
         cards += f'''<article class="card ecard"><div class="media">{media}</div><div class="bd"><h3><a href="{c["path"]}">{c["short"]}</a></h3><p>{c["card"]}</p><a class="more" href="{c["path"]}">Service &amp; repair {I_ARR}</a></div></article>'''
     content = f'''<p>We service and repair car wash equipment across every part of the wash. Pick a category to see what we work on, common faults we fix and the brands we see most.</p>
 <div class="ecards">{cards}</div><h2>Brands we service</h2><p>See the full list on our <a href="{BRANDS_URL}">brands we service</a> page.</p>{brand_list()}<h2>How to reach us</h2>{facts()}'''
@@ -367,9 +393,13 @@ def equipment_hub():
         "In-bay automatics, tunnels, self-serve bays, vacuums, controllers and pay stations, chemical dosing, and water, reclaim and RO.",
         content, None)
 PAGES["/equipment/"] = equipment_hub
+BRAND_PHOTO = {"avw": "avw-brand-avw"}
+def BRAND_IMG(a):
+    k = BRAND_PHOTO[a]
+    return f'<figure class="bimg">{img(k, "(max-width:700px) calc(100vw - 40px), 560px")}<figcaption class="k-{kind(k)}">{caption(k)}</figcaption></figure>'
 def brands_page():
     jump = '<ul class="chips sm">' + "".join(f'<li><a class="chip" href="#{cid}">{short}</a></li>' for cid, _, short, _ in BRAND_CATS) + "</ul>"
-    secs = "<!--brands-->" + "".join(f'<h2 id="{cid}">{name}</h2>' + CAT_LINKS.get(cid, "") + "".join(f'<h3 id="{a}">{n}</h3><p>{txt}</p>' for n, a, _, txt, *_ in bs) for cid, name, _, bs in BRAND_CATS) + "<!--/brands-->"
+    secs = "<!--brands-->" + "".join(f'<h2 id="{cid}">{name}</h2>' + CAT_LINKS.get(cid, "") + "".join(f'<h3 id="{a}">{n}</h3><p>{txt}</p>' + (BRAND_IMG(a) if a in BRAND_PHOTO else "") for n, a, _, txt, *_ in bs) for cid, name, _, bs in BRAND_CATS) + "<!--/brands-->"
     content = f'''<p>We repair and service car wash equipment from the brands below, grouped by type. We work on other makes too, so if yours isn’t listed, call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a>.</p>
 {jump}<p class="tm">{TM}</p>{secs}<p class="tm">{TM}</p><h2>How to reach us</h2>{facts()}'''
     svc = service_ld(BRANDS_URL, "Car wash equipment repair and service for all major brands", "Car wash equipment repair")
@@ -393,7 +423,7 @@ PAGES["/chemistry/"] = lambda: inner("/chemistry/", "Chemistry",
     "Chemistry tailored to your wash by a real chemist. CWM Ceramic Wax, made by Car Wash Management. Call, text or request pricing.",
     "Car Wash Chemicals &amp; Chemical Programs",
     "Chemistry tailored to your wash by a real chemist.",
-    f'''<div class="cimg inl">{img("chemistry", "(max-width:700px) calc(100vw - 40px), 560px")}</div><h2>Our own product</h2><p>CWM Ceramic Wax, made by Car Wash Management.</p><h2>Dosing equipment</h2><p>We service chemical injectors and dosing equipment as part of our repair work.</p><p>Ask us about the chemistry for your wash.</p><h2>How to reach us</h2>{facts()}''',
+    f'''<div class="cimg inl">{img("chemistry", "(max-width:700px) calc(100vw - 40px), 560px")}{badge("chemistry")}</div><h2>Our own product</h2><p>CWM Ceramic Wax, made by Car Wash Management.</p><h2>Dosing equipment</h2><p>We service chemical injectors and dosing equipment as part of our repair work.</p><p>Ask us about the chemistry for your wash.</p><h2>How to reach us</h2>{facts()}''',
     None, "Ask about chemistry")
 PAGES["/about/"] = lambda: inner("/about/", "About",
     "About Car Wash Management | Car Wash Equipment Service",
@@ -415,13 +445,18 @@ def contact():
                 f"Call or send a service or quote request to Car Wash Management. Tell us your wash type, equipment and issue. Hours {HOURS}.",
                 body, (crumbs_ld("/contact/", "Request Service"), cp))
 def credits():
+    used = [k for k in IMG if k in USED_IMG]
+    own = "".join(f'<li>{html.escape(IMG[k][0])}</li>' for k in used if kind(k) == "own")
+    man = "".join(f'<li><b>{html.escape(IMG[k][0])}</b><br>Manufacturer image from {c[0]}, <a href="{c[1]}" rel="nofollow noopener">source page</a>. Shown as a general example of the equipment; not a Car Wash Management job, site or install.</li>'
+                  for k in used if (c := IMG[k][5]) and c[4] == "manufacturer")
     stock = "".join(f'<li><b>{html.escape(IMG[k][0])}</b><br>Photo by {c[0]}, <a href="{c[1]}" rel="nofollow noopener">source</a>, used under the <a href="{c[3]}" rel="nofollow noopener">{c[2]}</a>.</li>'
-                    for k in IMG if (c := IMG[k][5]) and k in USED_IMG)
+                    for k in used if (c := IMG[k][5]) and c[4] == "stock")
     body = f'''<section class="phero"><div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <span aria-current="page">Photo Credits</span></nav>
 <h1>Photo Credits</h1><p class="lead">Where the photos on this site come from.</p></div></section>
-<section class="body"><div class="wrap"><div class="txt" style="max-width:820px"><h2>Our own photos</h2><p>Photos captioned “Our job”, the “From real jobs” strip, the service cards, the small photos in the homepage header and the headers of the repair, installation, maintenance plans, urgent repair and equipment category pages (other than the stock photos listed below) were taken by Car Wash Management.</p>
-<h2>Stock photos</h2><p>These are general car wash scenes from free stock libraries. They are not Car Wash Management jobs or sites.</p><ul class="ticks">{stock}</ul></div></div></section>'''
-    return page("/credits/", "Photo Credits | Car Wash Management", "Credits and licenses for the stock photos used on carwashmgmt.com.", body, noindex=True)
+<section class="body"><div class="wrap"><div class="txt" style="max-width:820px"><h2>Our own photos</h2><p>Every photo captioned “Our job” was taken by Car Wash Management on our own jobs. Customer names, sites and license plates are left out or blurred.</p><ul class="ticks">{own}</ul>
+<h2>Manufacturer images</h2><p>Photos marked “Photo: AVW” are manufacturer images from AVW Equipment Company. They show the type of equipment we service; they are not our jobs, sites or installs. {TM}</p><ul class="ticks">{man}</ul>
+<h2>Stock photos</h2><p>Photos marked “Stock photo” are general car wash scenes from free stock libraries. They are not Car Wash Management jobs or sites.</p><ul class="ticks">{stock}</ul></div></div></section>'''
+    return page("/credits/", "Photo Credits | Car Wash Management", "Credits and licenses for the photos used on carwashmgmt.com: our own jobs, manufacturer images and stock.", body, noindex=True)
 def thank_you():
     body = f'''<section class="ty"><div class="wrap"><div class="eyebrow">Request sent</div><h1 style="margin-top:12px">Thanks. We got your request.</h1>
 <p>Your details went to the Car Wash Management team. We reply the same business day.</p><p>If your wash is down right now, call or text {PHONE_D}. Hours: {HOURS}.</p>
@@ -439,9 +474,24 @@ def write(path, content):
     out.parent.mkdir(parents=True, exist_ok=True); out.write_text(content)
 
 def main():
-    built = {"/": home(), "/contact/": contact(), "/thank-you/": thank_you()}
-    for p, fn in PAGES.items(): built[p] = fn()
-    built["/credits/"] = credits()
+    built = {}
+    for p, fn in [("/", home), ("/contact/", contact), ("/thank-you/", thank_you), *PAGES.items(), ("/credits/", credits)]:
+        CUR_PAGE[0] = p; built[p] = fn()
+    photos = ROOT / IMG_DIR.strip("/")
+    shutil.rmtree(photos, ignore_errors=True); photos.mkdir(parents=True)
+    for k in USED_IMG:
+        for w, src in IMG[k][6].items():
+            assert not _bad(str(src)), src
+            shutil.copyfile(src, photos / f"{k}-{w}w.webp")
+    rows = []
+    for k in USED_IMG:
+        if kind(k) != "manufacturer": continue
+        pages = sorted(p for p in USED_IMG[k] if p != "/credits/")
+        for w, src in sorted(IMG[k][6].items(), reverse=True):
+            d = str(src).replace(str(DESIGN) + "/", ""); orig = d if d.startswith("avw/") else "avw/" + d
+            rows.append([f"{IMG_DIR}{k}-{w}w.webp", d, orig if (DESIGN / orig).is_file() else "", IMG[k][5][5], "; ".join(pages + ["/credits/"])])
+    with open("/workspace/audit/avw-images.csv", "w", newline="") as fh:
+        wr = csv.writer(fh); wr.writerow(["repo_path", "design_file", "avw_original_in_avw_files_txt", "source_url", "pages"]); wr.writerows(rows)
     for p, c in built.items(): write(p, c)
     (ROOT / "404.html").write_text(notfound())
     indexable = [p for p in built if p not in ("/thank-you/", "/credits/")]

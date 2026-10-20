@@ -2,7 +2,7 @@
 # FAQ answers use only approved facts (phone, hours, same-business-day reply, after-hours line,
 # installation wording, plan wording, service area): they are filled in by build.py from those constants.
 # images: (hero key or None, [gallery keys]) from build.py IMG. Design's per-category sets override these
-# automatically when /workspace/brand/cwm-redesign/images/categories/<slug>/manifest.csv exists.
+# automatically from /workspace/brand/cwm-redesign/images/categories/manifest.csv (see design_category in build.py).
 # brands: anchor ids from brands.py.
 CATEGORIES = [
  dict(slug="in-bay-automatic", short="In-bay automatic", name="in-bay automatic",

@@ -219,29 +219,44 @@ section.s{padding:96px 0}
  .mbar .btn{padding:14px 8px}.mbar .btn-ghost{color:#fff;border-color:#3b5673}
 }
 
-/* Photos: Design treatment (treatment.css, Look A navy) adapted to <img>/<picture> so srcset + fetchpriority work */
+/* Photos: Design treatment.css v2b (Look A navy, lighter overlay, 2026-10-20) adapted to <picture>/<img> so srcset + fetchpriority work.
+   Same values as treatment.css: photo filter saturate(1) contrast(1.04) at 50% 45%; text-side radial scrim 84%/66%; 90deg navy 85->20%;
+   bottom fade 55%; eyebrow navy pill at all widths; ghost button 55% navy; mobile photo fills top 640px with the vertical gradient. */
 .hero,.phero.photo{position:relative;isolation:isolate}
 .hero.home,.phero.photo{background:var(--ink)}
 .hbg{position:absolute;inset:0;z-index:-2;overflow:hidden}
-.hbg img{width:100%;height:100%;object-fit:cover;object-position:50% 40%;filter:saturate(.85) contrast(1.05)}
-.hero.home::after,.phero.photo::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(11,27,43,.96) 0%,rgba(11,27,43,.90) 34%,rgba(11,27,43,.66) 62%,rgba(11,27,43,.44) 100%),linear-gradient(0deg,rgba(11,27,43,.85) 0%,rgba(11,27,43,0) 42%),radial-gradient(1200px 600px at 85% 10%,rgba(18,58,99,.55) 0,transparent 60%)}
+.hbg img{width:100%;height:100%;object-fit:cover;object-position:50% 45%;filter:saturate(1) contrast(1.04)}
+.hero.home::after,.phero.photo::after{content:"";position:absolute;inset:0;z-index:-1;background:
+  radial-gradient(900px 600px at 27% 38%,rgba(11,27,43,.84) 0,rgba(11,27,43,.66) 52%,rgba(11,27,43,0) 80%),
+  linear-gradient(90deg,rgba(11,27,43,.85) 0%,rgba(11,27,43,.62) 32%,rgba(11,27,43,.30) 62%,rgba(11,27,43,.20) 100%),
+  linear-gradient(0deg,rgba(11,27,43,.55) 0%,rgba(11,27,43,0) 30%)}
+.hero.home h1{display:inline;background:rgba(11,27,43,.80);-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:3px 6px;border-radius:4px}
+.hero .hd,.hero p.lead,.hero.home h1,.hero .sms,.phero.photo h1,.phero.photo .lead{text-shadow:0 1px 2px rgba(6,14,24,.45)}
+.hero .btn-ghost,.phero.photo .btn-ghost{background:rgba(11,27,43,.55);border-color:#5b7894}
+.hcap{position:absolute;right:14px;bottom:12px;z-index:1;background:rgba(11,27,43,.85);color:#fff;font:700 11.5px/1 var(--text);letter-spacing:.04em;padding:6px 8px;border-radius:6px}
+.pcap{position:absolute;left:8px;bottom:8px;z-index:1;background:rgba(11,27,43,.85);color:#fff;font:700 11.5px/1 var(--text);letter-spacing:.04em;padding:6px 8px;border-radius:6px}
+.card .media,.ecard .media,.cimg{position:relative}
+.bimg{position:relative;margin:10px 0 22px;max-width:560px;aspect-ratio:3/2;border-radius:12px;overflow:hidden}
+.bimg img{width:100%;height:100%;object-fit:cover;display:block}
+.bimg figcaption{position:absolute;left:8px;bottom:8px;background:rgba(11,27,43,.85);color:#fff;font:700 11.5px/1 var(--text);letter-spacing:.04em;padding:6px 8px;border-radius:6px}
+@media (max-width:760px){
+ .hbg{bottom:auto;height:640px}.hbg img{object-position:50% 50%}
+ .hero.home::after,.phero.photo::after{background:linear-gradient(180deg,rgba(11,27,43,.40) 0px,rgba(11,27,43,.70) 150px,rgba(11,27,43,.82) 300px,rgba(11,27,43,.93) 460px,var(--ink) 640px)}
+ .hcap{top:8px;bottom:auto;right:8px}
+}
 .hero .photos img{width:100%;height:100%;object-fit:cover;border-radius:14px;border:1px solid rgba(201,214,229,.25)}
 .card .media{aspect-ratio:369/200;overflow:hidden;border-bottom:3px solid var(--ink)}
 .card .media img{width:100%;height:100%;object-fit:cover;display:block}
 .jobs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:56px}
 .jobs figure{position:relative;aspect-ratio:280/180;border-radius:12px;overflow:hidden;margin:0}
 .jobs img{width:100%;height:100%;object-fit:cover;display:block}
-.jobs figure::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(11,27,43,.75),rgba(11,27,43,0) 55%)}
-.jobs figcaption{position:absolute;left:12px;right:12px;bottom:10px;z-index:1;color:#fff;font:600 14px/1.35 var(--text)}
+.jobs figure::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(11,27,43,.35),rgba(11,27,43,0) 55%)}
+.jobs figcaption{position:absolute;left:8px;bottom:8px;z-index:1;background:rgba(11,27,43,.85);color:#fff;font:700 11.5px/1 var(--text);letter-spacing:.04em;padding:6px 8px;border-radius:6px}
 .cimg{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:552/340}
 .cimg img{width:100%;height:100%;object-fit:cover;display:block}
 .cimg::after{content:"";position:absolute;inset:0;background:rgba(11,27,43,.18);mix-blend-mode:multiply}
 .cimg.inl{margin-bottom:28px}
-@media (max-width:760px){
- .hbg img{object-position:50% 30%}
- .hero.home::after,.phero.photo::after{background:linear-gradient(180deg,rgba(11,27,43,.66) 0%,rgba(11,27,43,.90) 45%,rgba(11,27,43,.97) 100%)}
-}
-@media (max-width:700px){.jobs{grid-template-columns:1fr 1fr;gap:10px}.jobs figcaption{font-size:12.5px;left:8px;right:8px;bottom:7px}}
+@media (max-width:700px){.jobs{grid-template-columns:1fr 1fr;gap:10px}}
 
 /* Equipment hub + category pages */
 .ecards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:22px 0 10px}
