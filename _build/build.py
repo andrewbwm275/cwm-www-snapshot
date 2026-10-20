@@ -43,7 +43,7 @@ CSS = re.sub(r"/\*.*?\*/", "", CSS, flags=re.S); CSS = re.sub(r"\s*\n\s*", "", C
 
 def header(path):
     nav = "".join(f'<a href="{u}"{" aria-current=\"page\"" if u == path else ""}>{t}</a>' for u, t in NAV)
-    mnav = "".join(f'<a href="{u}">{t}</a>' for u, t in NAV) + '<a href="/emergency-car-wash-repair/">Emergency repair</a><a href="/contact/">Request service</a>'
+    mnav = "".join(f'<a href="{u}">{t}</a>' for u, t in NAV) + '<a href="/urgent-car-wash-repair/">Urgent repair</a><a href="/contact/">Request service</a>'
     return f'''<a class="skip" href="#main">Skip to content</a>
 <header class="hdr"><div class="wrap"><a class="logo" href="/"><img src="/assets/cwm/img/cwm-logo-horizontal-white.png" alt="Car Wash Management" width="133" height="44"></a>
 <nav class="main" aria-label="Main">{nav}</nav>
@@ -54,19 +54,19 @@ def footer():
     return f'''<footer class="foot"><div class="wrap fgrid">
 <div><a class="logo" href="/"><img src="/assets/cwm/img/cwm-logo-stacked-white.png" alt="Car Wash Management" width="111" height="96"></a><p style="margin-top:14px;max-width:300px">Service and repair for any car wash equipment, plus installation and replacement of equipment and components.</p>
 <p style="margin-top:16px"><a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> · <a href="sms:{PHONE_T}" data-evt="sms_click">call or text</a></p><p><a href="mailto:{EMAIL}">{EMAIL}</a></p><p>Hours: {HOURS}</p></div>
-<div><h2>Services</h2><p><a href="/car-wash-equipment-repair/">Car wash equipment repair</a></p><p><a href="/car-wash-equipment-installation/">Installation &amp; replacement</a></p><p><a href="/car-wash-maintenance-plans/">Maintenance plans</a></p><p><a href="/emergency-car-wash-repair/">Emergency repair</a></p><p><a href="/chemistry/">Chemistry</a></p></div>
+<div><h2>Services</h2><p><a href="/car-wash-equipment-repair/">Car wash equipment repair</a></p><p><a href="/car-wash-equipment-installation/">Installation &amp; replacement</a></p><p><a href="/car-wash-maintenance-plans/">Maintenance plans</a></p><p><a href="/urgent-car-wash-repair/">Urgent repair</a></p><p><a href="/chemistry/">Chemistry</a></p></div>
 <div><h2>Company</h2><p><a href="/equipment/">Equipment &amp; brands</a></p><p><a href="/service-area/">Service area</a></p><p><a href="/about/">About</a></p><p><a href="/contact/">Request service</a></p></div>
 <div><h2>Brands we service</h2>{"".join(f"<p>{b}</p>" for b, _ in BRANDS)}</div>
 </div><div class="wrap">{SMS_OPTIN}
-<div class="fbot">© 2026 Car Wash Management · carwashmgmt.com · <a href="https://legal.carwashmgmt.com/privacy-policy.html">Privacy Policy</a> · <a href="https://legal.carwashmgmt.com/terms-and-conditions.html">Terms &amp; Conditions</a> {tag("Legal entity name for this line: Andrew to confirm")}<p class="tm-foot">{TM}</p></div></div></footer>
+<div class="fbot">© 2026 Car Wash Management · carwashmgmt.com · <a href="https://legal.carwashmgmt.com/privacy-policy.html">Privacy Policy</a> · <a href="https://legal.carwashmgmt.com/terms-and-conditions.html">Terms &amp; Conditions</a><p class="tm-foot">{TM}</p></div></div></footer>
 <div class="mbar">{call_btn("btn btn-blue", "Call")}{text_btn("btn btn-ghost", "Text")}<a class="btn btn-white" href="/contact/">Request</a></div>'''
 
-REQ_TYPES = ["Repair", "Installation or replacement", "Maintenance plan", "Emergency / wash is down", "Chemistry", "Other"]
+REQ_TYPES = ["Repair", "Installation or replacement", "Maintenance plan", "Urgent / wash is down", "Chemistry", "Other"]
 def form(fid, loc, heading="Request service or a quote", hlevel="h2", flat=False):
     opts = "".join(f"<option>{t}</option>" for t in REQ_TYPES)
     f = lambda n: f"{fid}-{n}"
     return f'''<form class="form{" flat" if flat else ""}" id="{fid}" data-cwm-request data-form-location="{loc}" action="/contact/" method="post">
-<{hlevel}>{heading}</{hlevel}><p class="sub">Tell us what’s going on and we’ll get back to you. {tag("Callback time: Andrew to confirm")}</p>
+<{hlevel}>{heading}</{hlevel}><p class="sub">Tell us what’s going on. We reply the same business day.</p>
 <div class="row2"><div class="field"><label for="{f("name")}">Your name <span class="req">*</span></label><input id="{f("name")}" name="name" autocomplete="name" required maxlength="120" data-err="Please enter your name."><span class="err"></span></div>
 <div class="field"><label for="{f("biz")}">Business / wash site <span class="req">*</span></label><input id="{f("biz")}" name="business_site" autocomplete="organization" required maxlength="160" data-err="Please enter your business or wash name."><span class="err"></span></div></div>
 <div class="row2"><div class="field"><label for="{f("email")}">Email <span class="req">*</span></label><input id="{f("email")}" name="email" type="email" autocomplete="email" required maxlength="160" data-err="Please enter a valid email address."><span class="err"></span></div>
@@ -87,7 +87,7 @@ ORG = {"@context": "https://schema.org", "@graph": [
      "logo": BASE + "/assets/cwm/img/cwm-logo-horizontal.png", "telephone": "+1-808-465-2291", "email": EMAIL},
     {"@type": "HomeAndConstructionBusiness", "@id": BASE + "/#business", "name": "Car Wash Management", "url": BASE + "/",
      "image": BASE + "/assets/cwm/img/cwm-logo-horizontal.png", "telephone": "+1-808-465-2291", "email": EMAIL,
-     "parentOrganization": {"@id": BASE + "/#org"},
+     "parentOrganization": {"@id": BASE + "/#org"}, "areaServed": {"@type": "Place", "name": "Southwest United States"},
      "openingHoursSpecification": {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "08:00", "closes": "17:00"}}]}
 def crumbs_ld(path, name):
     return {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
@@ -115,7 +115,7 @@ def page(path, title, desc, body, extra_ld=(), noindex=False, canonical=True):
 '''
 
 def downtime():
-    return f'''<section class="downtime" aria-labelledby="dt-h"><div class="wrap"><div class="pulse" aria-hidden="true"></div><div><h2 id="dt-h">Wash down? Call now.</h2><p>Every hour down costs you cars. Call or text and tell us what stopped. {tag("After-hours availability: Andrew to confirm")} <a href="/emergency-car-wash-repair/">Emergency repair →</a></p></div>
+    return f'''<section class="downtime" aria-labelledby="dt-h"><div class="wrap"><div class="pulse" aria-hidden="true"></div><div><h2 id="dt-h">Wash down? Call now.</h2><p>Every hour down costs you cars. Call or text and tell us what stopped. Call or text any time. Messages after hours are answered the next business morning. <a href="/urgent-car-wash-repair/">Urgent repair →</a></p></div>
 <div class="acts">{call_btn("btn btn-ink", PHONE_D)}{text_btn()}</div></div></section>'''
 
 def brands_block(h="h2"):
@@ -136,11 +136,11 @@ def home():
          "We service and repair any equipment on tunnels, in-bay automatics and self-serve bays, including equipment we didn’t install.",
          ["Conveyors, brushes, pumps and controls", "Equipment we didn’t install", "Any make, any age"]),
         ("02", "Installation", "/car-wash-equipment-installation/", "Car wash equipment installation",
-         "Installation and replacement of equipment and components, from pumps and motors to pay stations, RO and reclaim parts.",
+         "Installation and replacement of equipment and components, from single parts to complete systems.",
          ["Replacement parts and components", "Pay stations and controllers", "Water, RO and reclaim components"]),
         ("03", "Support", "/car-wash-maintenance-plans/", "Car wash maintenance plans",
          "Ongoing support for your equipment, with one number to call or text when something isn’t right.",
-         ["Preventive maintenance plans (details coming soon)", "One number to call or text", HOURS]),
+         ["Scheduled preventive maintenance visits", "Priority scheduling", "A custom quote for each site"]),
     ]
     cardh = "".join(f'''<article class="card">{ph("real job photo")}<div class="bd"><h3><span class="n">{n}</span>{t}</h3><p>{d}</p><ul class="ticks">{"".join(f"<li>{x}</li>" for x in li)}</ul><a class="more" href="{u}">{a} {I_ARR}</a></div></article>''' for n, t, u, a, d, li in cards)
     closeups = "".join(ph("repair close-up (real job photo)", True) for _ in range(8))
@@ -151,28 +151,27 @@ def home():
              ("We repair, replace or set up a plan", "The work gets done, and your team knows what changed."),
              ("We’re still there after", "Same number, same team, every time your wash needs us.")]
     stp = "".join(f'<li class="st"><div class="num">{i}</div><h3>{a}</h3><p>{b}</p></li>' for i, (a, b) in enumerate(steps, 1))
-    areas = "".join(f'<div class="abox">PLACEHOLDER: service area region (Andrew to confirm)</div>' for _ in range(4))
     body = f'''<section class="hero"><div class="wrap grid"><div>
-<h1>Car Wash Equipment Service, Installation &amp; Support for Any Brand</h1>
+<h1>Car Wash Equipment Service, Installation &amp; Support for Any Brand Across the Southwest United States</h1>
 <p class="hd head">Any equipment.<br>Any problem.<br><em>We’re there for you.</em></p>
 <p class="lead">Car Wash Management services and repairs any car wash equipment, installs and replaces equipment and components, and supports your team, so your wash keeps running and your customers keep coming.</p>
 <div class="btns">{call_btn()}<a class="btn btn-ghost" href="#request">Request Service {I_ARR}</a></div>
-<p class="sms">Or text a photo of the problem to <a href="sms:{PHONE_T}" data-evt="sms_click">{PHONE_D}</a> · {HOURS}</p>
+<p class="sms">Serving the Southwest United States. Or text a photo of the problem to <a href="sms:{PHONE_T}" data-evt="sms_click">{PHONE_D}</a> · {HOURS}</p>
 <div class="photos">{ph("real job photo (tech at work)", True)}{ph("real job photo", True)}</div>
 </div><div id="request">{form("home-request", "home-hero")}</div></div></section>
 {downtime()}
 <section class="s" aria-labelledby="wd-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">What we do</div><h2 id="wd-h">Service, installation and support. One team for your whole wash.</h2></div><p>Aging equipment, a part that needs replacing, or a bay that just went down: call one number and we take it from there.</p></div><div class="cards">{cardh}</div></div></section>
 {brands_block()}
-<section class="area" aria-labelledby="ar-h"><div class="wrap"><div class="ahead"><div><div class="eyebrow">Service area</div><h2 id="ar-h">Is your wash in our area?</h2></div><p>Call or text and we’ll tell you straight. {tag("Service area wording: Andrew to confirm")}</p></div><div class="agrid">{areas}</div><a class="lnk" href="/service-area/">See our service area →</a></div></section>
+<section class="area" aria-labelledby="ar-h"><div class="wrap"><div class="ahead"><div><div class="eyebrow">Service area</div><h2 id="ar-h">Serving the Southwest United States.</h2></div><p>We service car washes across the Southwest United States. Call or text and we’ll tell you straight whether we can reach your site.</p></div><a class="lnk" href="/service-area/">See our service area →</a></div></section>
 <section class="s dark" aria-labelledby="ba-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Our work</div><h2 id="ba-h">Real jobs. Up close. Before and after.</h2></div><p style="color:var(--on-dark)">Close-ups of real repairs, and before/after pairs shot from the same spot. {tag("Photos: Andrew to approve")}</p></div>
 <h3 class="h3s">Repair close-ups</h3><div class="closeups">{closeups}</div><h3 class="h3s">Before &amp; after</h3><div class="pairs">{pair * 3}</div></div></section>
 <section class="s" aria-labelledby="rv-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Reviews</div><h2 id="rv-h">What owners say after we leave.</h2></div><p>Real reviews from real wash owners, shared with their permission. {tag("Reviews: placeholder until real reviews exist")}</p></div><div class="rgrid">{rev * 3}</div></div></section>
-<section class="chem" aria-labelledby="ch-h" style="background:var(--mist)"><div class="wrap cg"><div>{ph("real job photo (chemistry setup or dosing station)")}</div><div><div class="eyebrow">Chemistry</div><h2 id="ch-h">Chemistry, from the people who fix your equipment.</h2><p>We service chemical injectors and dosing equipment, and we can talk through the chemistry side of your wash.</p><p style="margin-top:10px">{tag("Chemistry offer and product line: Andrew to confirm")}</p><a class="lnk" href="/chemistry/">Car wash chemicals &amp; programs →</a></div></div></section>
+<section class="chem" aria-labelledby="ch-h" style="background:var(--mist)"><div class="wrap cg"><div>{ph("real job photo (chemistry setup or dosing station)")}</div><div><div class="eyebrow">Chemistry</div><h2 id="ch-h">Chemistry tailored to your wash by a real chemist.</h2><p>CWM Ceramic Wax, made by Car Wash Management.</p><p style="margin-top:10px">We also service chemical injectors and dosing equipment.</p><a class="lnk" href="/chemistry/">Car wash chemicals &amp; programs →</a></div></div></section>
 <section class="s steps" aria-labelledby="hw-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">How it works</div><h2 id="hw-h">From “it’s broken” to running, in four steps.</h2></div></div><ol class="sgrid">{stp}</ol></div></section>
 {final_cta()}'''
     website = {"@context": "https://schema.org", "@type": "WebSite", "@id": BASE + "/#website", "name": "Car Wash Management", "url": BASE + "/", "publisher": {"@id": BASE + "/#org"}}
-    return page("/", "Car Wash Equipment Service & Install | Car Wash Management",
-                "We service and repair any car wash equipment and install and replace components for tunnels, in-bays and self-serve. Call or request a quote.",
+    return page("/", "Southwest Car Wash Equipment Service | Car Wash Management",
+                "We service and repair any car wash equipment across the Southwest United States, and install from single parts to complete systems. Call or request a quote.",
                 body, (website,))
 
 # ---------------- Inner pages ----------------
@@ -180,7 +179,7 @@ def inner(path, crumb, title, desc, h1, lead, content, soon, form_heading="Reque
     soon_html = f'<div class="soon"><b>Coming soon:</b> {soon}</div>' if soon else ""
     body = f'''<section class="phero"><div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <span aria-current="page">{crumb}</span></nav>
 <h1>{h1}</h1><p class="lead">{lead}</p><div class="btns">{call_btn()}{text_btn()}<a class="btn btn-ghost" href="#request">Request Service {I_ARR}</a></div></div></section>
-{downtime() if path != "/emergency-car-wash-repair/" else ""}
+{downtime() if path != "/urgent-car-wash-repair/" else ""}
 <section class="body"><div class="wrap cols"><div class="txt">{content}{soon_html}</div><div id="request">{form(path.strip("/").replace("/", "-") + "-request", path, form_heading, "h2", True)}</div></div></section>'''
     return page(path, title, desc, body, (crumbs_ld(path, crumb), *extra_ld))
 
@@ -204,30 +203,30 @@ PAGES["/car-wash-equipment-repair/"] = lambda: inner("/car-wash-equipment-repair
     extra_ld=(service_ld("/car-wash-equipment-repair/", "Car wash equipment repair", "Car wash equipment repair"),))
 PAGES["/car-wash-equipment-installation/"] = lambda: inner("/car-wash-equipment-installation/", "Installation",
     "Car Wash Equipment Installation | Car Wash Management",
-    "Installation and replacement of car wash equipment and components, from pumps and motors to pay stations, RO and reclaim parts. Request a quote.",
+    "Installation and replacement of car wash equipment and components, from single parts to complete systems. Request an installation quote today.",
     "Car Wash Equipment Installation &amp; Replacement",
-    "Car Wash Management handles installation and replacement of equipment and components, so worn or failed parts are swapped out and your wash gets back to work.",
+    "Installation and replacement of equipment and components, from single parts to complete systems.",
     f'''<h2>What we install and replace</h2><ul class="ticks"><li>Replacement parts and components</li><li>Motors, gear drives and pumps</li><li>Pay stations and wash controllers</li><li>Reverse osmosis, water and reclaim components</li></ul>
-<p>Not sure whether to repair or replace? Call or text and tell us what you’re working with.</p><p>{tag("Installation scope (e.g. complete systems): Andrew to confirm")}</p><h2>How to reach us</h2>{facts()}''',
-    "installation scope, examples and photos.", "Request an installation quote",
+<p>Not sure whether to repair or replace? Call or text and tell us what you’re working with.</p><p>Installation and replacement of equipment and components, from single parts to complete systems.</p><h2>How to reach us</h2>{facts()}''',
+    "examples and photos from real installation jobs.", "Request an installation quote",
     extra_ld=(service_ld("/car-wash-equipment-installation/", "Car wash equipment installation and replacement", "Car wash equipment installation"),))
 PAGES["/car-wash-maintenance-plans/"] = lambda: inner("/car-wash-maintenance-plans/", "Maintenance Plans",
     "Car Wash Preventive Maintenance Plans | Car Wash Management",
-    "Ask Car Wash Management about preventive maintenance for your car wash equipment. Plan details are coming soon. Call, text or request a quote.",
+    "Scheduled preventive maintenance visits, priority scheduling and a custom quote for each site. Ask Car Wash Management about a plan for your wash.",
     "Car Wash Preventive Maintenance &amp; Support Plans",
-    "Ask us about preventive maintenance for your equipment, with one number to call or text between visits.",
-    f'''<h2>Talk to us about a plan</h2><p>Tell us your wash type and equipment, and we’ll talk through what ongoing maintenance and support could look like for your site.</p><p>{tag("Plan terms (what a plan includes, visit frequency, pricing): Andrew to confirm")}</p><h2>How to reach us</h2>{facts()}''',
-    "what a maintenance plan includes, visit options and how to sign up.", "Ask about a maintenance plan",
+    "Scheduled preventive maintenance visits, priority scheduling and a custom quote for each site.",
+    f'''<h2>Talk to us about a plan</h2><p>Tell us your wash type and equipment, and we’ll talk through what ongoing maintenance and support could look like for your site.</p><ul class="ticks"><li>Scheduled preventive maintenance visits</li><li>Priority scheduling</li><li>A custom quote for each site</li></ul><h2>How to reach us</h2>{facts()}''',
+    None, "Ask about a maintenance plan",
     extra_ld=(service_ld("/car-wash-maintenance-plans/", "Car wash preventive maintenance", "Car wash equipment maintenance"),))
-PAGES["/emergency-car-wash-repair/"] = lambda: inner("/emergency-car-wash-repair/", "Emergency Repair",
-    "Emergency Car Wash Repair | Car Wash Management",
-    f"Wash down? Call or text Car Wash Management at {PHONE_D} for repair of conveyors, pumps, controllers and in-bay automatics. {HOURS}.",
-    "Emergency Car Wash Repair: Get Your Wash Back Up",
-    f"Wash down? Call or text {PHONE_D} and tell us what stopped. A photo of the problem helps.",
-    f'''<h2>Call or text first</h2><p>The fastest way to reach us is a call or text to <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a>. Tell us the equipment, what it’s doing and when it stopped.</p>
-<p>{tag("After-hours and weekend availability: Andrew to confirm")} {tag("Response time: Andrew to confirm")}</p><h2>How to reach us</h2>{facts()}''',
-    "after-hours details and what to have ready when you call.", "Request emergency service",
-    extra_ld=(service_ld("/emergency-car-wash-repair/", "Emergency car wash repair", "Car wash equipment repair"),))
+PAGES["/urgent-car-wash-repair/"] = lambda: inner("/urgent-car-wash-repair/", "Wash Down? Urgent Car Wash Repair",
+    "Wash Down? Urgent Car Wash Repair | Car Wash Management",
+    f"Wash down? Call or text Car Wash Management at {PHONE_D} and tell us what stopped. Messages after hours are answered the next business morning.",
+    "Wash Down? Urgent Car Wash Repair",
+    f"Call or text {PHONE_D} and tell us what stopped. Call or text any time. Messages after hours are answered the next business morning.",
+    f'''<h2>Call or text with what stopped</h2><p>Call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> and tell us what stopped: the equipment, what it’s doing and when it stopped. A photo of the problem helps.</p>
+<p>Call or text any time. Messages after hours are answered the next business morning.</p><h2>How to reach us</h2>{facts()}''',
+    None, "Request urgent service",
+    extra_ld=(service_ld("/urgent-car-wash-repair/", "Urgent car wash repair", "Car wash equipment repair"),))
 PAGES["/equipment/"] = lambda: inner("/equipment/", "Equipment &amp; Brands",
     "Car Wash Equipment & Brands We Service | Car Wash Management",
     "Car Wash Management services and repairs any make of car wash equipment, including WashWorld, MacNeil, Unitec/DRB, AXEON, HECO, Ryko and more.",
@@ -236,19 +235,19 @@ PAGES["/equipment/"] = lambda: inner("/equipment/", "Equipment &amp; Brands",
     f'''<h2>Brands we service</h2>{brand_list()}<h2>Equipment types</h2><ul class="ticks"><li>Tunnel</li><li>In-bay automatic</li><li>Self-serve</li><li>Dryers &amp; blowers</li><li>Vacuums</li><li>Water &amp; reclaim</li><li>Chemistry &amp; dosing</li></ul><p>{tag("Equipment types list: Andrew to confirm")}</p><h2>How to reach us</h2>{facts()}''',
     "brand-by-brand pages and the equipment we install and replace.")
 PAGES["/service-area/"] = lambda: inner("/service-area/", "Service Area",
-    "Car Wash Equipment Service Area | Car Wash Management",
-    f"Not sure if your car wash is in Car Wash Management’s service area? Call or text {PHONE_D} or send a request and we’ll tell you straight.",
-    "Car Wash Equipment Service Area",
-    "Is your wash in our area? Call or text and we’ll tell you straight.",
-    f'''<h2>Where we work</h2><div class="agrid" style="grid-template-columns:1fr 1fr">{"".join('<div class="abox">PLACEHOLDER: service area region (Andrew to confirm)</div>' for _ in range(4))}</div><p style="margin-top:14px">{tag("Service area wording: Andrew to confirm")}</p><h2>How to reach us</h2>{facts()}''',
-    "the regions we cover and how to book a visit.")
+    "Southwest United States Service Area | Car Wash Management",
+    f"Car Wash Management services car washes across the Southwest United States. Call or text {PHONE_D} to check whether we can reach your site.",
+    "Car Wash Equipment Service Across the Southwest United States",
+    "We service car washes across the Southwest United States. Call or text and we’ll tell you straight whether we can reach your site.",
+    f'''<h2>Where we work</h2><p>We service car washes across the Southwest United States. Call or text and we’ll tell you straight whether we can reach your site.</p><h2>How to reach us</h2>{facts()}''',
+    None)
 PAGES["/chemistry/"] = lambda: inner("/chemistry/", "Chemistry",
     "Car Wash Chemicals & Chemical Programs | Car Wash Management",
-    "Ask Car Wash Management about chemicals and chemical dosing for your car wash. Program details are coming soon. Call, text or request pricing.",
+    "Chemistry tailored to your wash by a real chemist. CWM Ceramic Wax, made by Car Wash Management. Call, text or request pricing.",
     "Car Wash Chemicals &amp; Chemical Programs",
-    "Chemistry, from the people who fix your equipment.",
-    f'''<h2>Dosing equipment</h2><p>We service chemical injectors and dosing equipment as part of our repair work.</p><h2>Chemical programs</h2><p>{tag("Chemistry offer and product line: Andrew to confirm")}</p><p>Ask us about the chemistry side of your wash and we’ll point you in the right direction.</p><h2>How to reach us</h2>{facts()}''',
-    "our chemical program and product details.", "Ask about chemistry")
+    "Chemistry tailored to your wash by a real chemist.",
+    f'''<h2>Our own product</h2><p>CWM Ceramic Wax, made by Car Wash Management.</p><h2>Dosing equipment</h2><p>We service chemical injectors and dosing equipment as part of our repair work.</p><p>Ask us about the chemistry for your wash.</p><h2>How to reach us</h2>{facts()}''',
+    None, "Ask about chemistry")
 PAGES["/about/"] = lambda: inner("/about/", "About",
     "About Car Wash Management | Car Wash Equipment Service",
     "Car Wash Management services and repairs car wash equipment and installs and replaces components. Learn who we are and how to reach our team.",
@@ -259,20 +258,20 @@ PAGES["/about/"] = lambda: inner("/about/", "About",
     extra_ld=({"@context": "https://schema.org", "@type": "AboutPage", "url": BASE + "/about/", "name": "About Car Wash Management", "about": {"@id": BASE + "/#org"}},))
 def contact():
     body = f'''<section class="phero"><div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <span aria-current="page">Request Service</span></nav>
-<h1>Request Service or a Quote</h1><p class="lead">Call or text {PHONE_D}, or send the form. Tell us your wash type, equipment and what’s going on, and we’ll get back to you.</p></div></section>
+<h1>Request Service or a Quote</h1><p class="lead">Call or text {PHONE_D}, or send the form. Tell us your wash type, equipment and what’s going on. We reply the same business day.</p></div></section>
 <section class="body"><div class="wrap cols"><div id="request">{form("contact-request", "/contact/", "Service or quote request", "h2", True)}</div>
 <div class="txt"><h2>Other ways to reach us</h2>{facts()}<div style="display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 24px">{call_btn()}{text_btn("btn btn-white")}</div>
 <h2>What to include</h2><ul class="ticks"><li>Your wash type (tunnel, in-bay automatic or self-serve)</li><li>The equipment and brand, if you know it</li><li>What it’s doing, and since when</li><li>A photo, texted to {PHONE_D}</li></ul>
-<div class="soon"><b>Wash down right now?</b> Call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> instead of using the form. {tag("Reply time for form requests: Andrew to confirm")}</div></div></div></section>'''
+<div class="soon"><b>Wash down right now?</b> Call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> instead of using the form. Form requests: We reply the same business day.</div></div></div></section>'''
     cp = {"@context": "https://schema.org", "@type": "ContactPage", "url": BASE + "/contact/", "name": "Request Service or a Quote", "about": {"@id": BASE + "/#business"}}
     return page("/contact/", "Request Car Wash Service or a Quote | Car Wash Management",
                 f"Call or send a service or quote request to Car Wash Management. Tell us your wash type, equipment and issue. Hours {HOURS}.",
                 body, (crumbs_ld("/contact/", "Request Service"), cp))
 def thank_you():
     body = f'''<section class="ty"><div class="wrap"><div class="eyebrow">Request sent</div><h1 style="margin-top:12px">Thanks. We got your request.</h1>
-<p>Your details went to the Car Wash Management team and we’ll get back to you. {tag("Callback time: Andrew to confirm")}</p><p>If your wash is down right now, call or text {PHONE_D}. Hours: {HOURS}.</p>
+<p>Your details went to the Car Wash Management team. We reply the same business day.</p><p>If your wash is down right now, call or text {PHONE_D}. Hours: {HOURS}.</p>
 <div class="btns">{call_btn()}{text_btn("btn btn-white")}<a class="btn btn-white" href="/">Back to the homepage</a></div></div></section>'''
-    return page("/thank-you/", "Thank You | Car Wash Management", "Thanks for your request. The Car Wash Management team will get back to you.", body, noindex=True)
+    return page("/thank-you/", "Thank You | Car Wash Management", "Thanks for your request. We reply the same business day.", body, noindex=True)
 def notfound():
     body = f'''<section class="ty"><div class="wrap"><div class="eyebrow">Error 404</div><h1 style="margin-top:12px">Page not found</h1>
 <p>That page doesn’t exist or has moved. Try one of these, or call or text {PHONE_D}.</p>
@@ -290,14 +289,14 @@ def main():
     for p, c in built.items(): write(p, c)
     (ROOT / "404.html").write_text(notfound())
     indexable = [p for p in built if p != "/thank-you/"]
-    order = ["/", "/car-wash-equipment-repair/", "/car-wash-equipment-installation/", "/car-wash-maintenance-plans/", "/emergency-car-wash-repair/",
+    order = ["/", "/car-wash-equipment-repair/", "/car-wash-equipment-installation/", "/car-wash-maintenance-plans/", "/urgent-car-wash-repair/",
              "/equipment/", "/service-area/", "/chemistry/", "/about/", "/contact/"]
     assert sorted(order) == sorted(indexable)
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
         f"  <url><loc>{BASE}{p}</loc><lastmod>{LASTMOD}</lastmod></url>\n" for p in order) + "</urlset>\n"
     (ROOT / "sitemap.xml").write_text(sm)
     (ROOT / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {BASE}/sitemap.xml\n")
-    R = [("/index.html", "/", 301),
+    R = [("/index.html", "/", 301), ("/emergency-car-wash-repair/", "/urgent-car-wash-repair/", 301), ("/emergency-car-wash-repair", "/urgent-car-wash-repair/", 301),
          ("/services.html", "/car-wash-equipment-repair/", 301), ("/services", "/car-wash-equipment-repair/", 301),
          ("/equipment.html", "/equipment/", 301),
          ("/preventive-maintenance.html", "/car-wash-maintenance-plans/", 301), ("/preventive-maintenance", "/car-wash-maintenance-plans/", 301),

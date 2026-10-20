@@ -28,7 +28,7 @@ Do not edit [legal.carwashmgmt.com](https://legal.carwashmgmt.com/).
   from the repo root; it writes `index.html`, `<page>/index.html`, `404.html`, `sitemap.xml`, `robots.txt`, `_redirects`, `_headers`.
   `_build/` holds no secrets; IT may exclude it from the deploy root like `workers/`.
 - Pages: `/`, `/car-wash-equipment-repair/`, `/car-wash-equipment-installation/`, `/car-wash-maintenance-plans/`,
-  `/emergency-car-wash-repair/`, `/equipment/`, `/service-area/`, `/chemistry/`, `/about/`, `/contact/`, `/thank-you/` (noindex), `404.html`.
+  `/urgent-car-wash-repair/` (old `/emergency-car-wash-repair/` 301s here), `/equipment/`, `/service-area/`, `/chemistry/`, `/about/`, `/contact/`, `/thank-you/` (noindex), `404.html`.
   Old .html pages were removed and 301/302 to their new equivalents via `_redirects`. `privacy-policy.html` / `terms-and-conditions.html`
   are kept untouched (noindex via `_headers`); the footer links the legal.carwashmgmt.com copies.
 - Fonts: Archivo + Inter (SIL OFL 1.1, licences in `assets/cwm/fonts/`), self-hosted, Latin subset, variable ranges trimmed.
