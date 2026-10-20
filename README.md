@@ -1,9 +1,22 @@
-# CWM www snapshot (10DLC CTA)
+# CWM www snapshot (carwashmgmt.com)
 
-Static freeze of the live Base44 homepage look, with crawler-visible `START` / `STOP` / `HELP` in View Source (`id="sms-opt-in"`).
+Static copy of **www.carwashmgmt.com**. The `main` branch is what GitHub Pages serves today at
+www.carwashmgmt.com (behind the Cloudflare proxy), including `/email-signature/*.png` used in
+email signatures. **Do not break `main` or the CNAME file** until the Cloudflare Pages cutover is approved.
 
-**Proof URL (no custom domain bound):** https://andrewbwm275.github.io/cwm-www-snapshot/
-
-Do **not** attach `www.carwashmgmt.com` as a GitHub Pages custom domain while GoDaddy `www` still CNAMEs to `base44.onrender.com` (that 301s this github.io URL into the JS shell). After Andrew Saves the www CNAME to `andrewbwm275.github.io`, bind the custom domain.
-
+Proof URL (no custom domain bound): https://andrewbwm275.github.io/cwm-www-snapshot/
 Do not edit [legal.carwashmgmt.com](https://legal.carwashmgmt.com/).
+
+## Branch `cloudflare-pages-preview`
+- Base44-hosted images moved local (no Base44 dependency left): favicon `2732c3225_9png.png` (14 pages),
+  `10a2161d8_bg-.png` (about), `96fef0b92_Aboutbg.png` (solutions).
+- Cloudflare Pages deploy root = repo minus `.git`, `workers/`, `README.md`, `CNAME`, `.gitignore`, `.nojekyll`.
+  Project: `cwm-www` (*.pages.dev, no custom domain).
+- `COMPARE-PAGES-PREVIEW.md`: live vs preview, all 14 pages + signature image identical.
+- `DNS-RECORDS.md`: record map; cutover touches only apex/www.
+
+## Known gaps (same on live)
+- The 4 forms (index, contact, equipment, preventive-maintenance) have no action/backend.
+- Broken links: /blog/* (4 posts), /Testimonials, /Contact?type=chemistry.
+- Touch Free booklet PDF still on Duda (irp.cdn-website.com, 47 MB, over Pages' 25 MiB/file limit).
+- preventive-maintenance.html is live but not linked from any page.
