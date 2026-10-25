@@ -40,7 +40,7 @@ Do not edit [legal.carwashmgmt.com](https://legal.carwashmgmt.com/).
   It feeds the brands page, the homepage chips, the footer and the repair/equipment lists. Text only, no logos, no dealer/partner claims;
   the trademark disclaimer shows wherever brands are listed.
 - Equipment categories: `_build/categories.py` (copy, components, faults, brands, fallback images). FAQ answers come only from the approved
-  facts in `build.py` (phone, hours, same-business-day reply, after-hours line, install/plan wording, service area). If Design's
+  facts in `build.py` (phone, hours, install/plan wording, service area; no response-time promises). If Design's
   `/workspace/brand/cwm-redesign/images/categories/<slug>/manifest.csv` exists, the build copies that set in (skipping PENDING/ALTERNATE
   rows and `_pending-clearance`), captions `kind=own` photos "Our job", leaves stock uncaptioned and credits it on `/credits/`.
 - Photos: `assets/cwm/img/photos/` (WebP, 1600w/800w heroes, 1200w/600w others), picked from Design's manifest

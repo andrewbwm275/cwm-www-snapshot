@@ -1,5 +1,5 @@
 # Brand-neutral equipment category pages (/equipment/<slug>/). Generic, honest copy only.
-# FAQ answers use only approved facts (phone, hours, same-business-day reply, after-hours line,
+# FAQ answers use only approved facts (phone, hours,
 # installation wording, plan wording, service area): they are filled in by build.py from those constants.
 # images: (hero key or None, [gallery keys]) from build.py IMG. Design's per-category sets override these
 # automatically from /workspace/brand/cwm-redesign/images/categories/manifest.csv (see design_category in build.py).
@@ -17,7 +17,7 @@ CATEGORIES = [
       faults=["Carriage won’t travel or stops mid-wash", "Low or no high pressure", "Vehicle positioning or sizing errors", "Brushes not turning or retracting",
               "Dryer won’t start", "Chemicals not applying evenly"],
       images=("hero-installation", ["card-installation", "job-05", "chemistry"]),
-      brands=["washworld", "pdq", "ryko", "washtec", "mark-vii", "istobal", "petit", "opw", "belanger", "coleman-hanna", "hydro-spray"],
+      brands=["washworld", "ryko"],
       extra_q="install"),
  dict(slug="tunnel", short="Tunnel", name="tunnel",
       h1="Tunnel Car Wash Equipment Service &amp; Repair",
@@ -31,7 +31,7 @@ CATEGORIES = [
       faults=["Conveyor stops or the chain jumps", "Rollers not coming up on call", "Brush arms not retracting or hitting vehicles", "Hydraulic leaks or slow movement",
               "Low pressure at the arches", "Blower motor failures", "Sensors misreading vehicles"],
       images=("hero-maintenance", ["job-01", "job-03", "job-04", "card-repair", "card-support"]),
-      brands=["sonnys", "tommy", "macneil", "avw", "motor-city-wash-works", "belanger", "coleman-hanna", "peco", "ncs", "heco", "istobal", "petit"],
+      brands=["macneil", "heco"],
       extra_q="install"),
  dict(slug="self-serve", short="Self-serve", name="self-serve",
       h1="Self-Serve Car Wash Equipment Service &amp; Repair",
@@ -44,7 +44,7 @@ CATEGORIES = [
       faults=["Low pressure in one bay", "Meter not taking coins or cards", "No foam at the brush", "Leaking booms or swivels", "Spot-free rinse not working",
               "Weep system not running"],
       images=("job-06", []),
-      brands=["ginsan", "hydro-spray", "erie-brush", "coleman-hanna", "je-adams", "cat-pumps"],
+      brands=["cat-pumps"],
       extra_q="plan"),
  dict(slug="vacuums", short="Vacuums", name="vacuum",
       h1="Car Wash Vacuum Service &amp; Repair",
@@ -56,7 +56,7 @@ CATEGORIES = [
                   "Hoses and nozzles", "Stand-alone vacuum motors", "Vacuum meters"],
       faults=["Low suction at the hose", "Motor won’t start", "Clogged separators or filters", "Torn hoses and leaks in the piping", "Meters not working"],
       images=(None, []),
-      brands=["vacutech", "autovac", "je-adams", "ivs", "kleen-rite"],
+      brands=[],
       extra_q="plan"),
  dict(slug="controllers-pay-stations", short="Controllers &amp; pay stations", name="controller and pay station",
       h1="Car Wash Controller &amp; Pay Station Service &amp; Repair",
@@ -69,7 +69,7 @@ CATEGORIES = [
       faults=["Pay station not taking payments", "Bill or coin jams", "Controller faults that stop the wash", "Gate not opening", "Sensors misreading vehicles",
               "Pay station and wash not talking to each other"],
       images=(None, ["job-06"]),
-      brands=["drb", "unitec", "ics", "hamilton", "kesseltronics"],
+      brands=["unitec-drb"],
       extra_q="plan"),
  dict(slug="chemical-dosing", short="Chemical dosing", name="chemical dosing",
       h1="Car Wash Chemical Dosing Equipment Service &amp; Repair",
@@ -81,7 +81,7 @@ CATEGORIES = [
                   "Applicators, arches and nozzles", "Blending and dispensing systems"],
       faults=["Chemical not drawing", "Inconsistent dilution", "Leaks at fittings and lines", "Clogged lines or nozzles", "Foam not forming"],
       images=("chemistry-page-hero", ["chemistry"]),
-      brands=["dosatron", "hydra-flex", "blendco", "grundfos"],
+      brands=["grundfos"],
       extra_q="install"),
  dict(slug="water-reclaim-ro", short="Water, reclaim &amp; RO", name="water, reclaim and RO",
       h1="Car Wash Water, Reclaim &amp; RO Service &amp; Repair",
@@ -93,6 +93,6 @@ CATEGORIES = [
                   "Spot-free storage and delivery pumps", "Odor control"],
       faults=["Low RO output", "Spotting after the final rinse", "Reclaim odor", "Pump failures and pressure drops", "Clogged filters"],
       images=(None, []),
-      brands=["axeon", "con-serv", "cat-pumps", "grundfos", "dultmeier"],
+      brands=["axeon", "cat-pumps", "grundfos"],
       extra_q="plan"),
 ]

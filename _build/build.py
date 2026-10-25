@@ -150,7 +150,7 @@ def form(fid, loc, heading="Request service or a quote", hlevel="h2", flat=False
     opts = "".join(f"<option>{t}</option>" for t in REQ_TYPES)
     f = lambda n: f"{fid}-{n}"
     return f'''<form class="form{" flat" if flat else ""}" id="{fid}" data-cwm-request data-form-location="{loc}" action="/contact/" method="post">
-<{hlevel}>{heading}</{hlevel}><p class="sub">Tell us what’s going on. We reply the same business day.</p>
+<{hlevel}>{heading}</{hlevel}><p class="sub">Tell us what’s going on.</p>
 <div class="row2"><div class="field"><label for="{f("name")}">Your name <span class="req">*</span></label><input id="{f("name")}" name="name" autocomplete="name" required maxlength="120" data-err="Please enter your name."><span class="err"></span></div>
 <div class="field"><label for="{f("biz")}">Business / wash site <span class="req">*</span></label><input id="{f("biz")}" name="business_site" autocomplete="organization" required maxlength="160" data-err="Please enter your business or wash name."><span class="err"></span></div></div>
 <div class="row2"><div class="field"><label for="{f("email")}">Email <span class="req">*</span></label><input id="{f("email")}" name="email" type="email" autocomplete="email" required maxlength="160" data-err="Please enter a valid email address."><span class="err"></span></div>
@@ -199,7 +199,7 @@ def page(path, title, desc, body, extra_ld=(), noindex=False, canonical=True):
 '''
 
 def downtime():
-    return f'''<section class="downtime" aria-labelledby="dt-h"><div class="wrap"><div class="pulse" aria-hidden="true"></div><div><h2 id="dt-h">Wash down? Call now.</h2><p>Every hour down costs you cars. Call or text and tell us what stopped. Call or text any time. Messages after hours are answered the next business morning. <a href="/urgent-car-wash-repair/">Urgent repair →</a></p></div>
+    return f'''<section class="downtime" aria-labelledby="dt-h"><div class="wrap"><div class="pulse" aria-hidden="true"></div><div><h2 id="dt-h">Wash down? Call now.</h2><p>Every hour down costs you cars. Call or text and tell us what stopped. <a href="/urgent-car-wash-repair/">Urgent repair →</a></p></div>
 <div class="acts">{call_btn("btn btn-ink", PHONE_D)}{text_btn()}</div></div></section>'''
 
 def brand_chips(cls="bcats"):
@@ -310,11 +310,11 @@ PAGES["/car-wash-maintenance-plans/"] = lambda: inner("/car-wash-maintenance-pla
     extra_ld=(service_ld("/car-wash-maintenance-plans/", "Car wash preventive maintenance", "Car wash equipment maintenance"),))
 PAGES["/urgent-car-wash-repair/"] = lambda: inner("/urgent-car-wash-repair/", "Wash Down? Urgent Car Wash Repair",
     "Wash Down? Urgent Car Wash Repair | Car Wash Management",
-    f"Wash down? Call or text Car Wash Management at {PHONE_D} and tell us what stopped. Messages after hours are answered the next business morning.",
+    f"Wash down? Call or text Car Wash Management at {PHONE_D} and tell us what stopped.",
     "Wash Down? Urgent Car Wash Repair",
-    f"Call or text {PHONE_D} and tell us what stopped. Call or text any time. Messages after hours are answered the next business morning.",
+    f"Call or text {PHONE_D} and tell us what stopped. Hours: {HOURS}.",
     f'''<h2>Call or text with what stopped</h2><p>Call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> and tell us what stopped: the equipment, what it’s doing and when it stopped. A photo of the problem helps.</p>
-<p>Call or text any time. Messages after hours are answered the next business morning.</p><h2>How to reach us</h2>{facts()}''',
+<p>Call or text {PHONE_D} and tell us what stopped. Hours: {HOURS}.</p><h2>How to reach us</h2>{facts()}''',
     None, "Request urgent service",
     extra_ld=(service_ld("/urgent-car-wash-repair/", "Urgent car wash repair", "Car wash equipment repair"),))
 # ---------------- Equipment hub + category pages ----------------
@@ -346,8 +346,8 @@ CAT_LINKS = {"tunnel": '<p><a href="/equipment/tunnel/">Tunnel equipment service
 BRAND_BY_ANCHOR = {a: n for _, _, _, bs in BRAND_CATS for n, a, *_ in bs}
 def cat_faq(c):
     n = c["name"]
-    qs = [(f"How do I get my {n} equipment looked at?", f"Call or text {PHONE_D}, or send the request form on this page. We reply the same business day. Hours: {HOURS}."),
-          (f"What if my {n} equipment goes down after hours?", "Call or text any time. Messages after hours are answered the next business morning.")]
+    qs = [(f"How do I get my {n} equipment looked at?", f"Call or text {PHONE_D}, or send the request form on this page. Hours: {HOURS}."),
+          (f"What if my {n} equipment goes down after hours?", f"Call or text {PHONE_D} and tell us what stopped, or send the request form. Hours: {HOURS}.")]
     qs.append((f"Do you install and replace {n} equipment?", "Yes. Installation and replacement of equipment and components, from single parts to complete systems.")
               if c["extra_q"] == "install" else
               (f"Do you offer maintenance plans for {n} equipment?", "Yes. Scheduled preventive maintenance visits, priority scheduling and a custom quote for each site."))
@@ -364,7 +364,7 @@ def category_page(c):
     content = f'''<h2>What we service</h2><ul class="ticks">{"".join(f"<li>{x}</li>" for x in c["components"])}</ul>
 <h2>Common faults we fix</h2><ul class="ticks">{"".join(f"<li>{x}</li>" for x in c["faults"])}</ul>
 <h2>Photos</h2>{gallery(c)}
-<h2>Brands we service</h2><p>We work on {c["name"]} equipment from these brands, and other makes too. <a href="{BRANDS_URL}">See all brands</a>.</p><!--brands--><ul class="chips sm">{brands}</ul><!--/brands--><p class="tm">{TM}</p>
+<h2>Brands we service</h2>{(f'<p>We work on most major {c["name"]} equipment, including these brands. <a href="{BRANDS_URL}">See all brands</a>.</p><!--brands--><ul class="chips sm">{brands}</ul><!--/brands--><p class="tm">{TM}</p>') if brands else f'<p>We work on most major {c["name"]} equipment. Call or text {PHONE_D} with the make and model. <a href="{BRANDS_URL}">See the brands we service</a>.</p>'}
 <h2>Questions</h2><div class="faq">{"".join(f"<h3>{q}</h3><p>{a}</p>" for q, a in faq)}</div>
 <h2>How to reach us</h2>{facts()}'''
     faq_ld = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
@@ -389,7 +389,7 @@ def equipment_hub():
         "In-bay automatics, tunnels, self-serve bays, vacuums, controllers and pay stations, chemical dosing, and water, reclaim and RO.",
         content, None)
 PAGES["/equipment/"] = equipment_hub
-BRAND_PHOTO = {"avw": "avw-brand-avw"}
+BRAND_PHOTO = {}
 def BRAND_IMG(a):
     k = BRAND_PHOTO[a]
     return f'<figure class="bimg">{img(k, "(max-width:700px) calc(100vw - 40px), 560px")}<figcaption class="k-{kind(k)}">{caption(k)}</figcaption></figure>'
@@ -402,7 +402,7 @@ def brands_page():
     svc["description"] = "Repair, troubleshooting, parts replacement and preventive maintenance for tunnel, in-bay automatic, self-serve, vacuum, pay station and water equipment."
     return inner(BRANDS_URL, "Brands We Service",
         "Car Wash Equipment Brands We Service | Car Wash Management",
-        "We repair and service tunnel, in-bay, self-serve, vacuum, pay station and water equipment from Sonny’s, MacNeil, PDQ, Ryko, Belanger and more.",
+        "We repair and service most major tunnel, in-bay, self-serve, vacuum, pay station and water equipment, including Washworld, MacNeil, Ryko and Unitec/DRB.",
         "Car Wash Equipment Brands We Service",
         "Repair, troubleshooting, parts replacement and preventive maintenance for the major car wash equipment brands.",
         content, None, extra_ld=(svc,))
@@ -431,11 +431,11 @@ PAGES["/about/"] = lambda: inner("/about/", "About",
     extra_ld=({"@context": "https://schema.org", "@type": "AboutPage", "url": BASE + "/about/", "name": "About Car Wash Management", "about": {"@id": BASE + "/#org"}},))
 def contact():
     body = f'''<section class="phero"><div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <span aria-current="page">Request Service</span></nav>
-<h1>Request Service or a Quote</h1><p class="lead">Call or text {PHONE_D}, or send the form. Tell us your wash type, equipment and what’s going on. We reply the same business day.</p></div></section>
+<h1>Request Service or a Quote</h1><p class="lead">Call or text {PHONE_D}, or send the form. Tell us your wash type, equipment and what’s going on.</p></div></section>
 <section class="body"><div class="wrap cols"><div id="request">{form("contact-request", "/contact/", "Service or quote request", "h2", True)}</div>
 <div class="txt"><h2>Other ways to reach us</h2>{facts()}<div style="display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 24px">{call_btn()}{text_btn("btn btn-white")}</div>
 <h2>What to include</h2><ul class="ticks"><li>Your wash type (tunnel, in-bay automatic or self-serve)</li><li>The equipment and brand, if you know it</li><li>What it’s doing, and since when</li><li>A photo, texted to {PHONE_D}</li></ul>
-<div class="soon"><b>Wash down right now?</b> Call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> instead of using the form. Form requests: We reply the same business day.</div></div></div></section>'''
+<div class="soon"><b>Wash down right now?</b> Call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> instead of using the form.</div></div></div></section>'''
     cp = {"@context": "https://schema.org", "@type": "ContactPage", "url": BASE + "/contact/", "name": "Request Service or a Quote", "about": {"@id": BASE + "/#business"}}
     return page("/contact/", "Request Car Wash Service or a Quote | Car Wash Management",
                 f"Call or send a service or quote request to Car Wash Management. Tell us your wash type, equipment and issue. Hours {HOURS}.",
@@ -455,9 +455,9 @@ def credits():
     return page("/credits/", "Photo Credits | Car Wash Management", "Credits and licenses for the photos used on carwashmgmt.com: our own jobs, manufacturer images and stock.", body, noindex=True)
 def thank_you():
     body = f'''<section class="ty"><div class="wrap"><div class="eyebrow">Request sent</div><h1 style="margin-top:12px">Thanks. We got your request.</h1>
-<p>Your details went to the Car Wash Management team. We reply the same business day.</p><p>If your wash is down right now, call or text {PHONE_D}. Hours: {HOURS}.</p>
+<p>Your details went to the Car Wash Management team.</p><p>If your wash is down right now, call or text {PHONE_D}. Hours: {HOURS}.</p>
 <div class="btns">{call_btn()}{text_btn("btn btn-white")}<a class="btn btn-white" href="/">Back to the homepage</a></div></div></section>'''
-    return page("/thank-you/", "Thank You | Car Wash Management", "Thanks for your request. We reply the same business day.", body, noindex=True)
+    return page("/thank-you/", "Thank You | Car Wash Management", "Thanks for your request. Car Wash Management received your details.", body, noindex=True)
 def notfound():
     body = f'''<section class="ty"><div class="wrap"><div class="eyebrow">Error 404</div><h1 style="margin-top:12px">Page not found</h1>
 <p>That page doesn’t exist or has moved. Try one of these, or call or text {PHONE_D}.</p>
