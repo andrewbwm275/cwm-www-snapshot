@@ -165,7 +165,7 @@ def form(fid, loc, heading="Request service or a quote", hlevel="h2", flat=False
 <div class="field"><label for="{f("msg")}">Message</label><textarea id="{f("msg")}" name="message" maxlength="4000" placeholder="What’s happening? A photo can be texted to {PHONE_D}."></textarea><span class="err"></span></div>
 <div class="field"><fieldset><legend>Preferred contact</legend><div class="radios"><label><input type="radio" name="preferred_contact" value="Phone call" checked> Phone call</label><label><input type="radio" name="preferred_contact" value="Email"> Email</label></div></fieldset></div>
 <div class="check"><label><input type="checkbox" name="consent" required data-err="Please tick the box so we can contact you about this request."> <span>I agree that Car Wash Management may contact me by phone or email about this request. This does not sign me up for text messages.</span></label><span class="err"></span></div>
-<div class="check sms"><label><input type="checkbox" name="sms_consent" value="Yes"> <span>{html.escape(SMS_CONSENT)}</span></label><p class="smsl"><a href="{TERMS_URL}#sms">Terms</a> · <a href="{PRIVACY_URL}#sms">Privacy</a></p></div>
+<div class="check sms"><label><input type="checkbox" name="sms_consent" value="Yes"> <span>{html.escape(SMS_CONSENT)} See our <a href="{TERMS_URL}#sms">SMS Terms</a> and <a href="{PRIVACY_URL}">Privacy Policy</a>.</span></label></div>
 <button class="btn btn-blue" type="submit">Send request {I_ARR}</button>
 <p class="alt">Faster? Call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a></p></form>'''
 
@@ -199,7 +199,7 @@ def page(path, title, desc, body, extra_ld=(), noindex=False, canonical=True):
 {header(path)}
 <main id="main">{body}</main>
 {footer()}
-<script src="/forms-config.js" defer></script><script src="/events-config.js" defer></script><script src="/assets/js/site-forms.js" defer></script><script src="/assets/cwm/js/cwm.js?v=20261028b" defer></script>
+<script src="/forms-config.js" defer></script><script src="/events-config.js" defer></script><script src="/assets/js/site-forms.js" defer></script><script src="/assets/cwm/js/cwm.js?v=20261028c" defer></script>
 </body></html>
 '''
 
@@ -473,7 +473,7 @@ def notfound():
 LEGAL = {PRIVACY_URL: ("privacy.html", "Privacy Policy", "Privacy Policy | Car Wash Management",
                        "How Car Wash Management collects, uses and protects your information, including text message (SMS) opt-in data.", "Last modified: October 28, 2026"),
          TERMS_URL: ("terms.html", "Terms &amp; Conditions", "Terms & Conditions | Car Wash Management",
-                     "Terms for Car Wash Management services and our customer-care text message (SMS) program.", "Effective upon posting")}
+                     "Terms for Car Wash Management services and our customer-care text message (SMS) program.", "Last updated: October 28, 2026")}
 def legal(path):
     src, h1, title, desc, sub = LEGAL[path]
     txt = (ROOT / "_build/legal" / src).read_text()

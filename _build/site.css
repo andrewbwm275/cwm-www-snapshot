@@ -171,8 +171,7 @@ section.s{padding:96px 0}
 .check label{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.45;color:var(--body);cursor:pointer}
 .check input{width:18px;height:18px;margin-top:2px;flex:none;accent-color:var(--blue)}
 .check.sms{margin-top:12px}
-.smsl{margin:4px 0 0 28px;font-size:13px;line-height:1.4}
-.smsl a{color:var(--blue);text-decoration:underline}
+.check.sms a{color:var(--blue);text-decoration:underline}
 .err{display:block;color:#B42318;font-size:13px;margin-top:4px;min-height:0}
 .invalid input,.invalid select,.invalid textarea{border-color:#B42318;background:#FEF3F2}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
