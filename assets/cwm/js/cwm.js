@@ -57,6 +57,12 @@
       if (msg) msg.textContent = bad ? (c.getAttribute("data-err") || c.validationMessage) : "";
       if (bad && !first) first = c;
     });
+    var sms = f.elements.sms_consent, ph = f.elements.phone;
+    if (sms && ph && sms.checked && !ph.value.trim()) {
+      var pw = ph.closest(".field"); pw.classList.add("invalid");
+      var pm = pw.querySelector(".err"); if (pm) pm.textContent = ph.getAttribute("data-sms-err") || "Please add a mobile number so we can text you.";
+      if (!first) first = ph;
+    }
     if (first) first.focus();
     return !first;
   }
@@ -64,7 +70,12 @@
     f.setAttribute("novalidate", "");
     f.addEventListener("input", function (e) {
       var w = e.target.closest(".field, .check");
-      if (w && w.classList.contains("invalid") && e.target.validity.valid) { w.classList.remove("invalid"); var m = w.querySelector(".err"); if (m) m.textContent = ""; }
+      if (w && w.classList.contains("invalid") && e.target.validity.valid && !(e.target.name === "phone" && !e.target.value.trim() && f.elements.sms_consent && f.elements.sms_consent.checked)) { w.classList.remove("invalid"); var m = w.querySelector(".err"); if (m) m.textContent = ""; }
+    });
+    f.addEventListener("change", function (e) {
+      if (e.target.name !== "sms_consent" || e.target.checked || !f.elements.phone) return;
+      var pw = f.elements.phone.closest(".field");
+      if (pw && f.elements.phone.validity.valid) { pw.classList.remove("invalid"); var pm = pw.querySelector(".err"); if (pm) pm.textContent = ""; }
     });
     f.addEventListener("submit", function (e) {
       e.preventDefault();

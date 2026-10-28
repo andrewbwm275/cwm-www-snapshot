@@ -146,7 +146,7 @@ def footer():
 <div><h2>Company</h2><p><a href="/car-wash-equipment-brands/">Brands we service</a></p><p><a href="/equipment/">Equipment we service</a></p><p><a href="/service-area/">Service area</a></p><p><a href="/about/">About</a></p><p><a href="/contact/">Request service</a></p></div>
 <div><h2>Equipment we service</h2>{"".join(f'<p><a href="/equipment/{c["slug"]}/">{c["short"]}</a></p>' for c in CATEGORIES)}<p><a href="{BRANDS_URL}">Brands we service →</a></p></div>
 </div><div class="wrap">{SMS_OPTIN}
-<div class="fbot">© 2026 Car Wash Management · carwashmgmt.com · <a href="https://legal.carwashmgmt.com/privacy-policy.html">Privacy Policy</a> · <a href="https://legal.carwashmgmt.com/terms-and-conditions.html">Terms &amp; Conditions</a> · <a href="/credits/">Photo credits</a><p class="tm-foot">{TM}</p></div></div></footer>
+<div class="fbot">© 2026 Car Wash Management · carwashmgmt.com · <a href="{PRIVACY_URL}">Privacy Policy</a> · <a href="{TERMS_URL}">Terms &amp; Conditions</a> · <a href="/credits/">Photo credits</a><p class="tm-foot">{TM}</p></div></div></footer>
 <div class="mbar">{call_btn("btn btn-blue", "Call")}{text_btn("btn btn-ghost", "Text")}<a class="btn btn-white" href="/contact/">Request</a></div>'''
 
 REQ_TYPES = ["Repair", "Installation or replacement", "Maintenance plan", "Urgent / wash is down", "Chemistry", "Other"]
@@ -158,7 +158,7 @@ def form(fid, loc, heading="Request service or a quote", hlevel="h2", flat=False
 <div class="row2"><div class="field"><label for="{f("name")}">Your name <span class="req">*</span></label><input id="{f("name")}" name="name" autocomplete="name" required maxlength="120" data-err="Please enter your name."><span class="err"></span></div>
 <div class="field"><label for="{f("biz")}">Business / wash site <span class="req">*</span></label><input id="{f("biz")}" name="business_site" autocomplete="organization" required maxlength="160" data-err="Please enter your business or wash name."><span class="err"></span></div></div>
 <div class="row2"><div class="field"><label for="{f("email")}">Email <span class="req">*</span></label><input id="{f("email")}" name="email" type="email" autocomplete="email" required maxlength="160" data-err="Please enter a valid email address."><span class="err"></span></div>
-<div class="field"><label for="{f("phone")}">Phone <span class="req">*</span></label><input id="{f("phone")}" name="phone" type="tel" autocomplete="tel" required minlength="7" maxlength="40" pattern="[0-9+()\\-. ]{{7,40}}" data-err="Please enter a phone number we can reach you on."><span class="err"></span></div></div>
+<div class="field"><label for="{f("phone")}">Phone</label><input id="{f("phone")}" name="phone" type="tel" autocomplete="tel" minlength="7" maxlength="40" pattern="[0-9+()\\-. ]{{7,40}}" aria-describedby="{f("phone-err")}" data-err="Please enter a valid phone number." data-sms-err="Please add a mobile number so we can text you."><span class="err" id="{f("phone-err")}" aria-live="polite"></span></div></div>
 <div class="row2"><div class="field"><label for="{f("city")}">City</label><input id="{f("city")}" name="city" autocomplete="address-level2" maxlength="120"><span class="err"></span></div>
 <div class="field"><label for="{f("type")}">Request type <span class="req">*</span></label><select id="{f("type")}" name="request_type" required data-err="Please choose a request type."><option value="">Choose one</option>{opts}</select><span class="err"></span></div></div>
 <div class="field"><label for="{f("equip")}">Equipment or brand</label><input id="{f("equip")}" name="equipment_brand" maxlength="200" placeholder="e.g. tunnel conveyor, in-bay automatic, pay station"><span class="err"></span></div>
@@ -199,7 +199,7 @@ def page(path, title, desc, body, extra_ld=(), noindex=False, canonical=True):
 {header(path)}
 <main id="main">{body}</main>
 {footer()}
-<script src="/forms-config.js" defer></script><script src="/events-config.js" defer></script><script src="/assets/js/site-forms.js" defer></script><script src="/assets/cwm/js/cwm.js?v=20261028" defer></script>
+<script src="/forms-config.js" defer></script><script src="/events-config.js" defer></script><script src="/assets/js/site-forms.js" defer></script><script src="/assets/cwm/js/cwm.js?v=20261028b" defer></script>
 </body></html>
 '''
 
