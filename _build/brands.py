@@ -1,6 +1,7 @@
-# Brands we name, grouped by category. Andrew approved exactly these 8 on 2026-10-20:
+# Brands we name, grouped by category. Andrew approved these 8 on 2026-10-20:
 # Washworld (WashWorld), MacNeil, Unitec/DRB, AXEON, HECO, Ryko, Cat Pumps, Grundfos.
-# Name no other brand anywhere on the site; use generic wording ("most major ... equipment").
+# 2026-10-28: techs service all brands, so copy says "all major brands"; AVW, Motor City, Vacutech and NCS added (names only).
+# Name no other brand anywhere on the site beyond these 12.
 # Text only: no logos, no photos of Washworld, and no dealer/partner claims.
 # Each brand: (name, anchor id, short equipment label, section text, notes, source_url)
 P = "(808) 465-2291"
@@ -12,6 +13,12 @@ CATS = [
   ("HECO", "heco", "conveyor gear drives",
    "Conveyor drive trouble? We service and replace HECO gear drives and gearboxes used on tunnel conveyors.",
    "", "https://www.hecogear.com/product/electric_drive.asp"),
+  ("AVW", "avw", "tunnel systems",
+   "We service AVW tunnel systems, including conveyors, arches, brushes and dryers. Troubleshooting, parts replacement and scheduled maintenance.",
+   "AVW Equipment Company", "https://avwequipment.com/"),
+  ("Motor City", "motor-city", "tunnel systems",
+   f"We repair and service Motor City Wash Works tunnel equipment, including conveyors, arches, wraps and dryers. Call or text {P}.",
+   "Motor City Wash Works", "https://www.motorcitywashworks.com/systems/car-wash-tunnel-systems/"),
  ]),
  ("in-bay", "In-bay automatic systems", "In-bay automatic", [
   ("Washworld", "washworld", "in-bay automatic systems",
@@ -20,6 +27,14 @@ CATS = [
   ("Ryko", "ryko", "in-bay automatic systems",
    "Ryko in-bay systems, both friction and touch-free: we troubleshoot, replace worn parts and keep up preventive maintenance.",
    "", "https://ryko.com/systems/"),
+  ("NCS", "ncs", "in-bay and tunnel systems",
+   "We service NCS (National Carwash Solutions) in-bay automatics and tunnel systems: troubleshooting, worn-part replacement and preventive maintenance.",
+   "National Carwash Solutions", "https://www.ncswash.com/car-wash-equipment/"),
+ ]),
+ ("vacuums", "Vacuum systems", "Vacuums", [
+  ("Vacutech", "vacutech", "vacuum systems",
+   f"Weak suction or a producer down? We service Vacutech vacuum systems, including turbines, separators, arches and hoses. Call or text {P}.",
+   "", "https://www.ncswash.com/car-wash-vacuum-systems-vacutech/"),
  ]),
  ("controllers", "Controllers, pay stations &amp; entry systems", "Controllers &amp; pay stations", [
   ("Unitec/DRB", "unitec-drb", "pay stations, controllers and point-of-sale",

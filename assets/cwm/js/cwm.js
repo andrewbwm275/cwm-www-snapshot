@@ -31,12 +31,15 @@
   }
   function fieldsOf(f) {
     var consent = f.elements.consent;
+    var sms = f.elements.sms_consent;
     var o = {
       name: val(f, "name"), business_site: val(f, "business_site"), email: val(f, "email"), phone: val(f, "phone"),
       city: val(f, "city"), request_type: val(f, "request_type"), equipment_brand: val(f, "equipment_brand"),
       message: val(f, "message"), preferred_contact: radio(f, "preferred_contact"),
       consent: consent && consent.checked ? "Yes" : "No",
       consent_text: consent ? (consent.closest("label").textContent || "").replace(/\s+/g, " ").trim() : "",
+      sms_consent: sms && sms.checked ? "Yes" : "No",
+      sms_consent_text: sms ? (sms.closest("label").textContent || "").replace(/\s+/g, " ").trim() : "",
       form_location: f.getAttribute("data-form-location") || location.pathname,
       referrer: document.referrer ? document.referrer.slice(0, 300) : ""
     };

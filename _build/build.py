@@ -21,8 +21,12 @@ AREA_LINE = f"We service car washes across {AREA}. Call or text and we’ll tell
 BRANDS_URL = "/car-wash-equipment-brands/"
 TM = ("Brand names are trademarks of their respective owners. Car Wash Management is an independent service company "
       "and is not affiliated with or endorsed by these manufacturers.")
-# SMS opt-in block removed per Andrew 10/20/2026 (no "Text START to +1 619-914-6819" on carwashmgmt.com).
+# Keyword-only opt-in block removed per Andrew 10/20/2026 (no "Text START" line on carwashmgmt.com).
 SMS_OPTIN = ""
+# A2P 10DLC web opt-in: optional, never pre-checked, never required. Exact wording; cwm.js sends it as sms_consent / sms_consent_text.
+SMS_CONSENT = ("I agree to receive text messages from Car Wash Management, LLC about my service requests, appointments and account. "
+               "Message frequency varies. Msg & data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase.")
+PRIVACY_URL, TERMS_URL = "/privacy-policy.html", "/terms-and-conditions.html"
 NAV = [("/car-wash-equipment-repair/", "Repair"), ("/car-wash-equipment-installation/", "Installation"),
        ("/car-wash-maintenance-plans/", "Maintenance Plans"), (BRANDS_URL, "Brands"),
        ("/service-area/", "Service Area"), ("/chemistry/", "Chemistry"), ("/about/", "About")]
@@ -161,6 +165,7 @@ def form(fid, loc, heading="Request service or a quote", hlevel="h2", flat=False
 <div class="field"><label for="{f("msg")}">Message</label><textarea id="{f("msg")}" name="message" maxlength="4000" placeholder="What’s happening? A photo can be texted to {PHONE_D}."></textarea><span class="err"></span></div>
 <div class="field"><fieldset><legend>Preferred contact</legend><div class="radios"><label><input type="radio" name="preferred_contact" value="Phone call" checked> Phone call</label><label><input type="radio" name="preferred_contact" value="Email"> Email</label></div></fieldset></div>
 <div class="check"><label><input type="checkbox" name="consent" required data-err="Please tick the box so we can contact you about this request."> <span>I agree that Car Wash Management may contact me by phone or email about this request. This does not sign me up for text messages.</span></label><span class="err"></span></div>
+<div class="check sms"><label><input type="checkbox" name="sms_consent" value="Yes"> <span>{html.escape(SMS_CONSENT)}</span></label><p class="smsl"><a href="{TERMS_URL}#sms">Terms</a> · <a href="{PRIVACY_URL}#sms">Privacy</a></p></div>
 <button class="btn btn-blue" type="submit">Send request {I_ARR}</button>
 <p class="alt">Faster? Call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a></p></form>'''
 
@@ -194,12 +199,12 @@ def page(path, title, desc, body, extra_ld=(), noindex=False, canonical=True):
 {header(path)}
 <main id="main">{body}</main>
 {footer()}
-<script src="/forms-config.js" defer></script><script src="/events-config.js" defer></script><script src="/assets/js/site-forms.js" defer></script><script src="/assets/cwm/js/cwm.js" defer></script>
+<script src="/forms-config.js" defer></script><script src="/events-config.js" defer></script><script src="/assets/js/site-forms.js" defer></script><script src="/assets/cwm/js/cwm.js?v=20261028" defer></script>
 </body></html>
 '''
 
 def downtime():
-    return f'''<section class="downtime" aria-labelledby="dt-h"><div class="wrap"><div class="pulse" aria-hidden="true"></div><div><h2 id="dt-h">Wash down? Call now.</h2><p>Every hour down costs you cars. Call or text and tell us what stopped. <a href="/urgent-car-wash-repair/">Urgent repair →</a></p></div>
+    return f'''<section class="downtime" aria-labelledby="dt-h"><div class="wrap"><div class="pulse" aria-hidden="true"></div><div><h2 id="dt-h">Wash down? Call now.</h2><p>Call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a>, {HOURS}. <a href="/urgent-car-wash-repair/">Urgent repair →</a></p></div>
 <div class="acts">{call_btn("btn btn-ink", PHONE_D)}{text_btn()}</div></div></section>'''
 
 def brand_chips(cls="bcats"):
@@ -209,7 +214,7 @@ def brand_chips(cls="bcats"):
     return f'<!--brands--><div class="{cls}">{groups}</div><!--/brands-->'
 def brands_block(h="h2"):
     return f'''<section class="brands" aria-labelledby="br-h"><div class="wrap"><div class="eyebrow">Brands &amp; equipment</div><{h} id="br-h">We service and repair any make and model.</{h}>
-<p class="bintro">Tunnel, in-bay, self-serve, vacuum, pay station and water equipment from the brands below, and others too. Don’t see yours? Call or text {PHONE_D}.</p>
+<p class="bintro">Tunnel, in-bay, self-serve, vacuum, pay station and water equipment from all major brands, including the ones below. Don’t see yours? Call or text {PHONE_D}.</p>
 {brand_chips()}<p class="tm">{TM}</p><a class="lnk" href="{BRANDS_URL}">See all the brands we service →</a></div></section>'''
 
 def final_cta():
@@ -364,7 +369,7 @@ def category_page(c):
     content = f'''<h2>What we service</h2><ul class="ticks">{"".join(f"<li>{x}</li>" for x in c["components"])}</ul>
 <h2>Common faults we fix</h2><ul class="ticks">{"".join(f"<li>{x}</li>" for x in c["faults"])}</ul>
 <h2>Photos</h2>{gallery(c)}
-<h2>Brands we service</h2>{(f'<p>We work on most major {c["name"]} equipment, including these brands. <a href="{BRANDS_URL}">See all brands</a>.</p><!--brands--><ul class="chips sm">{brands}</ul><!--/brands--><p class="tm">{TM}</p>') if brands else f'<p>We work on most major {c["name"]} equipment. Call or text {PHONE_D} with the make and model. <a href="{BRANDS_URL}">See the brands we service</a>.</p>'}
+<h2>Brands we service</h2>{(f'<p>We work on all major {c["name"]} equipment brands, including these. <a href="{BRANDS_URL}">See all brands</a>.</p><!--brands--><ul class="chips sm">{brands}</ul><!--/brands--><p class="tm">{TM}</p>') if brands else f'<p>We work on all major {c["name"]} equipment brands. Call or text {PHONE_D} with the make and model. <a href="{BRANDS_URL}">See the brands we service</a>.</p>'}
 <h2>Questions</h2><div class="faq">{"".join(f"<h3>{q}</h3><p>{a}</p>" for q, a in faq)}</div>
 <h2>How to reach us</h2>{facts()}'''
     faq_ld = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
@@ -396,15 +401,15 @@ def BRAND_IMG(a):
 def brands_page():
     jump = '<ul class="chips sm">' + "".join(f'<li><a class="chip" href="#{cid}">{short}</a></li>' for cid, _, short, _ in BRAND_CATS) + "</ul>"
     secs = "<!--brands-->" + "".join(f'<h2 id="{cid}">{name}</h2>' + CAT_LINKS.get(cid, "") + "".join(f'<h3 id="{a}">{n}</h3><p>{txt}</p>' + (BRAND_IMG(a) if a in BRAND_PHOTO else "") for n, a, _, txt, *_ in bs) for cid, name, _, bs in BRAND_CATS) + "<!--/brands-->"
-    content = f'''<p>We repair and service car wash equipment from the brands below, grouped by type. We work on other makes too, so if yours isn’t listed, call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a>.</p>
+    content = f'''<p>We repair and service car wash equipment from all major brands. The brands below are grouped by type. If yours isn’t listed, call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a>.</p>
 {jump}<p class="tm">{TM}</p>{secs}<p class="tm">{TM}</p><h2>How to reach us</h2>{facts()}'''
     svc = service_ld(BRANDS_URL, "Car wash equipment repair and service for all major brands", "Car wash equipment repair")
     svc["description"] = "Repair, troubleshooting, parts replacement and preventive maintenance for tunnel, in-bay automatic, self-serve, vacuum, pay station and water equipment."
     return inner(BRANDS_URL, "Brands We Service",
         "Car Wash Equipment Brands We Service | Car Wash Management",
-        "We repair and service most major tunnel, in-bay, self-serve, vacuum, pay station and water equipment, including Washworld, MacNeil, Ryko and Unitec/DRB.",
+        "We repair and service all major car wash equipment brands, including Washworld, MacNeil, Ryko, AVW, Motor City, NCS, Vacutech and Unitec/DRB.",
         "Car Wash Equipment Brands We Service",
-        "Repair, troubleshooting, parts replacement and preventive maintenance for the major car wash equipment brands.",
+        "Repair, troubleshooting, parts replacement and preventive maintenance for all major car wash equipment brands.",
         content, None, extra_ld=(svc,))
 PAGES[BRANDS_URL] = brands_page
 PAGES["/service-area/"] = lambda: inner("/service-area/", "Service Area",
@@ -465,6 +470,18 @@ def notfound():
 <div class="btns">{call_btn()}<a class="btn btn-white" href="/">Go to the homepage</a></div></div></section>'''
     return page("/404", "Page Not Found | Car Wash Management", "The page you were looking for could not be found.", body, noindex=True, canonical=False)
 
+LEGAL = {PRIVACY_URL: ("privacy.html", "Privacy Policy", "Privacy Policy | Car Wash Management",
+                       "How Car Wash Management collects, uses and protects your information, including text message (SMS) opt-in data.", "Last modified: October 28, 2026"),
+         TERMS_URL: ("terms.html", "Terms &amp; Conditions", "Terms & Conditions | Car Wash Management",
+                     "Terms for Car Wash Management services and our customer-care text message (SMS) program.", "Effective upon posting")}
+def legal(path):
+    src, h1, title, desc, sub = LEGAL[path]
+    txt = (ROOT / "_build/legal" / src).read_text()
+    body = f'''<section class="phero"><div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <span aria-current="page">{h1}</span></nav>
+<h1>{h1}</h1><p class="lead">Car Wash Management, LLC · {sub}</p></div></section>
+<section class="body"><div class="wrap"><div class="txt legal" style="max-width:820px">{txt}</div></div></section>'''
+    return page(path, title, desc, body, (crumbs_ld(path, h1),), noindex=True)
+
 def write(path, content):
     out = ROOT / ("index.html" if path == "/" else path.strip("/") + "/index.html")
     out.parent.mkdir(parents=True, exist_ok=True); out.write_text(content)
@@ -490,6 +507,7 @@ def main():
         wr = csv.writer(fh); wr.writerow(["repo_path", "design_file", "avw_original_in_avw_files_txt", "source_url", "pages"]); wr.writerows(rows)
     for p, c in built.items(): write(p, c)
     (ROOT / "404.html").write_text(notfound())
+    for lp in LEGAL: (ROOT / lp.strip("/")).write_text(legal(lp))
     indexable = [p for p in built if p not in ("/thank-you/", "/credits/")]
     order = ["/", "/car-wash-equipment-repair/", "/car-wash-equipment-installation/", "/car-wash-maintenance-plans/", "/urgent-car-wash-repair/",
              "/car-wash-equipment-brands/", "/equipment/", *[f"/equipment/{c['slug']}/" for c in CATEGORIES], "/service-area/", "/chemistry/", "/about/", "/contact/"]
