@@ -4,7 +4,7 @@
 # Name no other brand anywhere on the site beyond these 12.
 # Text only: no logos, no photos of Washworld, and no dealer/partner claims.
 # Each brand: (name, anchor id, short equipment label, section text, notes, source_url)
-P = "(808) 465-2291"
+P = "(619) 704-7719"
 CATS = [
  ("tunnel", "Tunnel &amp; conveyor equipment", "Tunnel", [
   ("MacNeil", "macneil", "tunnel equipment",
