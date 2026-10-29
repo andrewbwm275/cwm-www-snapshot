@@ -80,7 +80,7 @@
     f.addEventListener("submit", function (e) {
       e.preventDefault();
       if (!showErrors(f)) return;
-      if (!window.SiteForms) { alert("Sorry, the form could not load. Please call or text (808) 465-2291."); return; }
+      if (!window.SiteForms) { alert("Sorry, the form could not load. Please call or text (619) 704-7719."); return; }
       var btn = f.querySelector('[type="submit"]'), label = btn ? btn.innerHTML : "";
       if (btn) { btn.disabled = true; btn.textContent = "Sending..."; }
       window.SiteForms.submit("Service request", fieldsOf(f)).then(function () {
