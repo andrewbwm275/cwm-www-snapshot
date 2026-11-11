@@ -515,7 +515,7 @@ POSTS = [
      "desc": "How to set up tunnel and bay cleaning that protects equipment: daily rinses, deeper cleans, and chemistry matched to each surface.",
      "h1": "How to Set Up a Tunnel and Bay Cleaning Program That Protects Your Equipment", "crumb": "Tunnel and Bay Cleaning",
      "lead": "A useful tunnel and bay cleaning program has three layers: a rinse and a look at opening and closing, a deeper clean of walls, arches, applicators, dryers, and sensors when film builds up, and pit and drain attention driven by car count and season. Match the chemistry to each surface, and keep it compatible with the reclaim system.",
-     "image": "nb-01", "image_w": 1200, "category": "Water, reclaim & chemistry",
+     "image": "job-tunnel-03", "image_w": 1200, "category": "Water, reclaim & chemistry",
      "summary": "Cleaning is equipment maintenance: film blocks nozzles and sensors, and the chemistry has to match the surface and the reclaim system.",
      "service": ("/car-wash-maintenance-plans/", "Cleaning built into a maintenance plan"),
      "equip": ("/chemistry/", "Car wash cleaning chemicals"),

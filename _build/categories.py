@@ -30,7 +30,7 @@ CATEGORIES = [
                   "Tunnel controller, photo eyes and sensors"],
       faults=["Conveyor stops or the chain jumps", "Rollers not coming up on call", "Brush arms not retracting or hitting vehicles", "Hydraulic leaks or slow movement",
               "Low pressure at the arches", "Blower motor failures", "Sensors misreading vehicles"],
-      images=("hero-maintenance", ["job-01", "job-03", "job-04", "card-repair", "card-support"]),
+      images=("hero-maintenance", ["job-01", "job-tunnel-01", "job-tunnel-04", "card-repair", "card-support"]),
       brands=["sonnys", "macneil", "belanger", "avw", "motor-city"],
       extra_q="install"),
  dict(slug="self-serve", short="Self-serve", name="self-serve",

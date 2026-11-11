@@ -127,6 +127,31 @@ if _design_sources_ready():
         IMG[f"nb-{n}"] = (alt, w, h, sw, sh, None, {big: NEWBUILD / f"nb-{n}-{big}w.webp", small: NEWBUILD / f"nb-{n}-{small}w.webp"}, {"filename": f"nb-{n}", "kind": "own"})
 else:
     PHOTO_REG = _load_shipped_photos()
+# Owner pack 2026-11-10. Alt text is the manifest line. Credit is own-job (no third party).
+OWNER_ALTS = {
+ "job-tunnel-01": "Conveyor and rollers leading out of a car wash tunnel under a blue overhead arch",
+ "job-tunnel-02": "Blue wrap brushes on stainless frames over a car wash tunnel conveyor",
+ "job-tunnel-03": "Blue tunnel brushes spraying water over a conveyor, looking toward the exit",
+ "job-tunnel-04": "Red wash brushes hanging over a tunnel conveyor in a white bay",
+ "job-tunnel-05": "Stainless tunnel frames and conveyor in an open-air wash bay",
+ "job-tunnel-06": "Red cloth wash curtain hanging from a stainless frame over a tunnel conveyor",
+ "job-tunnel-07": "Red overhead brush and conveyor inside a car wash tunnel",
+ "job-tunnel-08": "Yellow and black side brush beside a wet tunnel conveyor",
+ "job-equip-01": "Chemical pump stand with valves, gauges and supply jugs on a diamond-plate panel",
+}
+def _register_owner_jobs():
+    photo_dir = ROOT / "assets/cwm/img/photos"
+    for key, alt in OWNER_ALTS.items():
+        files, dims = {}, {}
+        for width in (1200, 600):
+            fp = photo_dir / f"{key}-{width}w.webp"
+            if not fp.is_file():
+                raise SystemExit(f"missing owner photo {fp}")
+            files[width] = fp
+            dims[width] = webp_size(fp)
+        (w, h), (sw, sh) = dims[1200], dims[600]
+        IMG[key] = (alt, w, h, sw, sh, None, files, {"filename": key, "kind": "own", "slot": ""})
+_register_owner_jobs()
 USED_IMG = {}            # key -> set of page paths
 CUR_PAGE = ["/"]
 def kind(key):
@@ -256,7 +281,9 @@ def final_cta():
 <div><div class="form"><h3>Prefer the form?</h3><p class="sub">It takes about two minutes. Your details go straight to our team.</p><a class="btn btn-blue" href="#request">Go to the request form {I_ARR}</a><p class="alt">Or use the <a href="/contact/">Request Service page</a></p></div></div></div></section>'''
 
 # ---------------- Home ----------------
-JOBS_STRIP = ["nb-04", "job-01", "job-02", "job-03", "nb-28", "nb-26"]   # 3 new-build picks + Design's 3, all "Our job"
+# job-03 (cloth on the ground) is retired from pages. job-equip-01 replaces it.
+# job-tunnel-01/02/03 are one job from different angles, so they are not placed together.
+JOBS_STRIP = ["nb-04", "job-tunnel-01", "job-01", "job-tunnel-04", "job-02", "job-equip-01", "job-tunnel-06", "nb-28", "nb-26"]
 def home():
     cards = [
         ("01", "Repair", "/car-wash-equipment-repair/", "Car wash equipment repair",
@@ -340,7 +367,7 @@ PAGES["/car-wash-equipment-repair/"] = lambda: inner("/car-wash-equipment-repair
 <ul class="ticks"><li>Tunnel conveyors, brushes and gear drives</li><li>In-bay automatic wash systems</li><li>High-pressure and water pumps</li><li>Pay stations and wash controllers</li><li>Photo eyes and vehicle-position sensors</li><li>Chemical injectors and dosing equipment</li><li>Reverse osmosis, water and reclaim components</li></ul>
 <p>Hydraulic drives and gearboxes are rebuilt in-house.</p>
 <h2>Photos from our jobs</h2><p>These photos are from our work. They are not before-and-after pairs, and they are not tied to the examples below.</p>
-{own_gallery(["job-01", "job-02", "job-03", "nb-06", "nb-15", "nb-28"])}
+{own_gallery(["job-equip-01", "job-tunnel-01", "job-tunnel-04", "job-tunnel-02", "job-tunnel-07", "job-tunnel-08", "job-01"])}
 <h2>Examples from the field</h2>
 <aside class="soon"><b>Real example.</b> Tunnel conveyor drive repair, Orange County (Laguna Niguel), March 2024. No customer name. {confirm("an owned photo of this exact conveyor-drive job")}</aside>
 <aside class="soon"><b>Real example.</b> In-bay automatic limit fault, Los Angeles County (Calabasas), October 2026. No customer name. {confirm("an owned photo of this exact limit-fault job")}</aside>
@@ -356,7 +383,7 @@ PAGES["/car-wash-equipment-installation/"] = lambda: inner("/car-wash-equipment-
     f'''<h2>What we install and replace</h2><ul class="ticks"><li>Replacement parts and components</li><li>Motors, gear drives and pumps</li><li>Pay stations and wash controllers</li><li>Reverse osmosis, water and reclaim components</li></ul>
 <p>Not sure whether to repair or replace? Call or text and tell us what you’re working with.</p><p>Installation and replacement of equipment and components, from single parts to complete systems. Travel charges apply to on-site visits; we’ll tell you before we book.</p>
 <h2>Photos from our jobs</h2><p>These photos are from our work. They show equipment we have put in. They are not the Inland Empire job below.</p>
-{own_gallery(["nb-26", "nb-25", "nb-30", "nb-28"])}
+{own_gallery(["job-tunnel-05", "job-equip-01", "nb-26", "nb-25", "nb-30", "nb-28"])}
 <h2>Example from the field</h2>
 <aside class="soon"><b>Real example.</b> RO booster pump supply and install, Inland Empire, October 2023. No customer name and no city. {confirm("an owned photo of this exact RO booster-pump job")}</aside>
 {new_pages.guides_for("/car-wash-equipment-installation/")}<h2>How to reach us</h2>{facts()}''',
@@ -381,8 +408,10 @@ PAGES["/urgent-car-wash-repair/"] = lambda: inner("/urgent-car-wash-repair/", "W
     extra_ld=(service_ld("/urgent-car-wash-repair/", "Urgent car wash repair", "Car wash equipment repair"),))
 # ---------------- Equipment hub + category pages ----------------
 CAT_MANIFEST = DESIGN / "categories/manifest.csv"
-CAT_OWN = {"tunnel": ["nb-12", "nb-06", "nb-01", "nb-32"], "in-bay-automatic": ["nb-15", "nb-16", "nb-18"],
-           "chemical-dosing": ["nb-28", "nb-29"], "water-reclaim-ro": ["nb-30", "nb-26", "nb-25"]}   # Andrew's picks, shown first
+# 01/02/03 are one tunnel from different angles, so they are separated in the gallery.
+OWNER_TUNNEL = ["job-tunnel-01", "job-tunnel-04", "job-tunnel-06", "job-tunnel-02", "job-tunnel-07", "job-tunnel-05", "job-tunnel-03", "job-tunnel-08"]
+CAT_OWN = {"tunnel": OWNER_TUNNEL + ["nb-12", "nb-06", "nb-01", "nb-32"], "in-bay-automatic": ["nb-15", "nb-16", "nb-18"],
+           "chemical-dosing": ["job-equip-01", "nb-28", "nb-29"], "water-reclaim-ro": ["nb-30", "nb-26", "nb-25"]}   # Andrew's picks, shown first
 _cat_rows = []
 if _design_sources_ready():
     _cat_rows = [r for r in csv.DictReader(CAT_MANIFEST.open(encoding="utf-8")) if not r["filename"].startswith("avw/")
@@ -403,6 +432,12 @@ for c in CATEGORIES:
         lay = PHOTO_REG["categories"][c["slug"]]
         c["hero"], c["gallery"] = lay["hero"], lay["gallery"]
     if c["hero"]: PAGE_HERO[c["path"]] = c["hero"]
+for c in CATEGORIES:
+    if c["slug"] == "tunnel":
+        rest = [k for k in c["gallery"] if k not in OWNER_TUNNEL]
+        c["gallery"] = OWNER_TUNNEL + rest
+    elif c["slug"] == "chemical-dosing" and "job-equip-01" not in c["gallery"]:
+        c["gallery"] = ["job-equip-01"] + list(c["gallery"])
 CAT_FOR_BRANDCAT = {"tunnel": "/equipment/tunnel/", "in-bay": "/equipment/in-bay-automatic/", "self-serve": "/equipment/self-serve/",
                     "vacuums": "/equipment/vacuums/", "controllers": "/equipment/controllers-pay-stations/", "chemistry-water": "/equipment/"}
 CAT_LINKS = {"tunnel": '<p><a href="/equipment/tunnel/">Tunnel equipment service and repair →</a></p>',
@@ -597,7 +632,10 @@ def main():
     stage_photo_sources()
     photos = ROOT / IMG_DIR.strip("/")
     shutil.rmtree(photos, ignore_errors=True); photos.mkdir(parents=True)
-    for k in USED_IMG:
+    # Copy photos the pages use, and keep retired job-03 files in the repo.
+    for k in set(USED_IMG) | {"job-03"}:
+        if k not in IMG:
+            continue
         for w, src in IMG[k][6].items():
             assert not _bad(str(src)), src
             shutil.copyfile(src, photos / f"{k}-{w}w.webp")
