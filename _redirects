@@ -16,12 +16,11 @@
 /solutions / 302
 /results.html /about/ 302
 /results /about/ 302
-/blog.html / 302
-/blog / 302
+/blog.html /blog/ 301
+/blog /blog/ 301
 /calculator.html /car-wash-equipment-installation/ 302
 /calculator /car-wash-equipment-installation/ 302
-/blog/* / 302
 /Testimonials /about/ 302
-/BlogPost / 302
+/BlogPost /blog/ 302
 /ChemicalProduct /chemistry/ 302
 /Contact /contact/ 301

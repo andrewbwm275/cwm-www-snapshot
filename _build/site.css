@@ -193,7 +193,7 @@ section.s{padding:96px 0}
 .ty h1{font-size:52px;font-weight:900}
 .ty p{font-size:19px;margin-top:16px;max-width:640px}
 .ty .btns{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
-@media (max-width:1180px){.hdr nav.main{display:none}.mnav{display:block}}
+@media (max-width:1400px){.hdr nav.main{display:none}.mnav{display:block}}
 @media (max-width:1000px){.bcats{grid-template-columns:1fr 1fr}}
 @media (max-width:640px){.bcats{grid-template-columns:1fr;gap:22px}}
 @media (max-width:700px){
@@ -270,4 +270,21 @@ section.s{padding:96px 0}
 .gal .ph{height:100%;border-radius:12px;font-size:11px}
 .gal figcaption{position:absolute;left:8px;bottom:8px;background:rgba(11,27,43,.85);color:#fff;font:700 11.5px/1 var(--text);letter-spacing:.04em;padding:6px 8px;border-radius:6px}
 .faq h3{font-size:19px;margin:18px 0 6px}
-@media (max-width:700px){.ecards{grid-template-columns:1fr}.gal{grid-template-columns:1fr 1fr}}
+.confirm{display:block;background:#FFF4D6;color:#6B4A00;border:1px dashed #C99000;border-radius:8px;padding:10px 12px;margin:14px 0;font-weight:650;line-height:1.45}
+.txt{overflow-wrap:break-word}
+.txt a,.confirm{overflow-wrap:anywhere}
+.table-scroll{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+.txt table{width:100%;border-collapse:collapse;margin:12px 0 18px;font-size:15px}
+.txt th,.txt td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+.txt th{background:var(--mist);color:var(--ink);font-weight:700}
+.note{border:1.5px solid var(--line);border-radius:14px;padding:16px 18px;margin:18px 0;background:var(--mist)}
+.state-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}
+.state-card{display:block;border:1.5px solid var(--line);border-radius:14px;padding:16px;background:#fff;color:inherit;text-decoration:none}
+.state-card b{display:block;color:var(--ink);font-family:var(--head);font-size:22px;margin-bottom:6px}
+.state-card p{margin:0 0 8px}
+.post-card{border:1.5px solid var(--line);border-radius:16px;padding:18px;margin:0 0 14px;background:#fff}
+.post-card h2{font-size:28px;margin:0 0 8px}
+.byline{font-size:14px;color:var(--muted);margin:0 0 16px}
+@media (max-width:700px){.ecards{grid-template-columns:1fr}.gal{grid-template-columns:1fr 1fr}.state-grid{grid-template-columns:1fr}.post-card h2{font-size:24px}
+ .hdr .btn-blue>span{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+ .txt .btn{white-space:normal}}
