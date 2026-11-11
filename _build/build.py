@@ -412,6 +412,7 @@ CAT_LINKS = {"tunnel": '<p><a href="/equipment/tunnel/">Tunnel equipment service
              "controllers": '<p><a href="/equipment/controllers-pay-stations/">Controller and pay station service and repair →</a></p>',
              "water": '<p><a href="/equipment/water-reclaim-ro/">Water, reclaim and RO service →</a></p>',
              "pumps": '<p><a href="/equipment/water-reclaim-ro/">Pumps on water, reclaim and RO equipment →</a></p>',
+             "dosing": '<p><a href="/equipment/chemical-dosing/">Chemical dosing equipment →</a></p>',
              "supplies": '<p><a href="/chemistry/">Soaps and chemicals</a> · <a href="/equipment/chemical-dosing/">Chemical dosing equipment</a></p>'}
 BRAND_BY_ANCHOR = {a: n for _, _, _, bs in BRAND_CATS for n, a, *_ in bs}
 def cat_faq(c):

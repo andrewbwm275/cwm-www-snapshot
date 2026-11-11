@@ -33,6 +33,8 @@ CATS = [
      "Car wash dryers."),
   _b("Erie Brush", "erie-brush", "brush equipment", "https://www.carwash.com/nrcc-2024-exhibitor-list-floor-plan/",
      "Brushes used on tunnel and in-bay equipment."),
+  _b("Petit", "petit", "tunnel and in-bay equipment", "https://www.petitautowash.com/",
+     "Petit Auto Wash tunnel and in-bay equipment, including pump stations, reclaim, and RO."),
   _b("HECO", "heco", "conveyor gear drives", "https://www.hecogear.com/product/electric_drive.asp",
      "Gear drives and gearboxes used on tunnel conveyors."),
   _b("OPW Vehicle Wash Solutions", "opw", "vehicle wash equipment", "https://www.opwvws.com/",
@@ -95,8 +97,10 @@ CATS = [
      "High-pressure plunger pumps for self-serve, in-bay, and tunnel washes."),
   _b("General Pump", "general-pump", "high-pressure pumps", "https://www.carwash.com/nrcc-2024-exhibitor-list-floor-plan/",
      "High-pressure pumps and pump components."),
-  _b("Grundfos", "grundfos", "water, booster, and dosing pumps", "https://www.grundfos.com/us/about-us/cases/grundfos-new-mtre-booster-design-the-perfect-fit-for-car-wash-recycled-water-challenges",
-     "Water, booster, and dosing pumps, including pumps on reclaim and chemical delivery."),
+ ]),
+ ("dosing", "Chemical dosing", "Chemical dosing", [
+  _b("Grundfos", "grundfos", "dosing and booster pumps", "https://www.grundfos.com/us/about-us/cases/grundfos-new-mtre-booster-design-the-perfect-fit-for-car-wash-recycled-water-challenges",
+     "Dosing pumps and booster pumps, including pumps on reclaim and chemical delivery."),
  ]),
  ("supplies", "Parts and supplies", "Parts and supplies", [
   ("Dultmeier", "dultmeier", "parts distribution",
