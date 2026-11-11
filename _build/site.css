@@ -23,7 +23,6 @@ img{max-width:100%;display:block}
 .ph{background:repeating-linear-gradient(135deg,#e6ebf1 0 14px,#d9e0e8 14px 28px);border:2px dashed #9aa8b8;border-radius:14px;display:flex;align-items:center;justify-content:center;text-align:center;color:#3D4B5C;font:700 13px/1.35 var(--text);letter-spacing:.04em;text-transform:uppercase;padding:14px}
 .ph.dark{background:repeating-linear-gradient(135deg,#1a3047 0 14px,#152a3f 14px 28px);border-color:#5b7590;color:#C9D6E5}
 .ph span{background:rgba(255,255,255,.88);padding:6px 10px;border-radius:6px}.ph.dark span{background:rgba(11,27,43,.88)}
-.tag-ph{display:inline-block;max-width:100%;background:#FFF4D6;color:#6B4A00;border:1px dashed #C99000;border-radius:6px;font:600 12px/1.3 var(--text);padding:3px 8px;letter-spacing:.02em;text-transform:none;white-space:normal;overflow-wrap:anywhere}
 /* header */
 .hdr{position:sticky;top:0;z-index:50;background:var(--ink);border-bottom:1px solid #1f3650}
 .hdr .wrap{display:flex;align-items:center;flex-wrap:wrap;height:auto;min-height:64px;gap:10px 14px;max-width:1440px;padding:8px 32px}
@@ -121,13 +120,6 @@ section.s{padding:96px 0}
 .dark .sh h2,.dark h2{color:#fff}.dark .eyebrow{color:var(--sky)}
 .closeups{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:56px}
 .closeups .ph{height:180px}
-.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.rev{border:2px dashed #9aa8b8;border-radius:18px;padding:28px;background:var(--mist)}
-.rev .q{font-family:var(--head);font-size:56px;line-height:.6;color:var(--signal);font-weight:900;margin-top:18px}
-.rev .ln{height:12px;background:#d5dde6;border-radius:6px;margin:12px 0}
-.rev .who{display:flex;gap:12px;align-items:center;margin-top:22px;font-size:14px}
-.rev .av{width:44px;height:44px;border-radius:50%;background:#d5dde6}
-.rev .who b{display:block;color:var(--ink);font-size:16px}
 .chem{padding:88px 0}
 .chem .cg{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
 .chem .ph{height:340px}
@@ -153,8 +145,6 @@ section.s{padding:96px 0}
 .txt h2:not(:first-child){margin-top:40px}
 .txt p{margin-bottom:14px;font-size:18px}
 .txt ul{margin:6px 0 18px 0}
-.soon{border:2px dashed #C99000;background:#FFF8E6;border-radius:14px;padding:18px 20px;margin:26px 0;color:#4a3800}
-.soon b{color:var(--ink)}
 .facts{list-style:none;border:1.5px solid var(--line);border-radius:14px;padding:6px 20px;margin:18px 0}
 .facts li{padding:12px 0;border-top:1px solid var(--line)}.facts li:first-child{border-top:0}
 .facts b{color:var(--ink)}
@@ -221,7 +211,7 @@ section.s{padding:96px 0}
  .downtime .wrap{flex-direction:column;align-items:flex-start;gap:14px}
  .downtime h2{font-size:32px}.downtime .acts{margin-left:0;width:100%;flex-direction:column}
  section.s{padding:60px 0}.sh{flex-direction:column;align-items:flex-start;gap:14px;margin-bottom:28px}.sh h2{font-size:36px}
- .cards,.rgrid,.sgrid,.final .grid,.fgrid,.body .cols,.chem .cg{grid-template-columns:1fr}
+ .cards,.sgrid,.final .grid,.fgrid,.body .cols,.chem .cg{grid-template-columns:1fr}
  .closeups{grid-template-columns:1fr 1fr}.closeups .ph{height:130px}
  .bgrid{grid-template-columns:1fr 1fr}.btile{min-height:64px;font-size:18px}.brands h2{font-size:30px}
  .area{padding:56px 0}.area h2,.chem h2{font-size:32px}.area .ahead{flex-direction:column;align-items:flex-start;gap:12px}.agrid{grid-template-columns:1fr 1fr}
@@ -281,9 +271,8 @@ section.s{padding:96px 0}
 .gal .ph{height:100%;border-radius:12px;font-size:11px}
 .gal figcaption{display:none}
 .faq h3{font-size:19px;margin:18px 0 6px}
-.confirm{display:block;background:#FFF4D6;color:#6B4A00;border:1px dashed #C99000;border-radius:8px;padding:10px 12px;margin:14px 0;font-weight:650;line-height:1.45}
 .txt{overflow-wrap:break-word}
-.txt a,.confirm{overflow-wrap:anywhere}
+.txt a{overflow-wrap:anywhere}
 .table-scroll{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
 .txt table{width:100%;border-collapse:collapse;margin:12px 0 18px;font-size:15px}
 .txt th,.txt td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}

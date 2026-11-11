@@ -170,17 +170,15 @@ def post_repair(H):
 <h2>You can replace one piece</h2>
 <p>A controller, pay station, dryer, pump station, or RO and reclaim skid can be swapped without a whole new wash. Start with <a href="/equipment/controllers-pay-stations/">controller and pay station service</a> or <a href="/equipment/water-reclaim-ro/">water, reclaim and RO</a>, and the <a href="/equipment/">equipment hub</a> for tunnels, <a href="/equipment/in-bay-automatic/">in-bay automatics</a>, and <a href="/equipment/self-serve/">self-serve bays</a>.</p>
 <h2>Count downtime, not just the repair bill</h2>
-<p>A cheap part is not cheap if the wash sits idle. Fill in your own numbers. We will not invent them for you:</p>
+<p>A cheap part is not cheap if the wash sits idle. Use your own figures. This is not a quote:</p>
 <p>(days down per year × your typical cars per day × your average ticket) + what you spend on repairs in a year, compared with what replacement would cost.</p>
-<p>That is a worksheet, not a quote.</p>
 <h2>Start with a full equipment inspection</h2>
-<p>Car Wash Management starts with a full equipment inspection, then replaces the damaged parts. You pay to fix what is actually failing, and you can see whether the rest is worth keeping. The inspection looks at the structure and frame, the drive or conveyor or gantry, hydraulics and pumps, electrical and controls, sensors, chemical delivery, water treatment, RO and reclaim, wear parts, and the service history. We do not state an inspection price here. Travel charges apply to on-site visits; we will tell you before we book.</p>
+<p>Car Wash Management starts with a full equipment inspection, then replaces the damaged parts. You pay to fix what is actually failing, and you can see whether the rest is worth keeping. The inspection looks at the structure and frame, the drive or conveyor or gantry, hydraulics and pumps, electrical and controls, sensors, chemical delivery, water treatment, RO and reclaim, wear parts, and the service history. Travel charges apply to on-site visits; we will tell you before we book.</p>
 <p><a class="btn btn-blue" href="/contact/">Book a full equipment inspection</a></p>
-<h2>Example from the field</h2>
-<aside class="soon"><b>Real example.</b> In-bay automatic limit fault, Los Angeles County (Calabasas), October 2026. The job type on file is a repair of a limit fault. We are not adding a diagnosis, a parts list, or a customer name.</aside>
-{H["confirm"]("an owned photo of the October 2026 Calabasas limit-fault job, and whether any further detail may be published")}
+<h2>From the field</h2>
+<p>In October 2026 we repaired an in-bay automatic limit fault in Calabasas, Los Angeles County.</p>
 <h2>If you replace, we supply and install</h2>
-<p>We supply and install car wash equipment: tunnel, in-bay automatic, self-serve, vacuums, controllers and pay stations, chemical dosing, and water, reclaim and RO. Read <a href="/car-wash-equipment-installation/">car wash equipment installation</a>. This page does not add permit, electrical, or other steps beyond that.</p>
+<p>We supply and install car wash equipment: tunnel, in-bay automatic, self-serve, vacuums, controllers and pay stations, chemical dosing, and water, reclaim and RO. Read <a href="/car-wash-equipment-installation/">car wash equipment installation</a>.</p>
 <h2>If you repair, keep it from happening again</h2>
 <p>A <a href="/car-wash-maintenance-plans/">preventive maintenance plan</a> is built for your wash, including how often we visit. There is no fixed tier list. Day-to-day repair stays on <a href="/car-wash-equipment-repair/">car wash equipment repair</a>.</p>
 {faq_html(faqs)}
@@ -222,7 +220,7 @@ def post_chain(H):
         ("Should I grease the conveyor chain?",
          "Kleen-Rite’s tunnel roller-chain guidance says to flush the chain and rollers rather than grease them. Follow your own manufacturer’s manual if it says otherwise."),
         ("How often should I replace sprockets?",
-         "When the teeth show wear: hooked, pointed, or shark-fin shapes that no longer match the chain. There is no interval we will invent here."),
+         "When the teeth show wear: hooked, pointed, or shark-fin shapes that no longer match the chain."),
         ("Can I keep running while the chain slips?",
          "No. A slipping chain can jump a tooth, damage the sprocket, and stop the tunnel. Lock it out and have it looked at."),
         ("Do you service all brands of tunnel equipment?",
@@ -252,9 +250,8 @@ def post_chain(H):
 <p>Call when slipping comes back after the take-up is set, when the sprocket or chain needs replacement, when the drive or hydraulics need diagnosis, or when anything structural is damaged. Most car wash faults need a technician on site to diagnose properly, so the usual route is to book a visit.</p>
 {coverage()}
 <p><a href="/car-wash-equipment-repair/">Car wash equipment repair</a> · <a href="/urgent-car-wash-repair/">Urgent repair</a> if the tunnel is down.</p>
-<h2>Example from the field</h2>
-<aside class="soon"><b>Real example.</b> Tunnel conveyor drive repair, Orange County (Laguna Niguel), March 2024. No customer name, and no extra diagnosis beyond the job type on file.</aside>
-{H["confirm"]("an owned photo of the March 2024 Laguna Niguel conveyor-drive repair")}
+<h2>From the field</h2>
+<p>In March 2024 we repaired a tunnel conveyor drive in Laguna Niguel, Orange County.</p>
 <h2>Climate note for Southwest and Hawaii washes</h2>
 <p>Heat can raise hydraulic oil temperature. Cold mornings in high desert and mountain areas can leave ice in a trough. Salt air along the California coast and in Hawaii speeds corrosion on chain and hardware. See the <a href="/service-area/">service area</a> for how on-site work is arranged. No counts are attached to that.</p>
 {faq_html(faqs)}
@@ -298,7 +295,7 @@ def post_detect(H):
     body = f"""
 <h2>First, a short triage</h2>
 <p>Stay out of the path of the gantry. These are look-and-read checks, not repairs:</p>
-<ol class="ticks"><li>Read the controller or screen for a fault code, and write it down.</li><li>See whether the pay station shows the wash as paid or started. If it does not, the bay may be waiting on payment rather than on a sensor. See <a href="/equipment/controllers-pay-stations/">controllers and pay stations</a>.</li><li>Look for something in the way: a hose, a brush, debris, or a gantry that is not parked at home.</li><li>Clean the sensor lenses and reflectors. Film, water, and mineral spots block eyes.</li><li>Power-cycle only if your manufacturer’s procedure says to. Do not invent a reset.</li></ol>
+<ol class="ticks"><li>Read the controller or screen for a fault code, and write it down.</li><li>See whether the pay station shows the wash as paid or started. If it does not, the bay may be waiting on payment rather than on a sensor. See <a href="/equipment/controllers-pay-stations/">controllers and pay stations</a>.</li><li>Look for something in the way: a hose, a brush, debris, or a gantry that is not parked at home.</li><li>Clean the sensor lenses and reflectors. Film, water, and mineral spots block eyes.</li><li>Power-cycle only if your manufacturer’s procedure says to.</li></ol>
 <p>Stop there if the bay is still wrong. Most car wash faults need a technician on site to diagnose properly, so the usual route is to book a visit. We do not troubleshoot one-off callers over the phone.</p>
 <h2>Photo-eyes and vehicle sensors</h2>
 <p>Dirt, chemical film, hard-water spotting, a bumped bracket, and sun glare at one time of day are the usual reasons an eye stops seeing the car. Operators on car wash forums describe the same sequence: clean, check alignment, then look at wiring if it is still dead. Glare is worth noting in a bright Southwest bay. Do not adjust a live eye while the gantry can move.</p>
@@ -312,8 +309,6 @@ def post_detect(H):
 <p>Clean lenses on a rhythm that matches your volume, re-check alignment after any hit in the bay, and keep spot-free rinse from laying mineral film on the eyes. <a href="/equipment/water-reclaim-ro/">Water, reclaim and RO</a> service is the equipment side of that film. A <a href="/car-wash-maintenance-plans/">maintenance plan</a> sets the visit rhythm for your wash. There is no fixed package.</p>
 <h2>When to call a technician</h2>
 <p>Call for any electrical or loop work, any fault that returns after the lenses are clean, or a gantry that is unsafe to move. If the machine moves when it should not, keep the wash closed. <a href="/urgent-car-wash-repair/">Urgent repair</a> is the page for a bay that is down.</p>
-<h2>Example from the field</h2>
-{H["confirm"]("a confirmed vehicle-detection job, region and month and year only. The confirmed in-bay job on file is a limit fault in Los Angeles County (Calabasas), October 2026. That record does not describe a detection fault, so it is not used as this article’s example. No example is invented here.")}
 {faq_html(faqs)}
 {reach(H, "Bay not seeing cars?")}
 {coverage()}
@@ -350,7 +345,7 @@ def post_clean(H):
         ("Do cleaning chemicals affect the reclaim system?",
          "They can. Everything you spray ends up in the pit. Check that the cleaner is compatible with the filters, pumps, and any biological treatment before you use it."),
         ("Do you clean tunnels and bays?",
-         "Yes. Car Wash Management does tunnel and bay cleaning and supplies the soaps and chemicals for it from the Car Wash Labs (Car Wash Laboratories) line. Whether that covers every wash type as a standalone visit is still open: see the note below."),
+         "Yes. Car Wash Management does tunnel and bay cleaning and supplies the soaps and chemicals for it from the Car Wash Labs (Car Wash Laboratories) line."),
         ("Do you sell car wash cleaning chemicals?",
          "Yes. We supply soaps and chemicals from the Car Wash Labs (Car Wash Laboratories) line. See <a href=\"/chemistry/\">car wash cleaning chemicals</a>."),
         ("Do you come to my state?",
@@ -358,7 +353,7 @@ def post_clean(H):
     ]
     body = f"""
 <h2>Why cleaning is equipment maintenance</h2>
-<p>Buildup around a conveyor, bearings, and gears adds wear. Scale and film on applicators and manifolds block nozzles and throw chemical off target. Dirty sensors cause faults, which is the same failure mode as a <a href="/blog/conveyor-chain-slipping/">slipping conveyor chain</a> or an <a href="/blog/in-bay-automatic-wont-detect-vehicle/">in-bay automatic that will not detect the car</a>. Sludge plus overspray is also a slip hazard. Professional Carwashing &amp; Detailing’s October 12, 2026 piece on a cleaning maintenance program makes that equipment case. We are not copying it, and we are not attaching any numbers to it.</p>
+<p>Buildup around a conveyor, bearings, and gears adds wear. Scale and film on applicators and manifolds block nozzles and throw chemical off target. Dirty sensors cause faults, which is the same failure mode as a <a href="/blog/conveyor-chain-slipping/">slipping conveyor chain</a> or an <a href="/blog/in-bay-automatic-wont-detect-vehicle/">in-bay automatic that will not detect the car</a>. Sludge plus overspray is also a slip hazard. Professional Carwashing &amp; Detailing’s October 12, 2026 piece on a cleaning maintenance program makes that equipment case.</p>
 <h2>Where buildup collects</h2>
 {table(["Area", "What collects"], [
     ["Tunnel entrance", "Silt and road grime"],
@@ -375,31 +370,22 @@ def post_clean(H):
     ["Look at sensors and nozzles", "Cloth and brush media, within the maker’s guidance", "When film or sludge shows up early"],
     ["Note leaks, worn media, and blocked screens", "A planned pass with the cleaner matched to each surface", "Before a busy holiday weekend if the wash is already dirty"],
 ])}
-{H["confirm"]("whether to publish any cleaning frequency. Until then, the schedule is set wash by wash and no interval is stated as ours.")}
 <h2>A basic wall and equipment wash-down</h2>
 <ol class="ticks"><li>Wear the protection the product calls for: gloves, eye protection, and a respirator where the label or SDS says so.</li><li>Read the SDS. Never mix chemicals.</li><li>Lock out moving equipment before anyone is near it. OSHA’s <a href="https://www.osha.gov/control-hazardous-energy" rel="noopener">lockout/tagout</a> page is the reference.</li><li>Apply cleaner from the bottom up.</li><li>Let it dwell for the time on the product label. We do not publish our own dwell time.</li><li>Agitate with a long-handled brush where the label allows it.</li><li>Rinse from the top down.</li></ol>
 <h2>Match the chemistry to the surface</h2>
 <p>Stainless, aluminum, tinted or treated glass, plastics, rubber, coated surfaces, friction media, and electronics do not take the same product. The old approach of bathing everything in one strong acid is a good way to etch metal and haze plastic. Check the equipment maker’s guidance and the label. Car Wash Management supplies soaps and chemicals from the Car Wash Labs (Car Wash Laboratories) line, including chemistry for tunnel and bay cleaning. See <a href="/chemistry/">chemistry</a>. We supply that line rather than claiming the formulas are manufactured here.</p>
-{H["confirm"]("names of specific Car Wash Labs cleaning products, if any should be listed")}
 <h2>Pits, drains, and reclaim</h2>
 <p>Cleaner ends up in the pit. Check it against reclaim filtration, pumps, and any biological treatment. Drive pit cleanouts by car count and conditions, not by a calendar we have not set. In California we service and install reclaim systems. See <a href="/equipment/water-reclaim-ro/">water, reclaim and RO</a>.</p>
-<p>Pits and reclaim tanks can be permit-required confined spaces. Do not send staff in without the right procedure. OSHA’s <a href="https://www.osha.gov/confined-spaces" rel="noopener">confined spaces</a> page is the reference. We do not say we pump pits or do tank cleanouts.</p>
-{H["confirm"]("whether Car Wash Management performs pit, trench, or reclaim-tank cleanouts. That work is left out until you say so.")}
-<h2>Seasonal notes for the Southwest and Hawaii</h2>
-<p>Summer heat and sun dry chemistry faster and favor algae in damp corners. Desert dust and monsoon storms load pits, filters, and sensors. Hard water lays scale on nozzles and applicators. Higher country sees salt and sand in winter. Hawaii adds salt air. See the <a href="/service-area/">service area</a>. No statistics are attached.</p>
+<p>Pits and reclaim tanks can be permit-required confined spaces. Do not send staff in without the right procedure. OSHA’s <a href="https://www.osha.gov/confined-spaces" rel="noopener">confined spaces</a> page is the reference.</p>
+<h2>Season and climate in the Southwest and Hawaii</h2>
+<p>Summer heat and sun dry chemistry faster and favor algae in damp corners. Desert dust and monsoon storms load pits, filters, and sensors. Hard water lays scale on nozzles and applicators. Higher country sees salt and sand in winter. Hawaii adds salt air. See the <a href="/service-area/">service area</a>.</p>
 <h2>Cleaning that catches problems early</h2>
 <p>People who rinse cloth and clean arches are the first to see worn media, a blocked screen, a dirty sensor, or a leak. Put a “report it” line on the checklist. A cleaning crew is not a repair crew. If something looks worn, loose, or leaking, stop and have a technician look. <a href="/car-wash-equipment-repair/">Car wash equipment repair</a> and <a href="/urgent-car-wash-repair/">urgent repair</a> are the repair paths.</p>
 <h2>Have us handle it</h2>
 <p>Car Wash Management does tunnel and bay cleaning and supplies the soaps and chemicals for it. We can build cleaning into a <a href="/car-wash-maintenance-plans/">maintenance plan</a> made for your wash, and our technicians fix what they find. Most car wash faults need a technician on site to diagnose properly, so the usual route is to book a visit.</p>
 {coverage()}
-{H["confirm"]("whether cleaning is offered on its own or as a one-time deep clean, or only inside a maintenance plan or full site management")}
-{H["confirm"]("whether cleaning is offered for tunnels, in-bay automatics, and self-serve bays, or only for some of those")}
-{H["confirm"]("a real cleaning job for a Real example box: region and month and year only. None is on file, so none is written here.")}
-{H["confirm"]("an owned photo of a tunnel or bay being cleaned, and of Car Wash Labs cleaning product in use. Pending-clearance chemistry photos are not used.")}
 {faq_html(faqs)}
 {reach(H, "Want a cleaning program built for your wash?")}
-<p>The request form does not yet have a Cleaning type. Use Maintenance plan or Other until that is added.</p>
-{H["confirm"]("whether the request form should add a Cleaning option")}
 {related([
     ("/car-wash-maintenance-plans/", "Cleaning built into a maintenance plan"),
     ("/chemistry/", "Car wash cleaning chemicals"),
@@ -451,16 +437,15 @@ def post_soap(H):
 ])}
 <h2>Safe checks an owner can do</h2>
 <p>Looking and a bucket. No panel, no manifold, no pump work.</p>
-<ol class="ticks"><li>Is there concentrate in the drum, and is the pickup line and foot valve under the liquid and clear of sludge?</li><li>Is the soap tank at its normal level? Has it risen overnight with no traffic? A rising tank is water getting in.</li><li>Operators on Car Wash Forum describe a quick test: add a small amount of straight concentrate to the soap tank, run high-pressure soap in one bay for a short moment, and see if soap appears. If it does, the mix is too weak and the proportioner is the problem, not the high-pressure pump. Follow the chemical label and the SDS. That test is their report, not our instruction.</li><li>Is the water supply to the proportioner on? The manual for one common unit lists a flowing minimum of 25 PSI before it will draw concentrate. Check the manual for your unit. We are not naming that unit here.</li><li>Did anything change: a new chemical, a new metering tip, a valve that was opened, a freeze, or a power outage?</li></ol>
+<ol class="ticks"><li>Is there concentrate in the drum, and is the pickup line and foot valve under the liquid and clear of sludge?</li><li>Is the soap tank at its normal level? Has it risen overnight with no traffic? A rising tank is water getting in.</li><li>Operators on Car Wash Forum describe a quick test: add a small amount of straight concentrate to the soap tank, run high-pressure soap in one bay for a short moment, and see if soap appears. If it does, the mix is too weak and the proportioner is the problem, not the high-pressure pump. Follow the chemical label and the SDS.</li><li>Is the water supply to the proportioner on? The manual for one common unit lists a flowing minimum of 25 PSI before it will draw concentrate. Check the manual for your unit.</li><li>Did anything change: a new chemical, a new metering tip, a valve that was opened, a freeze, or a power outage?</li></ol>
 <p>Stop there. Opening an electrical panel, a pump room that is under pressure, or a solenoid manifold is technician work. Lock equipment out before anyone works on it. OSHA’s <a href="https://www.osha.gov/control-hazardous-energy" rel="noopener">lockout/tagout</a> page is the reference.</p>
-{H["confirm"]("whether the common name hydrominder may be used once for the chemical proportioner. It is not used on this page until you say so.")}
 <h2>Common causes, in plain terms</h2>
 <h3>The proportioner is not drawing</h3>
-<p>A clogged foot valve, a scaled or clogged metering tip, a tip that does not match the product, low water pressure, or a worn diaphragm will all stop the draw. Hard water in the Southwest speeds scale. We are explaining the fault, not telling you which tip to install.</p>
+<p>A clogged foot valve, a scaled or clogged metering tip, a tip that does not match the product, low water pressure, or a worn diaphragm will all stop the draw. Hard water in the Southwest speeds scale.</p>
 <h3>Rinse water is leaking back into the soap tank</h3>
 <p>A failing solenoid or check valve can let rinse water flow backward and dilute the soap. Operators report the tank level creeping up overnight as the sign. Finding which valve is technician work.</p>
 <h3>Tank outlet valves set wrong</h3>
-<p>If the valves under the tank are wide open, some pumps will not pull soap into the line. The correct position depends on the system. A technician should set it. We are not giving a valve position.</p>
+<p>If the valves under the tank are wide open, some pumps will not pull soap into the line. The correct position depends on the system. A technician should set it.</p>
 <h3>Weak or wrong chemical</h3>
 <p>Diluted or mismatched concentrate will rinse like water. Car Wash Management supplies soaps and chemicals from the Car Wash Labs (Car Wash Laboratories) line. See <a href="/chemistry/">chemistry</a>. We supply that line rather than claiming the formulas are manufactured here.</p>
 <h3>No power to the soap solenoids</h3>
@@ -471,9 +456,6 @@ def post_soap(H):
 <p>Call if soap is still missing after the safe checks, if the tank keeps filling with water, or if the work is electrical, a pump, or the manifold. Most car wash faults need a technician on site to diagnose properly, so the usual route is to book a visit.</p>
 {coverage()}
 <p>The equipment page is <a href="/equipment/self-serve/">self-serve car wash repair</a>. If the bays are down, see <a href="/urgent-car-wash-repair/">urgent repair</a>.</p>
-{H["confirm"]("Coleman Hanna is not on the approved brand list, so it is not named. Say if it should be added to the example list with the trademark line.")}
-{H["confirm"]("a real self-serve job for a Real example box: region and month and year only. None is on file, so none is written here.")}
-{H["confirm"]("an owned photo of a self-serve equipment room (soap tank, proportioner, pump stand) and of a bay with soap. Stock and manufacturer photos are not used as our work.")}
 {faq_html(faqs)}
 {reach(H, "No soap in the bays?")}
 {related([
@@ -602,7 +584,6 @@ def render_post(H, spec):
     extra_body, faqs = spec["build"](H)
     content = (f'<p class="byline">By the Car Wash Management Service Team · November 11, 2026</p>'
                + H["own_gallery"]([spec["image"]])
-               + "<p>This photo is from our work. It is not a photo of a specific example on this page.</p>"
                + extra_body)
     return H["inner"](path, spec["crumb"], spec["title"], spec["desc"], esc(spec["h1"]), spec["lead"],
                       content, None, "Request service or a quote",
@@ -634,7 +615,7 @@ def california(H):
         ("Does California’s 60 percent recycling rule apply to my wash?",
          "California Water Code sections 10950 through 10953 apply to in-bay and conveyor car washes that were permitted and constructed after January 1, 2014. They must recycle at least 60 percent of wash and rinse water, or use recycled water from a supplier for at least 60 percent. Cities and counties can be stricter. Read the statute and check your permit. This is not legal advice."),
         ("Is a self-serve wash exempt from that 60 percent rule?",
-         "The statute’s recycling requirement, as summarized from Water Code section 10951, exempts self-service washes. Confirm that against the code and your local rules before you rely on it."),
+         "The statute’s recycling requirement, as summarized from Water Code section 10951, exempts self-service washes. Check that against the code and your local rules before you rely on it."),
         ("Can you service my reclaim system so it keeps doing its job?",
          "In California we service and install reclaim systems. Whether a given system is meeting a percentage is a measurement question for your equipment and your permit. We do not certify compliance."),
         ("Do you install reclaim on an existing wash?",
@@ -644,7 +625,7 @@ def california(H):
     ]
     body = f"""
 <h2>How we work in California</h2>
-<p>On-site repair and fix work is centered on Southern California: Los Angeles and Orange County, the Inland Empire, and San Diego County. For the rest of California, full site management and on-site service by arrangement, with travel charges. We do not list other California metros as on-site repair areas.</p>
+<p>On-site repair and fix work is centered on Southern California: Los Angeles and Orange County, the Inland Empire, and San Diego County. For the rest of California, full site management and on-site service by arrangement, with travel charges.</p>
 {reach(H, "Southern California wash down or due for service?")}
 <h2>What we do on site</h2>
 <ul class="ticks"><li><a href="/car-wash-equipment-repair/">Car wash equipment repair</a> for all major brands</li>
@@ -658,11 +639,8 @@ def california(H):
 <p>California Water Code sections 10950 through 10953, from AB 2230, are the home for this rule on our site. In short: an in-bay or conveyor car wash permitted and constructed after January 1, 2014 has to recycle at least 60 percent of its wash and rinse water, or take at least 60 percent of that water as recycled water from a supplier. Self-service washes are exempt in the statute. A city or county can require more.</p>
 <p>The practical equipment side is the reclaim system: filters, pumps, and tanks that have to keep working if the wash is counting on them. Coastal salt air corrodes frames, fasteners, and electrical boxes. Inland heat raises hydraulic and pump temperatures and dries chemistry faster. Either climate still needs the reclaim kept up if the permit depends on it. We service and install reclaim systems in California. We do not certify that a wash meets the percentage.</p>
 <p>Read <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=WAT&amp;sectionNum=10951" rel="noopener">Water Code section 10951</a> and the definitions in <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=WAT&amp;sectionNum=10950" rel="noopener">section 10950</a>. Industry explainers of reclaim choices are at Professional Carwashing, linked below. This page is not a legal opinion.</p>
-<h2>Examples from the field</h2>
-<aside class="soon"><b>Real example.</b> Tunnel conveyor drive repair, Orange County (Laguna Niguel), March 2024.</aside>
-<aside class="soon"><b>Real example.</b> In-bay automatic limit fault, Los Angeles County (Calabasas), October 2026.</aside>
-<aside class="soon"><b>Real example.</b> RO booster pump supply and install, Inland Empire, October 2023. The region is the Inland Empire, not a city.</aside>
-{H["confirm"]("owned photos of these three California jobs. No customer names are added.")}
+<h2>Recent work</h2>
+<ul class="ticks"><li>Tunnel conveyor drive repair in Laguna Niguel, Orange County, March 2024.</li><li>In-bay automatic limit-fault repair in Calabasas, Los Angeles County, October 2026.</li><li>RO booster pump supply and install in the Inland Empire, October 2023.</li></ul>
 {faq_html(faqs)}
 {coverage()}
 {related([
@@ -690,11 +668,11 @@ def california(H):
 def arizona(H):
     faqs = [
         ("Does Phoenix hard water damage car wash equipment?",
-         "Phoenix’s 2025 water quality report lists total hardness of roughly 172 to 302 mg/L, about 10 to 17.6 grains per gallon, which the report’s range puts in hard to very hard water. That hardness is what scales nozzles, heaters, and RO membranes. How often to service them depends on your water and your volume. We do not publish an interval."),
+         "Phoenix’s 2025 water quality report lists total hardness of roughly 172 to 302 mg/L, about 10 to 17.6 grains per gallon, which the report’s range puts in hard to very hard water. That hardness is what scales nozzles, heaters, and RO membranes. How often to service them depends on your water and your volume."),
         ("Will my wash stay open during a Tucson water restriction?",
-         "Tucson Code section 27-95 limits vehicle washing, when that section is in effect, to facilities that recirculate wash water. Check the current declaration with the city. We do not track declarations for you on this page."),
+         "Tucson Code section 27-95 limits vehicle washing, when that section is in effect, to facilities that recirculate wash water. Check the current declaration with the city."),
         ("How often should RO membranes be serviced in the desert?",
-         "It depends on the water and the volume. Heat, dust, and hard water all shorten the comfortable gap between filter changes. We will not invent a number of weeks."),
+         "It depends on the water and the volume. Heat, dust, and hard water all shorten the comfortable gap between filter changes."),
     ]
     body = f"""
 <h2>How we work in Arizona</h2>
@@ -706,9 +684,6 @@ def arizona(H):
 <p>Tucson Code section 27-95 says that when that restriction is in effect, vehicle washing is prohibited except at facilities with wash-water recirculation. If your wash depends on staying open in a shortage, the recirculation equipment has to actually run. Oro Valley, in the Tucson area, has been reported by Tucson Local Media as requiring car washes to reuse 70 percent of their water. That figure is the news report’s, not a number we measured. Verify it with the town.</p>
 <h2>Heat, dust, and the high country</h2>
 <p>Summer heat loads motors, hydraulic oil, and control cabinets, and ultraviolet light ages hoses, brushes, and plastics. Monsoon dust and storms load filters, sensors, and reclaim solids. Flagstaff and the high country add freeze risk that Phoenix does not have. Full site management can include scheduling the filter and RO work. The visit itself is on-site by arrangement, and travel is charged.</p>
-<h2>Example</h2>
-{H["confirm"]("a confirmed full-site-management example in Arizona, region and month and year only. None is on file, so none is invented.")}
-{H["confirm"]("keep this Arizona page in the preview. Say if it should come off before any launch.")}
 {faq_html(faqs)}
 {related([
     ("/car-wash-management-services/", "Full site management"),
@@ -746,9 +721,6 @@ def nevada(H):
 <p>Commercial vehicle washing in the Las Vegas Valley is tied to where the water goes. LVVWD’s service rules and SNWA’s conservation pages allow it when discharge goes to the sanitary sewer through approved methods, or when a high-pressure, low-volume sprayer uses under 10 gallons per vehicle. If the sewer connection or the reclaim return is down, the wash has a rules problem as well as an equipment problem.</p>
 <p>SNWA’s Water Smart Car Wash program is voluntary. Its page says reclaimed water must be returned to the sanitary sewer, and mobile washes need a commercial reclaim system. We can talk about reclaim equipment. We do not help a wash qualify for that program.</p>
 <p>LVVWD’s water quality summary lists Las Vegas Valley water at about 280 mg/L, about 16 grains per gallon. That is the utility’s figure. It is why nozzles, solenoids, and heaters scale, and why RO and softener demand is heavy.</p>
-<h2>Example</h2>
-{H["confirm"]("a confirmed full-site-management example in Nevada, region and month and year only. None is on file, so none is invented.")}
-{H["confirm"]("keep this Nevada page in the preview. Say if it should come off before any launch.")}
 {faq_html(faqs)}
 {related([
     ("/car-wash-management-services/", "Full site management"),
@@ -774,7 +746,7 @@ def new_mexico(H):
         ("Does New Mexico require car wash water recycling?",
          "We did not find a statewide recycling mandate for car washes in the sources used here. Albuquerque’s water conservation strategy lists commercial carwash recycling standards as a measure to evaluate, not as a current mandate. Check the city and county that permitted your wash."),
         ("Do you winterize washes in New Mexico?",
-         "No. Car Wash Management does not offer winterizing visits in New Mexico. Freeze and thaw are real at this elevation. Follow the equipment maker’s guidance. We are not publishing a winterizing procedure."),
+         "No. Car Wash Management does not offer winterizing visits in New Mexico. Freeze and thaw are real at this elevation. Follow the equipment maker’s guidance."),
     ]
     body = f"""
 <h2>How we work in New Mexico</h2>
@@ -786,9 +758,6 @@ def new_mexico(H):
 <p>Albuquerque’s conservation strategy lists “commercial carwash recycling standards” as something to evaluate. It is not, in that document, a current statewide or citywide recycling mandate. Do not read this page as saying your wash must hit a percentage. Check locally.</p>
 <h2>High desert, sun, and freeze</h2>
 <p>Albuquerque’s elevation means freeze and thaw, strong sun, and dust. Ice at an exit is both a safety problem and, under the ordinance above, a water-waste problem if the water leaves your property. We do not offer winterizing visits in New Mexico. On-site visits for other work are by arrangement, and travel is charged.</p>
-<h2>Example</h2>
-{H["confirm"]("a confirmed full-site-management example in New Mexico, region and month and year only. None is on file, so none is invented. No winterizing visit will be offered.")}
-{H["confirm"]("keep this New Mexico page in the preview. Say if it should come off before any launch.")}
 {faq_html(faqs)}
 {related([
     ("/car-wash-management-services/", "Full site management"),
@@ -820,13 +789,10 @@ def utah(H):
 {reach(H, "Own a wash in Utah?")}
 {coverage()}
 <h2>St. George’s gallons-per-car rule</h2>
-<p>St. George City Code section 10-17A-15 requires car washes to be plumbed for wash-water and RO-reject recycling when they are built. For the window from July 1, 2022 through June 30, 2027, the code says a car wash is not permitted unless it averages 35 gallons or less of culinary water per car, and the recycling system has to be installed and kept in use. Washington County’s October 2023 water efficiency standards say the same thing about plumbing and the 35-gallon average. If you are buying or building in Washington County, those two documents are the ones to read. We do not track your gallons for you.</p>
+<p>St. George City Code section 10-17A-15 requires car washes to be plumbed for wash-water and RO-reject recycling when they are built. For the window from July 1, 2022 through June 30, 2027, the code says a car wash is not permitted unless it averages 35 gallons or less of culinary water per car, and the recycling system has to be installed and kept in use. Washington County’s October 2023 water efficiency standards say the same thing about plumbing and the 35-gallon average. If you are buying or building in Washington County, those two documents are the ones to read.</p>
 <h2>Salt Lake discharge, and two winters</h2>
 <p>Salt Lake City’s pretreatment program requires a questionnaire, and may require a discharge permit, for car and truck washes sending non-domestic wastewater to the sewer. That is a paperwork fact for a tunnel or in-bay that discharges process water.</p>
 <p>Along the Wasatch Front, winter means freeze protection, door and heater equipment, ice at the exit, and salt and grit in the reclaim and the pit. St. George’s problem is desert heat and the gallons rule above, not a Wasatch winter. A maintenance rhythm has to follow the site. We do not sell a named winter package.</p>
-<h2>Example</h2>
-{H["confirm"]("a confirmed full-site-management example in Utah, region and month and year only. None is on file, so none is invented.")}
-{H["confirm"]("keep this Utah page in the preview. Say if it should come off before any launch.")}
 {faq_html(faqs)}
 {related([
     ("/car-wash-management-services/", "Full site management"),
@@ -851,7 +817,7 @@ def texas(H):
         ("Is there a separate San Antonio recognition program?",
          "SAWS runs a WaterSaver Car Wash program with registration and best-practice materials, including nozzle replacement and leak repair. That is SAWS’s program. We do not enroll washes in it from this page."),
         ("What is El Paso’s gallons-per-car rule?",
-         "El Paso’s code, chapter 15.13, says a new commercial car wash permitted after June 1, 2002 has to document use of no more than 50 gallons per vehicle. Confirm the current code section before you build."),
+         "El Paso’s code, chapter 15.13, says a new commercial car wash permitted after June 1, 2002 has to document use of no more than 50 gallons per vehicle. Check the current code section before you build."),
     ]
     body = f"""
 <h2>How we work in Texas</h2>
@@ -860,10 +826,7 @@ def texas(H):
 {coverage()}
 <h2>San Antonio reuse, and El Paso’s cap</h2>
 <p>San Antonio’s plumbing and water code chapter 34 sets a reuse rule for vehicle washes that began on or after January 1, 2006 and use a conveyor, a touchless machine, or a rollover in-bay: at least 50 percent of the water from previous rinses must be reused, RO concentrate must be reused, and the site needs catchment and an oil-water separator. Self-serve wands are limited to 3 gallons per minute. SAWS also publishes a WaterSaver Car Wash program and best practices. Those are the utility’s materials.</p>
-<p>El Paso’s chapter 15.13 says a new commercial car wash permitted after June 1, 2002 must document that it uses no more than 50 gallons per vehicle. West Texas dust and hard water are the equipment backdrop. Gulf humidity around Houston is a corrosion backdrop. Both are qualitative. We are not citing a utility hardness number for Texas.</p>
-<h2>Example</h2>
-{H["confirm"]("a confirmed full-site-management example in Texas, region and month and year only. None is on file, so none is invented.")}
-{H["confirm"]("keep this Texas page in the preview. Say if it should come off before any launch.")}
+<p>El Paso’s chapter 15.13 says a new commercial car wash permitted after June 1, 2002 must document that it uses no more than 50 gallons per vehicle. West Texas dust and hard water are the equipment backdrop. Gulf humidity around Houston is a corrosion backdrop.</p>
 {faq_html(faqs)}
 {related([
     ("/car-wash-management-services/", "Full site management"),
@@ -885,9 +848,9 @@ def texas(H):
 def hawaii(H):
     faqs = [
         ("How do I protect equipment from salt air?",
-         "Salt air and humidity attack frames, fasteners, electrical enclosures, and sensors. Rinsing salt off, keeping enclosures closed, and catching corrosion early are the practical habits. We do not publish a coatings specification."),
+         "Salt air and humidity attack frames, fasteners, electrical enclosures, and sensors. Rinsing salt off, keeping enclosures closed, and catching corrosion early are the practical habits."),
         ("Where can Honolulu car wash water go?",
-         "The City and County of Honolulu says vehicle wash water may not enter streets or storm drains. The city’s storm-water page for automotive businesses describes citations for discharges to the storm drain. Confirm the current penalty schedule with the city. Wash water belongs in the sewer or in a reclaim system, not in the gutter."),
+         "The City and County of Honolulu says vehicle wash water may not enter streets or storm drains. The city’s storm-water page for automotive businesses describes citations for discharges to the storm drain. Check the current penalty schedule with the city. Wash water belongs in the sewer or in a reclaim system, not in the gutter."),
         ("Do you service neighbor islands?",
          "On-site service in Hawaii is by arrangement, including neighbor islands. Travel charges apply, and we will tell you before we book. We handle parts and jobs in Hawaii. We do not keep a local parts inventory in Hawaii."),
     ]
@@ -898,13 +861,9 @@ def hawaii(H):
 {reach(H, "Own a wash in Hawaii?")}
 {coverage()}
 <h2>Where the water goes</h2>
-<p>The City and County of Honolulu tells businesses that vehicle wash water may not enter streets or storm drains, and its storm-water page for automotive businesses describes enforcement, including citations. The city’s industrial wastewater survey says car washes, self-serve, automated, or full-service, are required to install a water recycling system and a two-way valve if they sit where rainwater could enter the system. That sentence is the city’s, from the survey form. Confirm it with Environmental Services before you build or remodel. The Board of Water Supply also publishes voluntary conservation guidance. We are not quoting a savings percentage from it.</p>
+<p>The City and County of Honolulu tells businesses that vehicle wash water may not enter streets or storm drains, and its storm-water page for automotive businesses describes enforcement, including citations. The city’s industrial wastewater survey says car washes, self-serve, automated, or full-service, are required to install a water recycling system and a two-way valve if they sit where rainwater could enter the system. Check the current wording with Environmental Services before you build or remodel. The Board of Water Supply also publishes voluntary conservation guidance.</p>
 <h2>Salt air and parts</h2>
-<p>Salt air corrodes frames, fasteners, electrical enclosures, and sensors. Stainless and coatings help, and they are not magic. Island logistics mean parts take time. We handle parts and jobs in Hawaii. We do not keep a local parts stock or inventory in Hawaii. Plan critical spares with that in mind. We will not invent a stocking list here.</p>
-{H["confirm"]("how parts should be ordered for Hawaii jobs, beyond the confirmed line that we handle parts and jobs and do not keep a local inventory")}
-<h2>Example</h2>
-{H["confirm"]("a confirmed full-site-management example in Hawaii, region and month and year only. None is on file, so none is invented.")}
-{H["confirm"]("keep this Hawaii page in the preview. Say if it should come off before any launch.")}
+<p>Salt air corrodes frames, fasteners, electrical enclosures, and sensors. Stainless and coatings help, and they are not magic. Island logistics mean parts take time. We handle parts and jobs in Hawaii. We do not keep a local parts stock or inventory in Hawaii. Plan critical spares with that in mind.</p>
 {faq_html(faqs)}
 {related([
     ("/car-wash-management-services/", "Full site management"),
@@ -1003,13 +962,13 @@ POST_PATHS = [f"/blog/{s['slug']}/" for s in POSTS]
 def services_page(H):
     faqs = [
         ("What is included in full site management?",
-         "Accounting, operations, employment (hiring and firing), and repairs. That is the confirmed scope. A fuller weekly description is not published yet."),
+         "Accounting, operations, employment (hiring and firing), and repairs."),
         ("What does it cost?",
-         "A custom quote after a site review. No prices, fees, or package rates are listed."),
+         "The quote is custom, after we look at the site. This page does not list prices."),
         ("Is there a minimum site size?",
-         "No minimum site size or wash type is set on this page."),
+         "No. Any size and any wash type."),
         ("How often do owners get reports?",
-         "Regular reporting to owners. No cadence is stated, because none has been set."),
+         "Owners get regular reports. How often depends on the site."),
         ("Do you help with Nevada Water Smart or New Mexico winterizing?",
          "No. We do not offer help qualifying a wash for SNWA’s Water Smart program, and we do not offer winterizing visits in New Mexico."),
     ]
@@ -1018,20 +977,11 @@ def services_page(H):
 <p>Car Wash Management handles what it takes to run the car wash: accounting, operations, employment (hiring and firing), and repairs. The phrase we use is full site management.</p>
 <p>Repair work still has a home on <a href="/car-wash-equipment-repair/">car wash equipment repair</a>. Chemistry we supply is the Car Wash Labs (Car Wash Laboratories) line, on the <a href="/chemistry/">chemistry</a> page. A <a href="/car-wash-maintenance-plans/">maintenance plan</a> can sit inside the operation or stand next to it. Plans are customized. There is no fixed tier.</p>
 <h2>How a quote works</h2>
-<p>Custom quote after a site review. This page has no prices, no fee schedule, and no contract terms. There is no minimum site size or wash type.</p>
-<p>Owners get regular reporting. The contents of that report, and how often it goes out, are not set here.</p>
-{H["confirm"]("what a report to owners contains, and any cadence you want named. None is stated until you set it.")}
-{H["confirm"]("which states you will take full-site-management clients in. The pages exist for California, Arizona, Nevada, New Mexico, Utah, Texas, and Hawaii.")}
+<p>The quote is custom, after we look at the site. There is no minimum site size or wash type. Owners get regular reports.</p>
+<p>We do not offer help qualifying a wash for SNWA’s Water Smart Car Wash program, and we do not offer winterizing visits in New Mexico.</p>
 <h2>Where this is offered</h2>
 {coverage()}
-<p>On-site repair remains centered on Southern California. Read the <a href="/service-area/">service area</a> and the state pages before you assume a visit.</p>
-<h2>What this page does not claim</h2>
-<ul class="ticks"><li>No managed-site example, until one is confirmed.</li>
-<li>No help qualifying a wash for SNWA’s Water Smart Car Wash program.</li>
-<li>No winterizing visits in New Mexico.</li>
-<li>Installation stays the plain line already used on the site: we supply and install equipment.</li></ul>
-{H["confirm"]("a confirmed managed site: region and month and year only, with no customer name. None is on file, so none is invented.")}
-{H["confirm"]("the rest of the full-site-management brief. The standalone brief file was missing, so this page is a scaffold from the confirmed facts only.")}
+<p>On-site repair remains centered on Southern California. Read the <a href="/service-area/">service area</a> and the state pages.</p>
 {faq_html(faqs)}
 {reach(H, "Want the whole wash run, not only a repair call?")}
 {related([
@@ -1047,13 +997,13 @@ def services_page(H):
 ])}
 """
     svc = H["service_ld"]("/car-wash-management-services/", "Full car wash site management", "Car wash site management")
-    svc["description"] = "Full site management for car wash owners: accounting, operations, employment, and repairs. Custom quote after a site review."
+    svc["description"] = "Full site management for car wash owners: accounting, operations, employment, and repairs. Custom quote after we look at the site."
     return H["inner"]("/car-wash-management-services/", "Full Site Management",
                       "Full Car Wash Site Management | Car Wash Management",
-                      "Full site management for car wash owners and investors: accounting, operations, employment, and repairs. Custom quote after a site review.",
+                      "Full site management for car wash owners and investors: accounting, operations, employment, and repairs. Custom quote after we look at the site.",
                       "Full Car Wash Site Management",
-                      "Car Wash Management runs the wash for owners and investors: accounting, operations, employment, and repairs. The quote is custom, after a site review.",
-                      body, None, "Request a site review", (svc, faq_ld(faqs)))
+                      "Car Wash Management runs the wash for owners and investors: accounting, operations, employment, and repairs. The quote is custom, after we look at the site.",
+                      body, None, "Request a quote", (svc, faq_ld(faqs)))
 
 
 def register(pages, H):
@@ -1071,7 +1021,7 @@ def _check_lengths():
          "Practical answers on car wash equipment repair, replacement and maintenance for tunnels, in-bay automatics and self-serve bays.",
          "/blog/"),
         ("Full Car Wash Site Management | Car Wash Management",
-         "Full site management for car wash owners and investors: accounting, operations, employment, and repairs. Custom quote after a site review.",
+         "Full site management for car wash owners and investors: accounting, operations, employment, and repairs. Custom quote after we look at the site.",
          "/car-wash-management-services/"),
     ]
     for spec in POSTS:
