@@ -7,7 +7,7 @@ Rules: confirmed facts only; all proof is labeled PLACEHOLDER; no stats, testimo
 import html, json, pathlib, re, datetime, sys, tempfile
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from brands import CATS as BRAND_CATS
+from brands import CATS as BRAND_CATS, SHORT as BRAND_SHORT
 from categories import CATEGORIES
 import new_pages
 import csv, shutil, struct
@@ -49,8 +49,8 @@ def confirm(text):
 # Photos. Design delivery /workspace/brand/cwm-redesign/images/: manifest.csv PICK rows only (never _retired/, _pending-clearance/,
 # manifest-v1.csv, DROPPED/RETIRED/ALT rows), categories/manifest.csv for the 7 category pages, plus Andrew's approved new-build picks
 # (/workspace/website-photos/newbuild/web/, cleaned + EXIF-free). IMG key: (alt, large w, large h, small w, small h, credit, {w: source file}).
-# credit None = our own photo (visible caption "Our job"); otherwise (name, source page, license name, license url, kind) where kind is
-# "stock" (visible "Stock photo") or "manufacturer" (visible "Photo: AVW"; listed on /credits/ as a manufacturer image; never our work).
+# credit None = our own photo. Otherwise (name, source page, license name, license url, kind)
+# where kind is "stock" or "manufacturer". Credit goes in the alt text and on /credits/, never on the picture.
 IMG_DIR = "/assets/cwm/img/photos/"
 DESIGN = pathlib.Path("/workspace/brand/cwm-redesign/images")
 NEWBUILD = pathlib.Path("/workspace/website-photos/newbuild/web")
@@ -131,27 +131,32 @@ USED_IMG = {}            # key -> set of page paths
 CUR_PAGE = ["/"]
 def kind(key):
     c = IMG[key][5]; return "own" if c is None else c[4]
-def caption(key):
-    return {"own": "Our job", "manufacturer": "Photo: AVW", "stock": "Stock photo"}[kind(key)]
+def credit_alt(key):
+    """Credit stays in the alt text. Nothing is drawn on the picture."""
+    alt = IMG[key][0]
+    knd = kind(key)
+    if knd == "manufacturer":
+        who = IMG[key][5][0] if IMG[key][5] else "AVW"
+        suffix = f" (manufacturer image: {who})"
+    elif knd == "stock":
+        suffix = " (stock photo)"
+    else:
+        suffix = " (our job)"
+    if suffix.lower() in alt.lower():
+        return alt
+    return alt + suffix
 def own_gallery(keys, sizes="(max-width:700px) calc(50vw - 27px), 260px"):
-    figs = "".join(f'<figure>{img(k, sizes)}<figcaption class="k-{kind(k)}">{caption(k)}</figcaption></figure>' for k in keys)
+    figs = "".join(f'<figure>{img(k, sizes)}</figure>' for k in keys)
     return f'<div class="gal">{figs}</div>'
-EXTRA_BRANDS = {"avw", "motor-city", "ncs", "vacutech"}
-def extra_brand_note(anchors=None):
-    if anchors is not None and not (set(anchors) & EXTRA_BRANDS):
-        return ""
-    return confirm("keep AVW, Motor City, NCS and Vacutech in this brand list, or limit named brands to the approved eight: WashWorld, MacNeil, Unitec/DRB, AXEON, HECO, Ryko, Cat Pumps and Grundfos")
 def img(key, sizes, cls="", lazy=True, prio=False):
-    alt, w, h, sw, _sh, _c, _f, _r = IMG[key]
+    _alt, w, h, sw, _sh, _c, _f, _r = IMG[key]
     USED_IMG.setdefault(key, set()).add(CUR_PAGE[0])
     srcset = f"{IMG_DIR}{key}-{w}w.webp {w}w, {IMG_DIR}{key}-{sw}w.webp {sw}w"
     attrs = (' fetchpriority="high"' if prio else "") + (' loading="lazy" decoding="async"' if lazy else "")
     c = f' class="{cls}"' if cls else ""
-    return f'<img{c} src="{IMG_DIR}{key}-{sw}w.webp" srcset="{srcset}" sizes="{sizes}" width="{w}" height="{h}" alt="{html.escape(alt)}"{attrs}>'
-def badge(key, cls="pcap"):
-    return f'<span class="{cls} k-{kind(key)}">{caption(key)}</span>'
+    return f'<img{c} src="{IMG_DIR}{key}-{sw}w.webp" srcset="{srcset}" sizes="{sizes}" width="{w}" height="{h}" alt="{html.escape(credit_alt(key))}"{attrs}>'
 def hero_bg(key):
-    return f'<picture class="hbg">{img(key, "100vw", lazy=False, prio=True)}</picture>{badge(key, "hcap")}'
+    return f'<picture class="hbg">{img(key, "100vw", lazy=False, prio=True)}</picture>'
 HOME_HERO = "avw-home-hero"  # Design AVW arch (v2b). Andrew's #4 "nb-04" passed AA but read weak at 1440/390 (arch hidden behind headline/form); it leads the jobs strip instead
 PAGE_HERO = {"/car-wash-equipment-repair/": "avw-hero-repair", "/car-wash-equipment-installation/": "hero-installation",
              "/car-wash-maintenance-plans/": "hero-maintenance", "/urgent-car-wash-repair/": "hero-urgent", "/chemistry/": "chemistry-page-hero"}
@@ -173,8 +178,8 @@ def footer():
 <div><a class="logo" href="/"><img src="/assets/cwm/img/cwm-logo-stacked-white.png" alt="Car Wash Management" width="111" height="96"></a><p style="margin-top:14px;max-width:300px">Service and repair for any car wash equipment, plus installation and replacement of equipment and components.</p>
 <p style="margin-top:16px"><a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> · <a href="sms:{PHONE_T}" data-evt="sms_click">call or text</a></p><p><a href="mailto:{EMAIL}">{EMAIL}</a></p><p>Hours: {HOURS}</p><p>Serving the Southwest United States and Hawaii.</p></div>
 <div><h2>Services</h2><p><a href="/car-wash-equipment-repair/">Car wash equipment repair</a></p><p><a href="/car-wash-equipment-installation/">Installation &amp; replacement</a></p><p><a href="/car-wash-maintenance-plans/">Maintenance plans</a></p><p><a href="/car-wash-management-services/">Full site management</a></p><p><a href="/urgent-car-wash-repair/">Urgent repair</a></p><p><a href="/chemistry/">Chemistry</a></p></div>
-<div><h2>Company</h2><p><a href="/car-wash-equipment-brands/">Brands we service</a></p><p><a href="/equipment/">Equipment we service</a></p><p><a href="/service-area/">Service area</a></p><p><a href="/blog/">Guides</a></p><p><a href="/about/">About</a></p><p><a href="/contact/">Request service</a></p></div>
-<div><h2>Equipment we service</h2>{"".join(f'<p><a href="/equipment/{c["slug"]}/">{c["short"]}</a></p>' for c in CATEGORIES)}<p><a href="{BRANDS_URL}">Brands we service →</a></p></div>
+<div><h2>Company</h2><p><a href="/car-wash-equipment-brands/">Brands we service and support</a></p><p><a href="/equipment/">Equipment we service</a></p><p><a href="/service-area/">Service area</a></p><p><a href="/blog/">Guides</a></p><p><a href="/about/">About</a></p><p><a href="/contact/">Request service</a></p></div>
+<div><h2>Equipment we service</h2>{"".join(f'<p><a href="/equipment/{c["slug"]}/">{c["short"]}</a></p>' for c in CATEGORIES)}<p><a href="{BRANDS_URL}">Brands we service and support →</a></p></div>
 </div><div class="wrap">{SMS_OPTIN}
 <div class="fbot">© 2026 Car Wash Management · carwashmgmt.com · <a href="{PRIVACY_URL}">Privacy Policy</a> · <a href="{TERMS_URL}">Terms &amp; Conditions</a> · <a href="/credits/">Photo credits</a><p class="tm-foot">{TM}</p></div></div></footer>
 <div class="mbar">{call_btn("btn btn-blue", "Call")}{text_btn("btn btn-ghost", "Text")}<a class="btn btn-white" href="/contact/">Request</a></div>'''
@@ -237,15 +242,13 @@ def downtime():
     return f'''<section class="downtime" aria-labelledby="dt-h"><div class="wrap"><div class="pulse" aria-hidden="true"></div><div><h2 id="dt-h">Wash down? Call now.</h2><p>Call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a>, {HOURS}. <a href="/urgent-car-wash-repair/">Urgent repair →</a></p></div>
 <div class="acts">{call_btn("btn btn-ink", PHONE_D)}{text_btn()}</div></div></section>'''
 
-def brand_chips(cls="bcats"):
-    groups = "".join(f'<div class="bcat"><h3><a href="{CAT_FOR_BRANDCAT.get(cid, BRANDS_URL + "#" + cid)}">{short}</a></h3><ul class="chips sm">'
-                     + "".join(f'<li><a class="chip" href="{BRANDS_URL}#{a}">{n}</a></li>' for n, a, *_ in bs) + '</ul></div>'
-                     for cid, _, short, bs in BRAND_CATS)
-    return f'<!--brands--><div class="{cls}">{groups}</div><!--/brands-->'
+def short_brand_chips():
+    return "<!--brands--><ul class=\"chips sm\">" + "".join(
+        f'<li><a class="chip" href="{BRANDS_URL}#{a}">{n}</a></li>' for n, a in BRAND_SHORT) + "</ul><!--/brands-->"
 def brands_block(h="h2"):
-    return f'''<section class="brands" aria-labelledby="br-h"><div class="wrap"><div class="eyebrow">Brands &amp; equipment</div><{h} id="br-h">We service and repair any make and model.</{h}>
-<p class="bintro">Tunnel, in-bay, self-serve, vacuum, pay station and water equipment from all major brands, including the ones below. Don’t see yours? Call or text {PHONE_D}.</p>
-{brand_chips()}{extra_brand_note()}<p class="tm">{TM}</p><a class="lnk" href="{BRANDS_URL}">See all the brands we service →</a></div></section>'''
+    return f'''<section class="brands" aria-labelledby="br-h"><div class="wrap"><div class="eyebrow">Brands and equipment</div><{h} id="br-h">Brands we service and support.</{h}>
+<p class="bintro">Tunnel, in-bay, self-serve, vacuum, pay station, pump, and water equipment. A few of the names are below. Don’t see yours? Call or text {PHONE_D}.</p>
+{short_brand_chips()}<p class="tm">{TM}</p><a class="lnk" href="{BRANDS_URL}">See all the brands we service and support →</a></div></section>'''
 
 def final_cta():
     return f'''<section class="final" aria-labelledby="fin-h"><div class="wrap grid"><div><div class="eyebrow" style="color:var(--sky)">Get help today</div><h2 id="fin-h" style="margin-top:14px">Let’s get your wash running right.</h2><p>Call or text {PHONE_D}, or send the form. Tell us your equipment and what’s going on.</p>
@@ -267,8 +270,8 @@ def home():
          ["Scheduled preventive maintenance visits", "Priority scheduling", "A custom quote for each site"]),
     ]
     card_img = {"01": "avw-card-repair", "02": "avw-card-installation", "03": "avw-card-support"}
-    cardh = "".join(f'''<article class="card"><div class="media">{img(card_img[n], "(max-width:700px) calc(100vw - 40px), 369px")}{badge(card_img[n])}</div><div class="bd"><h3><span class="n">{n}</span>{t}</h3><p>{d}</p><ul class="ticks">{"".join(f"<li>{x}</li>" for x in li)}</ul><a class="more" href="{u}">{a} {I_ARR}</a></div></article>''' for n, t, u, a, d, li in cards)
-    jobs = "".join(f'<figure>{img(k, "(max-width:700px) calc(50vw - 27px), 360px")}<figcaption>Our job</figcaption></figure>' for k in JOBS_STRIP)
+    cardh = "".join(f'''<article class="card"><div class="media">{img(card_img[n], "(max-width:700px) calc(100vw - 40px), 369px")}</div><div class="bd"><h3><span class="n">{n}</span>{t}</h3><p>{d}</p><ul class="ticks">{"".join(f"<li>{x}</li>" for x in li)}</ul><a class="more" href="{u}">{a} {I_ARR}</a></div></article>''' for n, t, u, a, d, li in cards)
+    jobs = "".join(f'<figure>{img(k, "(max-width:700px) calc(50vw - 27px), 360px")}</figure>' for k in JOBS_STRIP)
     pair = f'''<div class="pair"><div class="two">{ph("before (real job photo)", True)}{ph("after, same angle", True)}<span class="lbl lb">BEFORE</span><span class="lbl la">AFTER</span></div><p class="cap">{tag("PLACEHOLDER caption: equipment · what was wrong · what we did")}</p></div>'''
     rev = f'''<div class="rev">{tag("PLACEHOLDER REVIEW: real customer review, used with permission (Andrew to supply)")}<div class="q" aria-hidden="true">“</div><div class="ln"></div><div class="ln"></div><div class="ln" style="width:70%"></div><div class="who"><div class="av"></div><div><b>Customer name</b>Wash name · city</div></div></div>'''
     steps = [("Call, text or send the form", "Tell us your equipment and what’s happening. A photo of the problem helps."),
@@ -290,7 +293,7 @@ def home():
 <section class="s dark" aria-labelledby="ba-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Our work</div><h2 id="ba-h">Real jobs. Up close. Before and after.</h2></div><p style="color:var(--on-dark)">Close-ups of real repairs, and before/after pairs shot from the same spot.</p></div>
 <h3 class="h3s">From real jobs</h3><div class="jobs">{jobs}</div><h3 class="h3s">Before &amp; after</h3>{confirm("three before-and-after pairs shot from the same angle, each with a caption: equipment, what was wrong, and what we did. No paired photos are on file, so the boxes below stay empty.")}<div class="pairs">{pair * 3}</div></div></section>
 <section class="s" aria-labelledby="rv-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Reviews</div><h2 id="rv-h">What owners say after we leave.</h2></div><p>Real reviews from real wash owners, shared with their permission. {tag("Reviews: placeholder until real reviews exist")}</p></div>{confirm("up to three permissioned reviews, each with the owner’s name, wash, city and quote, or say to remove this section. No review is invented here.")}<div class="rgrid">{rev * 3}</div></div></section>
-<section class="chem" aria-labelledby="ch-h" style="background:var(--mist)"><div class="wrap cg"><div class="cimg">{img("chemistry", "(max-width:700px) calc(100vw - 40px), 552px")}{badge("chemistry")}</div><div><div class="eyebrow">Chemistry</div><h2 id="ch-h">Chemistry tailored to your wash by a real chemist.</h2><p>Car Wash Management supplies soaps and chemicals from the Car Wash Labs (Car Wash Laboratories) line.</p>{confirm("whether this homepage should name CWM Ceramic Wax, and whether that product is made by Car Wash Management or supplied from the Car Wash Labs line. Leave the origin unsettled until you pick one.")}<p style="margin-top:10px">We also service chemical injectors and dosing equipment.</p><a class="lnk" href="/chemistry/">Car wash chemicals &amp; programs →</a></div></div></section>
+<section class="chem" aria-labelledby="ch-h" style="background:var(--mist)"><div class="wrap cg"><div class="cimg">{img("chemistry", "(max-width:700px) calc(100vw - 40px), 552px")}</div><div><div class="eyebrow">Chemistry</div><h2 id="ch-h">Chemistry tailored to your wash by a real chemist.</h2><p>Car Wash Management supplies soaps and chemicals from the Car Wash Labs (Car Wash Laboratories) line.</p>{confirm("whether this homepage should name CWM Ceramic Wax, and whether that product is made by Car Wash Management or supplied from the Car Wash Labs line. Leave the origin unsettled until you pick one.")}<p style="margin-top:10px">We also service chemical injectors and dosing equipment.</p><a class="lnk" href="/chemistry/">Car wash chemicals &amp; programs →</a></div></div></section>
 <section class="s steps" aria-labelledby="hw-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">How it works</div><h2 id="hw-h">From “it’s broken” to running, in four steps.</h2></div></div><ol class="sgrid">{stp}</ol></div></section>
 {final_cta()}'''
     website = {"@context": "https://schema.org", "@type": "WebSite", "@id": BASE + "/#website", "name": "Car Wash Management", "url": BASE + "/", "publisher": {"@id": BASE + "/#org"}}
@@ -311,7 +314,7 @@ def inner(path, crumb, title, desc, h1, lead, content, soon, form_heading="Reque
 def facts():
     return f'''<ul class="facts"><li><b>Call or text:</b> <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> (<a href="sms:{PHONE_T}" data-evt="sms_click">text</a>)</li><li><b>Email:</b> <a href="mailto:{EMAIL}">{EMAIL}</a></li><li><b>Hours:</b> {HOURS}</li></ul>'''
 def brand_list():
-    return "<!--brands--><ul class='ticks'>" + "".join(f'<li><a href="{BRANDS_URL}#{cid}">{short}</a>: ' + ", ".join(f'<a href="{BRANDS_URL}#{a}">{n}</a>' for n, a, *_ in bs) + "</li>" for cid, _, short, bs in BRAND_CATS) + f"</ul><!--/brands-->{extra_brand_note()}<p class='tm'>{TM}</p>"
+    return f'<p>We service and support all major brands, including the names below. <a href="{BRANDS_URL}">See every brand we service and support</a>.</p>{short_brand_chips()}<p class="tm">{TM}</p>'
 def service_ld(path, name, stype):
     return {"@context": "https://schema.org", "@type": "Service", "name": name, "serviceType": stype, "url": BASE + path, "provider": {"@id": BASE + "/#business"}}
 def repair_faq():
@@ -336,13 +339,13 @@ PAGES["/car-wash-equipment-repair/"] = lambda: inner("/car-wash-equipment-repair
     f'''<h2>What we work on</h2><p>Car Wash Management techs service and repair the equipment that keeps a wash running, whatever the make or age. Most car wash faults need a technician on site to diagnose properly, so the usual route is to book a visit.</p>
 <ul class="ticks"><li>Tunnel conveyors, brushes and gear drives</li><li>In-bay automatic wash systems</li><li>High-pressure and water pumps</li><li>Pay stations and wash controllers</li><li>Photo eyes and vehicle-position sensors</li><li>Chemical injectors and dosing equipment</li><li>Reverse osmosis, water and reclaim components</li></ul>
 <p>Hydraulic drives and gearboxes are rebuilt in-house.</p>
-<h2>Photos from our jobs</h2><p>Captioned “Our job.” These are not before-and-after pairs, and they are not tied to the examples below.</p>
+<h2>Photos from our jobs</h2><p>These photos are from our work. They are not before-and-after pairs, and they are not tied to the examples below.</p>
 {own_gallery(["job-01", "job-02", "job-03", "nb-06", "nb-15", "nb-28"])}
 <h2>Examples from the field</h2>
 <aside class="soon"><b>Real example.</b> Tunnel conveyor drive repair, Orange County (Laguna Niguel), March 2024. No customer name. {confirm("an owned photo of this exact conveyor-drive job")}</aside>
 <aside class="soon"><b>Real example.</b> In-bay automatic limit fault, Los Angeles County (Calabasas), October 2026. No customer name. {confirm("an owned photo of this exact limit-fault job")}</aside>
 <h2>Questions</h2><div class="faq">{"".join(f"<h3>{q}</h3><p>{a}</p>" for q, a in repair_faq())}</div>
-<h2>Brands we service</h2>{brand_list()}{new_pages.guides_for("/car-wash-equipment-repair/")}<h2>How to reach us</h2>{facts()}''',
+<h2>Brands we service and support</h2>{brand_list()}{new_pages.guides_for("/car-wash-equipment-repair/")}<h2>How to reach us</h2>{facts()}''',
     None,
     extra_ld=(service_ld("/car-wash-equipment-repair/", "Car wash equipment repair", "Car wash equipment repair"), repair_faq_ld()))
 PAGES["/car-wash-equipment-installation/"] = lambda: inner("/car-wash-equipment-installation/", "Installation",
@@ -352,7 +355,7 @@ PAGES["/car-wash-equipment-installation/"] = lambda: inner("/car-wash-equipment-
     "Installation and replacement of equipment and components, from single parts to complete systems.",
     f'''<h2>What we install and replace</h2><ul class="ticks"><li>Replacement parts and components</li><li>Motors, gear drives and pumps</li><li>Pay stations and wash controllers</li><li>Reverse osmosis, water and reclaim components</li></ul>
 <p>Not sure whether to repair or replace? Call or text and tell us what you’re working with.</p><p>Installation and replacement of equipment and components, from single parts to complete systems. Travel charges apply to on-site visits; we’ll tell you before we book.</p>
-<h2>Photos from our jobs</h2><p>Captioned “Our job.” These show equipment we have put in. They are not the Inland Empire job below.</p>
+<h2>Photos from our jobs</h2><p>These photos are from our work. They show equipment we have put in. They are not the Inland Empire job below.</p>
 {own_gallery(["nb-26", "nb-25", "nb-30", "nb-28"])}
 <h2>Example from the field</h2>
 <aside class="soon"><b>Real example.</b> RO booster pump supply and install, Inland Empire, October 2023. No customer name and no city. {confirm("an owned photo of this exact RO booster-pump job")}</aside>
@@ -407,7 +410,9 @@ CAT_LINKS = {"tunnel": '<p><a href="/equipment/tunnel/">Tunnel equipment service
              "self-serve": '<p><a href="/equipment/self-serve/">Self-serve equipment service and repair →</a></p>',
              "vacuums": '<p><a href="/equipment/vacuums/">Vacuum service and repair →</a></p>',
              "controllers": '<p><a href="/equipment/controllers-pay-stations/">Controller and pay station service and repair →</a></p>',
-             "chemistry-water": '<p><a href="/equipment/chemical-dosing/">Chemical dosing service →</a> · <a href="/equipment/water-reclaim-ro/">Water, reclaim and RO service →</a></p>'}
+             "water": '<p><a href="/equipment/water-reclaim-ro/">Water, reclaim and RO service →</a></p>',
+             "pumps": '<p><a href="/equipment/water-reclaim-ro/">Pumps on water, reclaim and RO equipment →</a></p>',
+             "supplies": '<p><a href="/chemistry/">Soaps and chemicals</a> · <a href="/equipment/chemical-dosing/">Chemical dosing equipment</a></p>'}
 BRAND_BY_ANCHOR = {a: n for _, _, _, bs in BRAND_CATS for n, a, *_ in bs}
 def cat_faq(c):
     n = c["name"]
@@ -420,7 +425,7 @@ def cat_faq(c):
     return qs
 def gallery(c):
     keys = c["gallery"]; slots = len(keys) if keys else 3
-    figs = [f'<figure>{img(k, "(max-width:700px) calc(50vw - 27px), 260px")}<figcaption class="k-{kind(k)}">{caption(k)}</figcaption></figure>' for k in keys]
+    figs = [f'<figure>{img(k, "(max-width:700px) calc(50vw - 27px), 260px")}</figure>' for k in keys]
     figs += [f'<figure class="gph">{ph(c["short"] + " photo")}</figure>' for _ in range(slots - len(keys))]
     return f'<div class="gal">{"".join(figs)}</div>'
 def category_page(c):
@@ -429,7 +434,7 @@ def category_page(c):
     content = f'''<h2>What we service</h2><ul class="ticks">{"".join(f"<li>{x}</li>" for x in c["components"])}</ul>
 <h2>Common faults we fix</h2><ul class="ticks">{"".join(f"<li>{x}</li>" for x in c["faults"])}</ul>
 <h2>Photos</h2>{gallery(c)}
-<h2>Brands we service</h2>{(f'<p>We work on all major {c["name"]} equipment brands, including these. <a href="{BRANDS_URL}">See all brands</a>.</p><!--brands--><ul class="chips sm">{brands}</ul><!--/brands-->{extra_brand_note(c["brands"])}<p class="tm">{TM}</p>') if brands else f'<p>We work on all major {c["name"]} equipment brands. Call or text {PHONE_D} with the make and model. <a href="{BRANDS_URL}">See the brands we service</a>.</p>'}
+<h2>Brands we service and support</h2>{(f'<p>We service and support all major {c["name"]} equipment brands, including these. <a href="{BRANDS_URL}">See every brand we service and support</a>.</p><!--brands--><ul class="chips sm">{brands}</ul><!--/brands--><p class="tm">{TM}</p>') if brands else f'<p>We service and support all major {c["name"]} equipment brands. Call or text {PHONE_D} with the make and model. <a href="{BRANDS_URL}">See every brand we service and support</a>.</p>'}
 <h2>Questions</h2><div class="faq">{"".join(f"<h3>{q}</h3><p>{a}</p>" for q, a in faq)}</div>
 {new_pages.guides_for(c["path"])}<h2>How to reach us</h2>{facts()}'''
     faq_ld = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
@@ -443,10 +448,10 @@ def equipment_hub():
     cards = ""
     for c in CATEGORIES:
         k = c["hero"] or (c["gallery"][0] if c["gallery"] else None)
-        media = (img(k, "(max-width:700px) calc(100vw - 40px), 270px") + badge(k)) if k else ph(c["short"] + " photo")
+        media = img(k, "(max-width:700px) calc(100vw - 40px), 270px") if k else ph(c["short"] + " photo")
         cards += f'''<article class="card ecard"><div class="media">{media}</div><div class="bd"><h3><a href="{c["path"]}">{c["short"]}</a></h3><p>{c["card"]}</p><a class="more" href="{c["path"]}">Service &amp; repair {I_ARR}</a></div></article>'''
     content = f'''<p>We service and repair car wash equipment across every part of the wash. Pick a category to see what we work on, common faults we fix and the brands we see most.</p>
-<div class="ecards">{cards}</div><h2>Brands we service</h2><p>See the full list on our <a href="{BRANDS_URL}">brands we service</a> page.</p>{brand_list()}<p>Practical answers are in the <a href="/blog/">equipment guides</a>.</p><h2>How to reach us</h2>{facts()}'''
+<div class="ecards">{cards}</div><h2>Brands we service and support</h2><p>See the full list on our <a href="{BRANDS_URL}">brands we service and support</a> page.</p>{brand_list()}<p>Practical answers are in the <a href="/blog/">equipment guides</a>.</p><h2>How to reach us</h2>{facts()}'''
     return inner("/equipment/", "Equipment",
         "Car Wash Equipment We Service | Car Wash Management",
         "Car Wash Management services and repairs in-bay automatic, tunnel, self-serve, vacuum, pay station, chemical dosing and water reclaim equipment.",
@@ -457,19 +462,19 @@ PAGES["/equipment/"] = equipment_hub
 BRAND_PHOTO = {}
 def BRAND_IMG(a):
     k = BRAND_PHOTO[a]
-    return f'<figure class="bimg">{img(k, "(max-width:700px) calc(100vw - 40px), 560px")}<figcaption class="k-{kind(k)}">{caption(k)}</figcaption></figure>'
+    return f'<figure class="bimg">{img(k, "(max-width:700px) calc(100vw - 40px), 560px")}</figure>'
 def brands_page():
     jump = '<ul class="chips sm">' + "".join(f'<li><a class="chip" href="#{cid}">{short}</a></li>' for cid, _, short, _ in BRAND_CATS) + "</ul>"
     secs = "<!--brands-->" + "".join(f'<h2 id="{cid}">{name}</h2>' + CAT_LINKS.get(cid, "") + "".join(f'<h3 id="{a}">{n}</h3><p>{txt}</p>' + (BRAND_IMG(a) if a in BRAND_PHOTO else "") for n, a, _, txt, *_ in bs) for cid, name, _, bs in BRAND_CATS) + "<!--/brands-->"
-    content = f'''<p>We repair and service car wash equipment from all major brands. The brands below are grouped by type. If yours isn’t listed, call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a>.</p>
-{extra_brand_note()}{jump}<p class="tm">{TM}</p>{secs}<p class="tm">{TM}</p><h2>How to reach us</h2>{facts()}'''
-    svc = service_ld(BRANDS_URL, "Car wash equipment repair and service for all major brands", "Car wash equipment repair")
-    svc["description"] = "Repair, troubleshooting, parts replacement and preventive maintenance for tunnel, in-bay automatic, self-serve, vacuum, pay station and water equipment."
-    return inner(BRANDS_URL, "Brands We Service",
-        "Car Wash Equipment Brands We Service | Car Wash Management",
-        "Repair and service for all major car wash brands, including WashWorld, MacNeil, Unitec/DRB, AXEON, HECO, Ryko, Cat Pumps and Grundfos.",
-        "Car Wash Equipment Brands We Service",
-        "Repair, troubleshooting, parts replacement and preventive maintenance for all major car wash equipment brands.",
+    content = f'''<p>We service and support car wash equipment from the manufacturers below, and from others not listed. If yours isn’t listed, call or text <a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a>. Names only. No logos.</p>
+{jump}<p class="tm">{TM}</p>{secs}<p class="tm">{TM}</p><h2>How to reach us</h2>{facts()}'''
+    svc = service_ld(BRANDS_URL, "Car wash equipment we service and support", "Car wash equipment repair")
+    svc["description"] = "Service and support for tunnel, in-bay automatic, self-serve, vacuum, pay station, pump, and water equipment from the major manufacturers."
+    return inner(BRANDS_URL, "Brands We Service and Support",
+        "Brands We Service and Support | Car Wash Management",
+        "Brands we service and support, from tunnel and in-bay equipment to pumps, pay stations, vacuums, and water treatment.",
+        "Brands We Service and Support",
+        "We service and support car wash equipment from the manufacturers below, and from others not listed.",
         content, None, extra_ld=(svc,))
 PAGES[BRANDS_URL] = brands_page
 PAGES["/service-area/"] = lambda: inner("/service-area/", "Service Area",
@@ -488,7 +493,7 @@ PAGES["/chemistry/"] = lambda: inner("/chemistry/", "Chemistry",
     "Soaps and chemicals from the Car Wash Labs line, plus dosing-equipment service. Call or text Car Wash Management.",
     "Car Wash Chemicals &amp; Chemical Programs",
     "Chemistry tailored to your wash by a real chemist.",
-    f'''<div class="cimg inl">{img("chemistry", "(max-width:700px) calc(100vw - 40px), 560px")}{badge("chemistry")}</div><h2>Soaps and chemicals we supply</h2><p>Car Wash Management supplies soaps and chemicals from the Car Wash Labs (Car Wash Laboratories) line. We also clean tunnels and bays and supply the soaps and chemicals for that work.</p>{confirm("product origin for CWM Ceramic Wax. Approved facts say we supply the Car Wash Labs (Car Wash Laboratories) line. Older copy said CWM Ceramic Wax is made by Car Wash Management. Which wording should this page use?")}<p>Photos marked pending clearance, including colored foam and the Ceramic Wax product photo, are not on this page.</p><h2>Dosing equipment</h2><p>We service chemical injectors and dosing equipment as part of our repair work. See <a href="/equipment/chemical-dosing/">chemical dosing equipment</a>.</p><p>Ask us about the chemistry for your wash.</p>{new_pages.guides_for("/chemistry/")}<h2>How to reach us</h2>{facts()}''',
+    f'''<div class="cimg inl">{img("chemistry", "(max-width:700px) calc(100vw - 40px), 560px")}</div><h2>Soaps and chemicals we supply</h2><p>Car Wash Management supplies soaps and chemicals from the Car Wash Labs (Car Wash Laboratories) line. We also clean tunnels and bays and supply the soaps and chemicals for that work.</p>{confirm("product origin for CWM Ceramic Wax. Approved facts say we supply the Car Wash Labs (Car Wash Laboratories) line. Older copy said CWM Ceramic Wax is made by Car Wash Management. Which wording should this page use?")}<p>Photos marked pending clearance, including colored foam and the Ceramic Wax product photo, are not on this page.</p><h2>Dosing equipment</h2><p>We service chemical injectors and dosing equipment as part of our repair work. See <a href="/equipment/chemical-dosing/">chemical dosing equipment</a>.</p><p>Ask us about the chemistry for your wash.</p>{new_pages.guides_for("/chemistry/")}<h2>How to reach us</h2>{facts()}''',
     None, "Ask about chemistry")
 PAGES["/about/"] = lambda: inner("/about/", "About",
     "About Car Wash Management | Car Wash Equipment Service",
@@ -498,7 +503,7 @@ PAGES["/about/"] = lambda: inner("/about/", "About",
     f'''<h2>How the work started</h2><p>Car Wash Management started out washing cars in the back of a Honda Civic, and its car wash repair work grew through Marine Corps Base Hawaii. Today we repair, supply and install car wash equipment for all major brands across the Southwest United States and Hawaii.</p>
 <h2>What we do</h2><ul class="ticks"><li><a href="/car-wash-equipment-repair/">Car wash equipment repair</a></li><li><a href="/car-wash-equipment-installation/">Installation and replacement</a></li><li><a href="/car-wash-maintenance-plans/">Maintenance and support</a></li><li><a href="/car-wash-management-services/">Full site management</a></li><li><a href="/chemistry/">Chemistry</a></li><li><a href="/blog/">Equipment guides</a></li></ul>
 <h2>The team</h2>{confirm("team names, roles and a team photo. Nothing here is invented, and no extra names are added.")}
-<h2>Photos from our jobs</h2><p>Captioned “Our job.”</p>{own_gallery(["nb-04", "job-01", "nb-15"])}{confirm("any other About photos you want published, including a team photo")}
+<h2>Photos from our jobs</h2><p>These photos are from our work.</p>{own_gallery(["nb-04", "job-01", "nb-15"])}{confirm("any other About photos you want published, including a team photo")}
 <h2>How to reach us</h2>{facts()}''',
     None,
     extra_ld=({"@context": "https://schema.org", "@type": "AboutPage", "url": BASE + "/about/", "name": "About Car Wash Management", "about": {"@id": BASE + "/#org"}},))
@@ -522,9 +527,9 @@ def credits():
                     for k in used if (c := IMG[k][5]) and c[4] == "stock")
     body = f'''<section class="phero"><div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <span aria-current="page">Photo Credits</span></nav>
 <h1>Photo Credits</h1><p class="lead">Where the photos on this site come from.</p></div></section>
-<section class="body"><div class="wrap"><div class="txt" style="max-width:820px"><h2>Our own photos</h2><p>Every photo captioned “Our job” was taken by Car Wash Management on our own jobs. Customer names, sites and license plates are left out or blurred.</p><ul class="ticks">{own}</ul>
-<h2>Manufacturer images</h2><p>Photos marked “Photo: AVW” are manufacturer images from AVW Equipment Company. They show the type of equipment we service; they are not our jobs, sites or installs. {TM}</p><ul class="ticks">{man}</ul>
-<h2>Stock photos</h2><p>Photos marked “Stock photo” are general car wash scenes from free stock libraries. They are not Car Wash Management jobs or sites.</p><ul class="ticks">{stock}</ul></div></div></section>'''
+<section class="body"><div class="wrap"><div class="txt" style="max-width:820px"><h2>Our own photos</h2><p>These photos were taken by Car Wash Management on our own jobs. The credit is in the image description, not printed on the picture. Customer names, sites, and license plates are left out or blurred.</p><ul class="ticks">{own}</ul>
+<h2>Manufacturer images</h2><p>These are manufacturer images from AVW Equipment Company. They show the type of equipment we service. They are not our jobs, sites, or installs. The credit is in the image description, not printed on the picture. {TM}</p><ul class="ticks">{man}</ul>
+<h2>Stock photos</h2><p>These are general car wash scenes from free stock libraries. They are not Car Wash Management jobs or sites. The credit is in the image description, not printed on the picture.</p><ul class="ticks">{stock}</ul></div></div></section>'''
     return page("/credits/", "Photo Credits | Car Wash Management", "Credits and licenses for the photos used on carwashmgmt.com: our own jobs, manufacturer images and stock.", body, noindex=True)
 def thank_you():
     body = f'''<section class="ty"><div class="wrap"><div class="eyebrow">Request sent</div><h1 style="margin-top:12px">Thanks. We got your request.</h1>
@@ -569,7 +574,7 @@ def stage_photo_sources():
 
 def main():
     new_pages.register(PAGES, {
-        "inner": inner, "img": img, "badge": badge, "confirm": confirm, "facts": facts,
+        "inner": inner, "img": img, "confirm": confirm, "facts": facts,
         "phone": PHONE_D, "tel": PHONE_T, "hours": HOURS, "tm": TM, "base": BASE,
         "service_ld": service_ld, "own_gallery": own_gallery,
     })

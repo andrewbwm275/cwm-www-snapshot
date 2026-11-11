@@ -7,7 +7,7 @@ import re
 TM = ("Brand names are trademarks of their respective owners. Car Wash Management is an independent service company "
       "and is not affiliated with or endorsed by these manufacturers.")
 MODIFIED = "2026-11-11"
-BRANDS_LINE = "MacNeil, Unitec/DRB, AXEON, HECO, Ryko, Cat Pumps, Grundfos and WashWorld."
+BRANDS_LINE = "Sonny's, MacNeil, Ryko, Washworld, Coleman Hanna, Cat Pumps, and Unitec."
 
 GUIDE_LINKS = {
     "/car-wash-equipment-repair/": [
@@ -602,7 +602,7 @@ def render_post(H, spec):
     extra_body, faqs = spec["build"](H)
     content = (f'<p class="byline">By the Car Wash Management Service Team · November 11, 2026</p>'
                + H["own_gallery"]([spec["image"]])
-               + "<p>Photo captioned “Our job.” It shows our work in general. It is not a photo of a specific example on this page.</p>"
+               + "<p>This photo is from our work. It is not a photo of a specific example on this page.</p>"
                + extra_body)
     return H["inner"](path, spec["crumb"], spec["title"], spec["desc"], esc(spec["h1"]), spec["lead"],
                       content, None, "Request service or a quote",
