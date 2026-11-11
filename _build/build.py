@@ -28,9 +28,12 @@ SMS_OPTIN = ""
 SMS_CONSENT = ("I agree to receive text messages from Car Wash Management, LLC about my service requests, appointments and account. "
                "Message frequency varies. Msg & data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase.")
 PRIVACY_URL, TERMS_URL = "/privacy-policy.html", "/terms-and-conditions.html"
-NAV = [("/car-wash-equipment-repair/", "Repair"), ("/car-wash-equipment-installation/", "Installation"),
-       ("/car-wash-maintenance-plans/", "Maintenance Plans"), (BRANDS_URL, "Brands"),
-       ("/service-area/", "Service Area"), ("/blog/", "Guides"), ("/chemistry/", "Chemistry"), ("/about/", "About")]
+NAV = [("/", "Home"), ("/equipment/", "Equipment"), (BRANDS_URL, "Brands"),
+       ("/chemistry/", "Chemistry"), ("/service-area/", "Service Area"),
+       ("/about/", "About"), ("/blog/", "Blog"), ("/contact/", "Contact Us")]
+SERVICES = [("/car-wash-equipment-repair/", "Repair"), ("/car-wash-equipment-installation/", "Installation"),
+            ("/car-wash-maintenance-plans/", "Maintenance Plans"), ("/urgent-car-wash-repair/", "Urgent Repair"),
+            ("/car-wash-management-services/", "Management Services")]
 I_PHONE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>'
 I_SMS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
 I_ARR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>'
@@ -189,21 +192,53 @@ PAGE_HERO = {"/car-wash-equipment-repair/": "avw-hero-repair", "/car-wash-equipm
 CSS = (ROOT / "_build/site.css").read_text()
 CSS = re.sub(r"/\*.*?\*/", "", CSS, flags=re.S); CSS = re.sub(r"\s*\n\s*", "", CSS)
 
+def _cur(path, href):
+    return ' aria-current="page"' if path == href else ""
+def _mi(path, href, label, sub=False):
+    cls = ' class="sub"' if sub else ""
+    return f'<a href="{href}"{cls}{_cur(path, href)}>{label}</a>'
 def header(path):
-    nav = "".join(f'<a href="{u}"{" aria-current=\"page\"" if u == path else ""}>{t}</a>' for u, t in NAV)
-    mnav = "".join(f'<a href="{u}">{t}</a>' for u, t in NAV) + '<a href="/car-wash-management-services/">Full site management</a><a href="/urgent-car-wash-repair/">Urgent repair</a><a href="/contact/">Request service</a>'
+    svc = "".join(f'<a href="{u}"{_cur(path, u)}>{t}</a>' for u, t in SERVICES)
+    cats = "".join(f'<a href="{c["path"]}"{_cur(path, c["path"])}>{c["short"]}</a>' for c in CATEGORIES)
+    equip_cur = _cur(path, "/equipment/")
+    panel = (
+        _mi(path, "/", "Home")
+        + '<p class="grp">Services</p>'
+        + "".join(_mi(path, u, t, True) for u, t in SERVICES)
+        + _mi(path, "/equipment/", "Equipment")
+        + "".join(_mi(path, c["path"], c["short"], True) for c in CATEGORIES)
+        + _mi(path, BRANDS_URL, "Brands")
+        + _mi(path, "/chemistry/", "Chemistry")
+        + _mi(path, "/service-area/", "Service Area")
+        + _mi(path, "/about/", "About")
+        + _mi(path, "/blog/", "Blog")
+        + _mi(path, "/contact/", "Contact Us")
+        + _mi(path, "/contact/", "Request Service")
+        + f'<a href="tel:{PHONE_T}" data-evt="tel_click">Call {PHONE_D}</a>'
+    )
     return f'''<a class="skip" href="#main">Skip to content</a>
 <header class="hdr"><div class="wrap"><a class="logo" href="/"><img src="/assets/cwm/img/cwm-logo-horizontal-white.png" alt="Car Wash Management" width="133" height="44"></a>
-<nav class="main" aria-label="Main">{nav}</nav>
+<nav class="main" aria-label="Main"><a href="/"{_cur(path, "/")}>Home</a>
+<div class="drop"><button type="button" class="drop-toggle" aria-expanded="false" aria-controls="menu-services">Services</button>
+<div class="drop-panel" id="menu-services">{svc}</div></div>
+<div class="drop"><a href="/equipment/"{equip_cur}>Equipment</a><button type="button" class="drop-toggle caret" aria-expanded="false" aria-controls="menu-equipment" aria-label="Equipment sections">+</button>
+<div class="drop-panel" id="menu-equipment"><a href="/equipment/"{equip_cur}>All equipment</a>{cats}</div></div>
+<a href="{BRANDS_URL}"{_cur(path, BRANDS_URL)}>Brands</a>
+<a href="/chemistry/"{_cur(path, "/chemistry/")}>Chemistry</a>
+<a href="/service-area/"{_cur(path, "/service-area/")}>Service Area</a>
+<a href="/about/"{_cur(path, "/about/")}>About</a>
+<a href="/blog/"{_cur(path, "/blog/")}>Blog</a>
+<a href="/contact/"{_cur(path, "/contact/")}>Contact Us</a></nav>
 <div class="cta"><a class="btn btn-ghost ico" href="sms:{PHONE_T}" data-evt="sms_click" aria-label="Text us at {PHONE_D}">{I_SMS}</a><a class="btn btn-white btn-req" href="/contact/">Request Service</a><a class="btn btn-blue" href="tel:{PHONE_T}" data-evt="tel_click" aria-label="Call {PHONE_D}">{I_PHONE}<span><span class="t">Call </span>{PHONE_D}</span></a>
-<details class="mnav"><summary aria-label="Menu">{I_MENU}</summary><nav aria-label="Mobile">{mnav}</nav></details></div></div></header>'''
+<button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-menu">{I_MENU}<span>Menu</span></button></div></div></header>
+<nav id="site-menu" class="nav-panel" aria-label="Menu">{panel}</nav>'''
 
 def footer():
     return f'''<footer class="foot"><div class="wrap fgrid">
 <div><a class="logo" href="/"><img src="/assets/cwm/img/cwm-logo-stacked-white.png" alt="Car Wash Management" width="111" height="96"></a><p style="margin-top:14px;max-width:300px">Service and repair for any car wash equipment, plus installation and replacement of equipment and components.</p>
 <p style="margin-top:16px"><a href="tel:{PHONE_T}" data-evt="tel_click">{PHONE_D}</a> · <a href="sms:{PHONE_T}" data-evt="sms_click">call or text</a></p><p><a href="mailto:{EMAIL}">{EMAIL}</a></p><p>Hours: {HOURS}</p><p>Serving the Southwest United States and Hawaii.</p></div>
 <div><h2>Services</h2><p><a href="/car-wash-equipment-repair/">Car wash equipment repair</a></p><p><a href="/car-wash-equipment-installation/">Installation &amp; replacement</a></p><p><a href="/car-wash-maintenance-plans/">Maintenance plans</a></p><p><a href="/car-wash-management-services/">Full site management</a></p><p><a href="/urgent-car-wash-repair/">Urgent repair</a></p><p><a href="/chemistry/">Chemistry</a></p></div>
-<div><h2>Company</h2><p><a href="/car-wash-equipment-brands/">Brands we service and support</a></p><p><a href="/equipment/">Equipment we service</a></p><p><a href="/service-area/">Service area</a></p><p><a href="/blog/">Guides</a></p><p><a href="/about/">About</a></p><p><a href="/contact/">Request service</a></p></div>
+<div><h2>Company</h2><p><a href="/car-wash-equipment-brands/">Brands we service and support</a></p><p><a href="/equipment/">Equipment we service</a></p><p><a href="/service-area/">Service area</a></p><p><a href="/blog/">Blog</a></p><p><a href="/about/">About</a></p><p><a href="/contact/">Request service</a></p></div>
 <div><h2>Equipment we service</h2>{"".join(f'<p><a href="/equipment/{c["slug"]}/">{c["short"]}</a></p>' for c in CATEGORIES)}<p><a href="{BRANDS_URL}">Brands we service and support →</a></p></div>
 </div><div class="wrap">{SMS_OPTIN}
 <div class="fbot">© 2026 Car Wash Management · carwashmgmt.com · <a href="{PRIVACY_URL}">Privacy Policy</a> · <a href="{TERMS_URL}">Terms &amp; Conditions</a> · <a href="/credits/">Photo credits</a><p class="tm-foot">{TM}</p></div></div></footer>
@@ -243,6 +278,44 @@ def crumbs_ld(path, name, parent=None):
     return {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
         {"@type": "ListItem", "position": i, "name": html.unescape(n), "item": BASE + u} for i, (u, n) in enumerate(trail, 1)]}
 
+NAV_JS = """
+(function(){
+  var btn = document.querySelector(".nav-toggle");
+  var panel = document.getElementById("site-menu");
+  function setMenu(open){
+    if (!btn || !panel) return;
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    panel.classList.toggle("is-open", open);
+  }
+  if (btn && panel){
+    btn.addEventListener("click", function(){ setMenu(btn.getAttribute("aria-expanded") !== "true"); });
+    panel.addEventListener("click", function(e){ if (e.target.closest("a")) setMenu(false); });
+  }
+  document.addEventListener("keydown", function(e){
+    if (e.key !== "Escape") return;
+    setMenu(false);
+    document.querySelectorAll(".drop.open").forEach(function(drop){
+      drop.classList.remove("open");
+      var t = drop.querySelector(".drop-toggle");
+      if (t) t.setAttribute("aria-expanded", "false");
+    });
+  });
+  document.querySelectorAll(".drop").forEach(function(drop){
+    var t = drop.querySelector(".drop-toggle");
+    if (!t) return;
+    t.addEventListener("mousedown", function(){ t.dataset.wasOpen = drop.classList.contains("open") ? "1" : "0"; });
+    t.addEventListener("click", function(){
+      var open = t.dataset.wasOpen !== "1";
+      drop.classList.toggle("open", open);
+      t.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    drop.addEventListener("focusin", function(){ t.setAttribute("aria-expanded", "true"); });
+    drop.addEventListener("focusout", function(e){
+      if (!drop.contains(e.relatedTarget) && !drop.classList.contains("open")) t.setAttribute("aria-expanded", "false");
+    });
+  });
+})();
+"""
 def page(path, title, desc, body, extra_ld=(), noindex=False, canonical=True):
     assert len(title) <= 60, (path, len(title)); assert len(desc) <= 158, (path, len(desc))
     canon = f'<link rel="canonical" href="{BASE}{path}">' if canonical else ""
@@ -251,7 +324,7 @@ def page(path, title, desc, body, extra_ld=(), noindex=False, canonical=True):
           f'<meta property="og:title" content="{html.escape(title)}"><meta property="og:description" content="{html.escape(desc)}">'
           + (f'<meta property="og:url" content="{BASE}{path}">' if canonical else "")
           + f'<meta property="og:image" content="{BASE}/assets/cwm/img/cwm-logo-horizontal.png"><meta name="twitter:card" content="summary">')
-    return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    return f'''<!doctype html><html lang="en"><head><script>document.documentElement.classList.add("js")</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)}</title><meta name="description" content="{html.escape(desc)}">{canon}{robots}{og}
 <meta name="theme-color" content="#0B1B2B"><link rel="icon" href="/assets/cwm/img/favicon.ico" sizes="48x48"><link rel="icon" type="image/png" href="/assets/cwm/img/favicon-32.png" sizes="32x32"><link rel="apple-touch-icon" href="/assets/cwm/img/apple-touch-icon.png">
 <link rel="preload" href="/assets/cwm/fonts/archivo-cwm.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/assets/cwm/fonts/inter-cwm.woff2" as="font" type="font/woff2" crossorigin>
@@ -260,6 +333,7 @@ def page(path, title, desc, body, extra_ld=(), noindex=False, canonical=True):
 <main id="main">{body}</main>
 {footer()}
 <script src="/forms-config.js" defer></script><script src="/events-config.js" defer></script><script src="/assets/js/site-forms.js" defer></script><script src="/assets/cwm/js/cwm.js?v=20261028c" defer></script>
+<script>{NAV_JS}</script>
 </body></html>
 '''
 
