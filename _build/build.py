@@ -38,6 +38,7 @@ I_PHONE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wid
 I_SMS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
 I_ARR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>'
 I_MENU = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>'
+CHEV = '<svg class="chev" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 3.5 5 7l3.5-3.5"/></svg>'
 
 def call_btn(cls="btn btn-blue", label=f"Call {PHONE_D}"):
     return f'<a class="{cls}" href="tel:{PHONE_T}" data-evt="tel_click">{I_PHONE} {label}</a>'
@@ -219,9 +220,9 @@ def header(path):
     return f'''<a class="skip" href="#main">Skip to content</a>
 <header class="hdr"><div class="wrap"><a class="logo" href="/"><img src="/assets/cwm/img/cwm-logo-horizontal-white.png" alt="Car Wash Management" width="133" height="44"></a>
 <nav class="main" aria-label="Main"><a href="/"{_cur(path, "/")}>Home</a>
-<div class="drop"><button type="button" class="drop-toggle" aria-expanded="false" aria-controls="menu-services">Services</button>
+<div class="drop"><button type="button" class="drop-toggle" aria-expanded="false" aria-controls="menu-services">Services{CHEV}</button>
 <div class="drop-panel" id="menu-services">{svc}</div></div>
-<div class="drop"><a href="/equipment/"{equip_cur}>Equipment</a><button type="button" class="drop-toggle caret" aria-expanded="false" aria-controls="menu-equipment" aria-label="Equipment sections">+</button>
+<div class="drop"><a href="/equipment/"{equip_cur}>Equipment</a><button type="button" class="drop-toggle caret" aria-expanded="false" aria-controls="menu-equipment" aria-label="Equipment sections">{CHEV}</button>
 <div class="drop-panel" id="menu-equipment"><a href="/equipment/"{equip_cur}>All equipment</a>{cats}</div></div>
 <a href="{BRANDS_URL}"{_cur(path, BRANDS_URL)}>Brands</a>
 <a href="/chemistry/"{_cur(path, "/chemistry/")}>Chemistry</a>
@@ -373,7 +374,6 @@ def home():
     card_img = {"01": "avw-card-repair", "02": "avw-card-installation", "03": "avw-card-support"}
     cardh = "".join(f'''<article class="card"><div class="media">{img(card_img[n], "(max-width:700px) calc(100vw - 40px), 369px")}</div><div class="bd"><h3><span class="n">{n}</span>{t}</h3><p>{d}</p><ul class="ticks">{"".join(f"<li>{x}</li>" for x in li)}</ul><a class="more" href="{u}">{a} {I_ARR}</a></div></article>''' for n, t, u, a, d, li in cards)
     jobs = "".join(f'<figure>{img(k, "(max-width:700px) calc(50vw - 27px), 360px")}</figure>' for k in JOBS_STRIP)
-    pair = f'''<div class="pair"><div class="two">{ph("before (real job photo)", True)}{ph("after, same angle", True)}<span class="lbl lb">BEFORE</span><span class="lbl la">AFTER</span></div><p class="cap">{tag("PLACEHOLDER caption: equipment · what was wrong · what we did")}</p></div>'''
     rev = f'''<div class="rev">{tag("PLACEHOLDER REVIEW: real customer review, used with permission (Andrew to supply)")}<div class="q" aria-hidden="true">“</div><div class="ln"></div><div class="ln"></div><div class="ln" style="width:70%"></div><div class="who"><div class="av"></div><div><b>Customer name</b>Wash name · city</div></div></div>'''
     steps = [("Call, text or send the form", "Tell us your equipment and what’s happening. A photo of the problem helps."),
              ("We look at it", "We get eyes on the equipment and tell you plainly what it needs."),
@@ -391,8 +391,8 @@ def home():
 <section class="s" aria-labelledby="wd-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">What we do</div><h2 id="wd-h">Service, installation and support. One team for your whole wash.</h2></div><p>Aging equipment, a part that needs replacing, or a bay that just went down: call one number and we take it from there.</p></div><div class="cards">{cardh}</div></div></section>
 {brands_block()}
 <section class="area" aria-labelledby="ar-h"><div class="wrap"><div class="ahead"><div><div class="eyebrow">Service area</div><h2 id="ar-h">Serving the Southwest United States and Hawaii.</h2></div><p>{AREA_LINE}</p></div><a class="lnk" href="/service-area/">See our service area →</a></div></section>
-<section class="s dark" aria-labelledby="ba-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Our work</div><h2 id="ba-h">Real jobs. Up close. Before and after.</h2></div><p style="color:var(--on-dark)">Close-ups of real repairs, and before/after pairs shot from the same spot.</p></div>
-<h3 class="h3s">From real jobs</h3><div class="jobs">{jobs}</div><h3 class="h3s">Before &amp; after</h3>{confirm("three before-and-after pairs shot from the same angle, each with a caption: equipment, what was wrong, and what we did. No paired photos are on file, so the boxes below stay empty.")}<div class="pairs">{pair * 3}</div></div></section>
+<section class="s dark" aria-labelledby="ba-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Our work</div><h2 id="ba-h">Real jobs. Up close.</h2></div><p style="color:var(--on-dark)">Photos from work we have done.</p></div>
+<div class="jobs">{jobs}</div></div></section>
 <section class="s" aria-labelledby="rv-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">Reviews</div><h2 id="rv-h">What owners say after we leave.</h2></div><p>Real reviews from real wash owners, shared with their permission. {tag("Reviews: placeholder until real reviews exist")}</p></div>{confirm("up to three permissioned reviews, each with the owner’s name, wash, city and quote, or say to remove this section. No review is invented here.")}<div class="rgrid">{rev * 3}</div></div></section>
 <section class="chem" aria-labelledby="ch-h" style="background:var(--mist)"><div class="wrap cg"><div class="cimg">{img("chemistry", "(max-width:700px) calc(100vw - 40px), 552px")}</div><div><div class="eyebrow">Chemistry</div><h2 id="ch-h">Chemistry tailored to your wash by a real chemist.</h2><p>Car Wash Management supplies soaps and chemicals from the Car Wash Labs (Car Wash Laboratories) line.</p>{confirm("whether this homepage should name CWM Ceramic Wax, and whether that product is made by Car Wash Management or supplied from the Car Wash Labs line. Leave the origin unsettled until you pick one.")}<p style="margin-top:10px">We also service chemical injectors and dosing equipment.</p><a class="lnk" href="/chemistry/">Car wash chemicals &amp; programs →</a></div></div></section>
 <section class="s steps" aria-labelledby="hw-h"><div class="wrap"><div class="sh"><div><div class="eyebrow">How it works</div><h2 id="hw-h">From “it’s broken” to running, in four steps.</h2></div></div><ol class="sgrid">{stp}</ol></div></section>
@@ -440,7 +440,7 @@ PAGES["/car-wash-equipment-repair/"] = lambda: inner("/car-wash-equipment-repair
     f'''<h2>What we work on</h2><p>Car Wash Management techs service and repair the equipment that keeps a wash running, whatever the make or age. Most car wash faults need a technician on site to diagnose properly, so the usual route is to book a visit.</p>
 <ul class="ticks"><li>Tunnel conveyors, brushes and gear drives</li><li>In-bay automatic wash systems</li><li>High-pressure and water pumps</li><li>Pay stations and wash controllers</li><li>Photo eyes and vehicle-position sensors</li><li>Chemical injectors and dosing equipment</li><li>Reverse osmosis, water and reclaim components</li></ul>
 <p>Hydraulic drives and gearboxes are rebuilt in-house.</p>
-<h2>Photos from our jobs</h2><p>These photos are from our work. They are not before-and-after pairs, and they are not tied to the examples below.</p>
+<h2>Photos from our jobs</h2><p>These photos are from our work. They are not tied to the examples below.</p>
 {own_gallery(["job-equip-01", "job-tunnel-01", "job-tunnel-04", "job-tunnel-02", "job-tunnel-07", "job-tunnel-08", "job-01"])}
 <h2>Examples from the field</h2>
 <aside class="soon"><b>Real example.</b> Tunnel conveyor drive repair, Orange County (Laguna Niguel), March 2024. No customer name. {confirm("an owned photo of this exact conveyor-drive job")}</aside>
