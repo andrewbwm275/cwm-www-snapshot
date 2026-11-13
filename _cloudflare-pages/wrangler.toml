@@ -5,7 +5,7 @@ compatibility_date = "2026-01-20"
 [vars]
 LEAD_TO = "andrew@carwashmgmt.com"
 LEAD_FROM = "leads@forms.carwashmgmt.com"
-ALLOWED_ORIGINS = "https://ambrsystems-www.pages.dev,https://*.ambrsystems-www.pages.dev,https://cwm-www.pages.dev,https://*.cwm-www.pages.dev"
+ALLOWED_ORIGINS = "https://ambrsystems-www.pages.dev,https://*.ambrsystems-www.pages.dev,https://cwm-www.pages.dev,https://*.cwm-www.pages.dev,https://www.carwashmgmt.com,https://carwashmgmt.com"
 
 [[d1_databases]]
 binding = "DB"
