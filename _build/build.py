@@ -2,9 +2,11 @@
 """Car Wash Management redesign (Design direction A): static HTML generator.
 Run from the repo root:  python3 _build/build.py
 Writes index.html, <page>/index.html, 404.html, sitemap.xml, robots.txt, _redirects, _headers.
-Plain Python 3, no dependencies. Shared header/footer live here; page copy lives in PAGES below.
+Shared header/footer live here; page copy lives in PAGES below.
+Photo derivatives are encoded with Pillow (quality 78) from _build/photo-masters/.
 Rules: confirmed facts only. No invented stats, testimonials, reviews, or logos."""
-import html, json, pathlib, re, datetime, sys, tempfile
+import html, io, json, pathlib, re, datetime, sys
+from PIL import Image
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from brands import CATS as BRAND_CATS, SHORT as BRAND_SHORT
@@ -83,18 +85,26 @@ def _register(rows, base_dir, key_for, alt_fix=None):
 _ALT_FIX = lambda a: a.replace("red emergency-stop button", "red stop button")
 def _design_sources_ready():
     return (DESIGN / "manifest.csv").is_file() and (DESIGN / "categories" / "manifest.csv").is_file() and NEWBUILD.is_dir()
+def _master_path(key):
+    return pathlib.Path(__file__).resolve().parent / "photo-masters" / f"{key}.webp"
+
 def _load_shipped_photos():
-    """Photos already shipped in assets/cwm/img/photos/, with alts and credits from the last build.
-    Used when the Design and new-build source folders are not on this machine. Never reads _pending-clearance."""
+    """Alts and credits from the registry. Pixel source is the photo master when it exists,
+    otherwise the largest file still in assets. Never reads _pending-clearance."""
     reg = json.loads((pathlib.Path(__file__).resolve().parent / "photo_registry.json").read_text())
     photo_dir = ROOT / "assets/cwm/img/photos"
     for rec in reg["images"]:
-        files = {int(w): photo_dir / fn for w, fn in rec["files"].items()}
-        missing = [str(p) for p in files.values() if not p.is_file()]
-        if missing:
-            raise SystemExit("missing shipped photo: " + ", ".join(missing))
+        master = _master_path(rec["key"])
+        if master.is_file():
+            src = master
+        else:
+            files = {int(w): photo_dir / fn for w, fn in rec["files"].items()}
+            src = files[max(files)]
+            if not src.is_file():
+                raise SystemExit(f"missing shipped photo {src}")
         credit = tuple(rec["credit"]) if rec["credit"] else None
-        IMG[rec["key"]] = (rec["alt"], rec["w"], rec["h"], rec["sw"], rec["sh"], credit, files,
+        w, h = rec["w"], rec["h"]
+        IMG[rec["key"]] = (rec["alt"], w, h, rec["sw"], rec["sh"], credit, {w: src},
                            {"filename": rec["key"], "kind": rec["kind"], "slot": "hero" if rec["key"].endswith("hero") else ""})
     return reg
 PHOTO_REG = None
@@ -140,18 +150,18 @@ OWNER_ALTS = {
 def _register_owner_jobs():
     photo_dir = ROOT / "assets/cwm/img/photos"
     for key, alt in OWNER_ALTS.items():
-        files, dims = {}, {}
-        for width in (1200, 600):
-            fp = photo_dir / f"{key}-{width}w.webp"
-            if not fp.is_file():
-                raise SystemExit(f"missing owner photo {fp}")
-            files[width] = fp
-            dims[width] = webp_size(fp)
-        (w, h), (sw, sh) = dims[1200], dims[600]
-        IMG[key] = (alt, w, h, sw, sh, None, files, {"filename": key, "kind": "own", "slot": ""})
+        master = _master_path(key)
+        src = master if master.is_file() else photo_dir / f"{key}-1200w.webp"
+        if not src.is_file():
+            raise SystemExit(f"missing owner photo {src}")
+        w, h = webp_size(src)
+        sw, sh = (800, round(h * 800 / w)) if w > 1000 else (w, h)
+        IMG[key] = (alt, w, h, sw, sh, None, {w: src}, {"filename": key, "kind": "own", "slot": ""})
 _register_owner_jobs()
 USED_IMG = {}            # key -> set of page paths
+EMIT_W = {}              # key -> set of widths the pages actually reference
 CUR_PAGE = ["/"]
+WEBP_Q = 78
 def kind(key):
     c = IMG[key][5]; return "own" if c is None else c[4]
 def credit_alt(key):
@@ -171,13 +181,32 @@ def credit_alt(key):
 def own_gallery(keys, sizes="(max-width:700px) calc(50vw - 27px), 260px"):
     figs = "".join(f'<figure>{img(k, sizes)}</figure>' for k in keys)
     return f'<div class="gal">{figs}</div>'
+def _slot_needs_full(sizes):
+    """True when the layout can ask for more than about 800 device pixels."""
+    if "100vw" in sizes:
+        return True
+    fallback = sizes.split(",")[-1]
+    m = re.search(r"(\d+)px", fallback)
+    return bool(m and int(m.group(1)) >= 500)
+
 def img(key, sizes, cls="", lazy=True, prio=False):
-    _alt, w, h, sw, _sh, _c, _f, _r = IMG[key]
+    _alt, w, h, _sw, _sh, _c, _f, _r = IMG[key]
     USED_IMG.setdefault(key, set()).add(CUR_PAGE[0])
-    srcset = f"{IMG_DIR}{key}-{w}w.webp {w}w, {IMG_DIR}{key}-{sw}w.webp {sw}w"
+    # Full WebP plus an 800px file when the source is wider than 1000px.
+    # Slots that never get that wide (galleries, cards under ~400px) reference only the 800.
+    widths = []
+    if w > 1000:
+        if _slot_needs_full(sizes):
+            widths.append(w)
+        widths.append(800)
+    else:
+        widths.append(w)
+    EMIT_W.setdefault(key, set()).update(widths)
+    src_w = min(widths)
+    srcset = ", ".join(f"{IMG_DIR}{key}-{vw}w.webp {vw}w" for vw in sorted(set(widths), reverse=True))
     attrs = (' fetchpriority="high"' if prio else "") + (' loading="lazy" decoding="async"' if lazy else "")
     c = f' class="{cls}"' if cls else ""
-    return f'<img{c} src="{IMG_DIR}{key}-{sw}w.webp" srcset="{srcset}" sizes="{sizes}" width="{w}" height="{h}" alt="{html.escape(credit_alt(key))}"{attrs}>'
+    return f'<img{c} src="{IMG_DIR}{key}-{src_w}w.webp" srcset="{srcset}" sizes="{sizes}" width="{w}" height="{h}" alt="{html.escape(credit_alt(key))}"{attrs}>'
 def hero_bg(key):
     return f'<picture class="hbg">{img(key, "100vw", lazy=False, prio=True)}</picture>'
 HOME_HERO = "avw-home-hero"  # Design AVW arch (v2b). Andrew's #4 "nb-04" passed AA but read weak at 1440/390 (arch hidden behind headline/form); it leads the jobs strip instead
@@ -636,7 +665,9 @@ def thank_you():
     body = f'''<section class="ty"><div class="wrap"><div class="eyebrow">Request sent</div><h1 style="margin-top:12px">Thanks. We got your request.</h1>
 <p>Your details went to the Car Wash Management team.</p><p>If your wash is down right now, call or text {PHONE_D}. Hours: {HOURS}.</p>
 <div class="btns">{call_btn()}{text_btn("btn btn-white")}<a class="btn btn-white" href="/">Back to the homepage</a></div></div></section>'''
-    return page("/thank-you/", "Thank You | Car Wash Management", "Thanks for your request. Car Wash Management received your details.", body, noindex=True)
+    return page("/thank-you/", "Thank You | Car Wash Management",
+                "Thanks for your request. Car Wash Management received your details. Call or text (619) 704-7719. We serve the Southwest United States and Hawaii.",
+                body, noindex=True)
 def notfound():
     body = f'''<section class="ty"><div class="wrap"><div class="eyebrow">Error 404</div><h1 style="margin-top:12px">Page not found</h1>
 <p>That page doesn’t exist or has moved. Try one of these, or call or text {PHONE_D}.</p>
@@ -663,18 +694,61 @@ def write(path, content):
     out = ROOT / ("index.html" if path == "/" else path.strip("/") + "/index.html")
     out.parent.mkdir(parents=True, exist_ok=True); out.write_text(strip_comments(content))
 
-def stage_photo_sources():
-    """Copy photo sources aside before assets/cwm/img/photos is rebuilt.
-    Shipped-photo mode reads from that folder, so deleting it first would lose the files."""
-    stage = pathlib.Path(tempfile.mkdtemp(prefix="cwm-photos-"))
-    for k in list(IMG):
-        alt, w, h, sw, sh, credit, files, meta = IMG[k]
-        new = {}
-        for width, src in files.items():
-            dest = stage / f"{k}-{width}w.webp"
+def _webp_bytes(im):
+    if im.mode not in ("RGB", "RGBA"):
+        im = im.convert("RGB")
+    buf = io.BytesIO()
+    im.save(buf, format="WEBP", quality=WEBP_Q, method=6)
+    return buf.getvalue()
+
+def ensure_masters():
+    """Keep one untouched source per photo so later rebuilds encode the same bytes."""
+    dest_dir = pathlib.Path(__file__).resolve().parent / "photo-masters"
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    for k, rec in IMG.items():
+        dest = dest_dir / f"{k}.webp"
+        if dest.is_file():
+            continue
+        src = rec[6][max(rec[6])]
+        shutil.copyfile(src, dest)
+    photo_dir = ROOT / "assets/cwm/img/photos"
+    for width in (1200, 600):
+        src = photo_dir / f"job-03-{width}w.webp"
+        dest = dest_dir / f"job-03-{width}w.webp"
+        if src.is_file() and not dest.is_file():
             shutil.copyfile(src, dest)
-            new[width] = dest
-        IMG[k] = (alt, w, h, sw, sh, credit, new, meta)
+
+def write_derivatives():
+    """Write the WebP files pages reference: quality 78, plus 800px when the master is wider than 1000."""
+    photos = ROOT / IMG_DIR.strip("/")
+    masters = pathlib.Path(__file__).resolve().parent / "photo-masters"
+    shutil.rmtree(photos, ignore_errors=True)
+    photos.mkdir(parents=True)
+    for k, widths in EMIT_W.items():
+        master_fp = masters / f"{k}.webp"
+        if not master_fp.is_file():
+            raise SystemExit(f"missing photo master {master_fp}")
+        im = Image.open(master_fp)
+        im.load()
+        mw, mh = im.size
+        for vw in sorted(set(widths)):
+            dest = photos / f"{k}-{vw}w.webp"
+            if vw == mw:
+                raw = _webp_bytes(im)
+                if len(raw) < master_fp.stat().st_size:
+                    dest.write_bytes(raw)
+                else:
+                    shutil.copyfile(master_fp, dest)
+            elif vw < mw:
+                nh = max(1, round(mh * vw / mw))
+                small = im.resize((vw, nh), Image.Resampling.LANCZOS)
+                dest.write_bytes(_webp_bytes(small))
+            else:
+                raise SystemExit(f"{k}: {vw}px is wider than the {mw}px master")
+    for width in (1200, 600):
+        src = masters / f"job-03-{width}w.webp"
+        if src.is_file():
+            shutil.copyfile(src, photos / f"job-03-{width}w.webp")
 
 def main():
     new_pages.register(PAGES, {
@@ -697,16 +771,8 @@ def main():
                     rows.append([f"{IMG_DIR}{k}-{w}w.webp", d, orig if (DESIGN / orig).is_file() else "", IMG[k][5][5], "; ".join(pages + ["/credits/"])])
             with open(audit / "avw-images.csv", "w", newline="") as fh:
                 wr = csv.writer(fh); wr.writerow(["repo_path", "design_file", "avw_original_in_avw_files_txt", "source_url", "pages"]); wr.writerows(rows)
-    stage_photo_sources()
-    photos = ROOT / IMG_DIR.strip("/")
-    shutil.rmtree(photos, ignore_errors=True); photos.mkdir(parents=True)
-    # Copy photos the pages use, and keep retired job-03 files in the repo.
-    for k in set(USED_IMG) | {"job-03"}:
-        if k not in IMG:
-            continue
-        for w, src in IMG[k][6].items():
-            assert not _bad(str(src)), src
-            shutil.copyfile(src, photos / f"{k}-{w}w.webp")
+    ensure_masters()
+    write_derivatives()
     for p, c in built.items(): write(p, c)
     (ROOT / "404.html").write_text(strip_comments(notfound()))
     for lp in LEGAL: (ROOT / lp.strip("/")).write_text(strip_comments(legal(lp)))
